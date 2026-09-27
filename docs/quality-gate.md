@@ -1,6 +1,6 @@
 # Testing and the quality gate
 
-ToolScope keeps a local gate and a GitHub validation workflow for its web, CLI, TUI, and launcher surfaces. The workflow does not publish or deploy anything. It has not yet run in the new public repository; local results and a future GitHub run should be reported separately.
+ToolScope keeps a local gate and a GitHub validation workflow for its web, CLI, TUI, and launcher surfaces. The workflow does not publish or deploy anything. See [GitHub Actions](https://github.com/nazeeh111/ToolScope/actions/workflows/main.yml) for the current run status; local results and GitHub results are reported separately.
 
 ## Clean installation
 
