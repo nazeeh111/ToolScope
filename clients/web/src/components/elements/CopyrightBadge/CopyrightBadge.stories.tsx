@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
-import { CopyrightBadge, COPYRIGHT_NOTICE } from "./CopyrightBadge";
+import { CopyrightBadge } from "./CopyrightBadge";
 
 const meta: Meta<typeof CopyrightBadge> = {
   title: "Elements/CopyrightBadge",
@@ -10,10 +10,13 @@ const meta: Meta<typeof CopyrightBadge> = {
 export default meta;
 type Story = StoryObj<typeof CopyrightBadge>;
 
-// The grey copyright notice pinned to the lower-left corner of the viewport.
+// The footer link opens the local attribution and license document.
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByText(COPYRIGHT_NOTICE)).toBeInTheDocument();
+    const link = canvas.getByRole("link", { name: "About & licenses" });
+    await expect(link).toHaveAttribute("href", "/about.html");
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(link).toHaveAttribute("rel", "noopener noreferrer");
   },
 };
