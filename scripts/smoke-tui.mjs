@@ -40,7 +40,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { removeSafe } from "./lib/child-cleanup.mjs";
 import { ensureTestServers } from "./lib/ensure-test-servers.mjs";
-import { resolvePtyWrapper } from "./lib/pty.mjs";
+import { interactivePtyEnv, resolvePtyWrapper } from "./lib/pty.mjs";
 import { DEFAULTS, normalizeMs, runRenderSmoke } from "./lib/render-smoke.mjs";
 
 const repoRoot = resolve(import.meta.dirname, "..");
@@ -146,7 +146,7 @@ try {
       // the loopback callback guard — same class smoke-cli.mjs's
       // SMOKE_BASE_ENV neutralizes.
       env: {
-        ...process.env,
+        ...interactivePtyEnv(process.env),
         MCP_OAUTH_CALLBACK_URL: "",
         HOME: work,
         USERPROFILE: work,

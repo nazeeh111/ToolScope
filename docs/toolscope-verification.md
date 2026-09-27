@@ -8,7 +8,7 @@ The publication candidate was checked on macOS with Node.js 24.14.0 on September
 | --- | --- |
 | `npm run build:toolscope` | Web, CLI, terminal interface, launcher, and bundled example servers built successfully |
 | Formatting, lint, and TypeScript | Passed for core, shared fixtures, and all four clients |
-| `npm run validate:guards` | Passed, including 362 maintenance-script tests |
+| `npm run validate:guards` | Passed, including 363 maintenance-script tests |
 | `npm --prefix clients/web run test:coverage -- --maxWorkers=2` | 439 files, 8,471 tests passed; all per-file coverage thresholds passed |
 | `npm --prefix clients/cli run test:coverage -- --maxWorkers=2` | 30 files, 391 tests passed; all per-file coverage thresholds passed |
 | `npm --prefix clients/tui run test:coverage -- --maxWorkers=2` | 31 files, 436 tests passed; all per-file coverage thresholds passed |
@@ -28,6 +28,10 @@ In Chrome, a real connection to the bundled server saved a five-tool baseline. C
 The earlier browser pass also verified baseline export, persistence across a new tab and reconnect, a removed tool, and clearing the saved baseline. The export parsed as the five original definitions and excluded the subsequently added tool. The relevant panel and storage code was unchanged apart from error-path coverage and status wording; the final comparison confirmed the corrected singular wording.
 
 Regression tests cover duplicate names, corrupt or inaccessible browser storage, storage write/remove failures, incomplete pagination, malformed or excluded advertised tools, and stale list state. Launcher tests verify that a personal inherited catalog is not used by default and that explicit catalogs, session files, and ad-hoc targets retain precedence. The terminal's variadic environment option and the web client's bare stdio transport option are covered directly in their parsers. An independent review found no remaining blocker in these changes.
+
+## CI terminal smoke repair
+
+The first GitHub run passed application validation and all coverage gates, but the terminal smoke did not render. The same failure reproduced locally with `CI=true`: Ink suppresses live frames in CI even when attached to a real terminal. The smoke now sets `CI=false` and `CONTINUOUS_INTEGRATION=false` only in its PTY child. The parent retains CI mode and fails if no PTY is available; render deadlines and the two-second survival assertion are unchanged. The repaired local CI-mode smoke rendered in 235 ms and survived the required interval. Focused PTY/render tests passed 30/30, and all 363 maintenance tests passed. The [GitHub workflow](https://github.com/nazeeh111/ToolScope/actions/workflows/main.yml) reports verification of the Linux terminal path and subsequent browser checks separately.
 
 ## Scope and remaining limits
 

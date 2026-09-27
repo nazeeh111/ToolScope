@@ -2,6 +2,7 @@ import { strict as assert } from "node:assert";
 import test from "node:test";
 
 import {
+  interactivePtyEnv,
   ptyCommand,
   probeScriptVersion,
   SCRIPT_PROBE_TIMEOUT_MS,
@@ -9,6 +10,22 @@ import {
   scriptFlavorFor,
   shellQuote,
 } from "./pty.mjs";
+
+test("interactivePtyEnv lets Ink paint on a CI PTY without changing the harness", () => {
+  const parent = {
+    CI: "true",
+    CONTINUOUS_INTEGRATION: "true",
+    TERM: "xterm",
+  };
+  const child = interactivePtyEnv(parent);
+  assert.deepEqual(child, {
+    CI: "false",
+    CONTINUOUS_INTEGRATION: "false",
+    TERM: "xterm",
+  });
+  assert.equal(parent.CI, "true");
+  assert.equal(parent.CONTINUOUS_INTEGRATION, "true");
+});
 
 // The flavors are not interchangeable: BSD `script` takes argv after the
 // typescript file, util-linux takes ONE shell string before it, and busybox

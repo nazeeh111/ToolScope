@@ -32,6 +32,19 @@
 import { spawnSync } from "node:child_process";
 
 /**
+ * Give a PTY child the environment of an interactive terminal. Ink's
+ * `is-in-ci` check suppresses live frames whenever either CI variable is
+ * truthy, even if stdin/stdout are real terminal descriptors. The harness
+ * itself keeps its CI environment so a missing PTY still fails in CI.
+ *
+ * @param {NodeJS.ProcessEnv} env
+ * @returns {NodeJS.ProcessEnv}
+ */
+export function interactivePtyEnv(env) {
+  return { ...env, CI: "false", CONTINUOUS_INTEGRATION: "false" };
+}
+
+/**
  * Platforms whose `script` takes the BSD argv form (`script -q FILE cmd args…`).
  *
  * Deliberately just these two. darwin is verified empirically here; freebsd is
