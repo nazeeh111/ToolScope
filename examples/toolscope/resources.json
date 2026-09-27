@@ -1,0 +1,8 @@
+{
+  "serverInfo": { "name": "ToolScope Resources", "version": "1.0.0" },
+  "tools": [{ "preset": "echo" }, { "preset": "send_progress" }],
+  "resources": [{ "preset": "numbered_resources", "params": { "count": 4 } }],
+  "resourceTemplates": [{ "preset": "file" }],
+  "prompts": [{ "preset": "simple_prompt" }, { "preset": "args_prompt" }],
+  "transport": { "type": "stdio" }
+}

@@ -1,0 +1,13 @@
+{
+  "serverInfo": { "name": "ToolScope Contracts", "version": "1.0.0" },
+  "tools": [
+    { "preset": "echo" },
+    { "preset": "list_items" },
+    { "preset": "get_temp" },
+    { "preset": "add_tool" },
+    { "preset": "remove_tool" }
+  ],
+  "resources": [{ "preset": "architecture" }],
+  "prompts": [{ "preset": "simple_prompt" }],
+  "transport": { "type": "stdio" }
+}

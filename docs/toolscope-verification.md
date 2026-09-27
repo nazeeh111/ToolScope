@@ -1,0 +1,36 @@
+# ToolScope verification
+
+The publication candidate was checked on macOS with Node.js 24.14.0 on September 26, 2026. Dependencies were installed cleanly from the root and four client lockfiles using the README commands. These results cover the local examples and test fixtures, not arbitrary third-party servers.
+
+## Build and automated checks
+
+| Check | Result |
+| --- | --- |
+| `npm run build:toolscope` | Web, CLI, terminal interface, launcher, and bundled example servers built successfully |
+| Formatting, lint, and TypeScript | Passed for core, shared fixtures, and all four clients |
+| `npm run validate:guards` | Passed, including 362 maintenance-script tests |
+| `npm --prefix clients/web run test:coverage -- --maxWorkers=2` | 439 files, 8,471 tests passed; all per-file coverage thresholds passed |
+| `npm --prefix clients/cli run test:coverage -- --maxWorkers=2` | 30 files, 391 tests passed; all per-file coverage thresholds passed |
+| `npm --prefix clients/tui run test:coverage -- --maxWorkers=2` | 31 files, 436 tests passed; all per-file coverage thresholds passed |
+| `npm --prefix clients/launcher run test:coverage -- --maxWorkers=2` | 1 file, 5 tests passed; 100% coverage |
+| `npm run verify:build-gate` | A real browser build rejected an injected Node-only import and restored the original entry file |
+| `npm run verify:bundle-externals` | All three bundled clients preserved their declared external dependencies |
+| Built launcher, CLI, TUI, and HTTP smoke tests | Passed, including CLI source/error cases, terminal rendering and survival, and authenticated web bootstrap |
+
+Coverage requires at least 90% per file for statements, branches, functions, and lines. The integration suites need permission to bind loopback listeners. The terminal tests used a disposable `MCP_INSPECTOR_LOG_DIR` so test logs stayed outside personal application state. A restricted-network install and a restricted-loopback CLI test attempt failed before the identical commands passed with the necessary native permissions; those failed attempts are not counted as passes.
+
+## Exercised workflows
+
+The built CLI listed the five bundled Tool contracts definitions as JSON: `echo`, `list_items`, `get_temp`, `add_tool`, and `remove_tool`. The example's `add_tool` definition intentionally exposes a schema-portability warning; the listing completed with no schema-portability errors.
+
+In Chrome, a real connection to the bundled server saved a five-tool baseline. Calling `add_tool` added `inspect_part`; the change notification disabled capture and comparison until the list was refreshed. Comparing then reported exactly one added definition. This workflow was repeated on the final publication build after the launcher repairs.
+
+The earlier browser pass also verified baseline export, persistence across a new tab and reconnect, a removed tool, and clearing the saved baseline. The export parsed as the five original definitions and excluded the subsequently added tool. The relevant panel and storage code was unchanged apart from error-path coverage and status wording; the final comparison confirmed the corrected singular wording.
+
+Regression tests cover duplicate names, corrupt or inaccessible browser storage, storage write/remove failures, incomplete pagination, malformed or excluded advertised tools, and stale list state. Launcher tests verify that a personal inherited catalog is not used by default and that explicit catalogs, session files, and ad-hoc targets retain precedence. The terminal's variadic environment option and the web client's bare stdio transport option are covered directly in their parsers. An independent review found no remaining blocker in these changes.
+
+## Scope and remaining limits
+
+The interface was inspected at 1470 pixels wide. It retains a 1280-pixel desktop minimum; mobile readiness is not claimed. The comparison reports changed top-level definition fields and does not determine backward compatibility. Baselines are stored in this browser; importing exported baselines is not implemented.
+
+No external-account authentication, production MCP server, sensitive sensor, or cross-device workflow was exercised. GitHub CI runs the browser smoke and Storybook interactions separately; its actual run status is the authority for those checks. Local unit coverage alone does not establish accessibility compliance or universal correctness.

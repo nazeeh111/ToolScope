@@ -1,0 +1,8 @@
+ToolScope is adapted from MCP Inspector by the Model Context Protocol maintainers and community.
+Upstream: https://github.com/modelcontextprotocol/inspector
+Source baseline: 1e31c78fbf81a989e8eb47021c6281d7876ad7fd (v2.8.0)
+Copyright (c) 2024-2025 Model Context Protocol a Series of LF Projects, LLC.
+
+ToolScope adaptations by nazeeh111 include the inspection workspace, schema-baseline workflow, visual identity, and local example launcher. Modified files are listed in docs/toolscope-changes.md. This is an independent derivative, not an official MCP Inspector release.
+
+The upstream project is transitioning from MIT to Apache-2.0; its combined LICENSE and all source notices are preserved. Upstream documentation is CC-BY-4.0 except specifications. New ToolScope code is Apache-2.0 and documentation is CC-BY-4.0.
