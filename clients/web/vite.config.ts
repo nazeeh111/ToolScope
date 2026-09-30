@@ -214,6 +214,7 @@ export default defineConfig(({ command }) => {
           "src/lib/**/*.{ts,tsx}",
           "src/utils/**/*.{ts,tsx}",
           "clients/web/server/**/*.{ts,tsx}",
+          path.join(repoRoot, "core/toolContracts.ts"),
           path.join(repoRoot, "core/mcp/**/*.{ts,tsx}"),
           path.join(repoRoot, "core/json/**/*.{ts,tsx}"),
           path.join(repoRoot, "core/client/**/*.{ts,tsx}"),

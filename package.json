@@ -88,7 +88,8 @@
     "postinstall": "node scripts/install-clients.mjs",
     "toolscope": "node scripts/toolscope.mjs",
     "build:examples": "npm --prefix clients/web run test-servers:build",
-    "build:toolscope": "npm run build && npm run build:examples"
+    "build:toolscope": "npm run build && npm run build:examples",
+    "toolscope:compare": "node scripts/compare-tool-baselines.mjs"
   },
   "dependencies": {
     "@hono/node-server": "^2.0.12",
@@ -109,7 +110,7 @@
     "pino": "^9.14.0",
     "proper-lockfile": "^4.1.2",
     "react": "^19.0.0",
-    "undici": "^8.5.0",
+    "undici": "^8.11.2",
     "vite": "^8.1.5",
     "yaml": "^2.9.0",
     "zod": "^4.4.3"
@@ -132,5 +133,9 @@
     "typescript-eslint": "^8.65.0",
     "vitest": "4.1.11"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "fast-uri": "^3.1.8",
+    "ip-address": "^10.7.2"
+  }
 }

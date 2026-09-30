@@ -1,0 +1,9 @@
+{
+  "format": "toolscope.schema/v1",
+  "server": "Synthetic baseline example",
+  "capturedAt": "2026-09-30T00:00:00.000Z",
+  "definitions": {
+    "lookup": "{\"name\":\"lookup\",\"description\":\"Look up a sample record by its ID\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"string\"}},\"required\":[\"id\"]}}",
+    "inspect_part": "{\"name\":\"inspect_part\",\"description\":\"Inspect a synthetic sample part\",\"inputSchema\":{\"type\":\"object\",\"properties\":{}}}"
+  }
+}
