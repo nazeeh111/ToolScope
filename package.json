@@ -92,7 +92,7 @@
     "toolscope:compare": "node scripts/compare-tool-baselines.mjs"
   },
   "dependencies": {
-    "@hono/node-server": "^2.0.12",
+    "@hono/node-server": "^2.1.1",
     "@modelcontextprotocol/client": "2.0.0",
     "@modelcontextprotocol/core": "2.0.0",
     "@modelcontextprotocol/ext-apps": "^2.0.0",
