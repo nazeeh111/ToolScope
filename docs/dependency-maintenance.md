@@ -1,6 +1,6 @@
 # Dependency maintenance
 
-The root and four clients have independent npm lockfiles. Weekly Dependabot checks cover all five directories and GitHub Actions. Patch and minor updates are grouped within each install, with at most one open npm update PR per directory and two Actions PRs. Updates require review and the existing validation gates; they are not merged automatically. Shared root/client versions must continue to satisfy `verify:dep-lockstep`.
+The root and four clients have independent npm lockfiles. Weekly Dependabot checks cover all five directories and GitHub Actions. Patch and minor updates for the same package are grouped across all five installs, with at most two open npm update PRs and two Actions PRs. This follows GitHub’s [cross-directory grouping configuration](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference#group-by-groups). Updates require review and the existing validation gates; they are not merged automatically. Shared root/client versions must continue to satisfy `verify:dep-lockstep`. GitHub can split updates when version constraints differ; those checks still apply. Cross-directory grouping applies to version updates.
 
 ## September 30, 2026 runtime updates
 
