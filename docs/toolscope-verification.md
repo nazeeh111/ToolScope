@@ -39,6 +39,26 @@ The import change was checked locally on Node.js 24.14.0. The two affected test 
 
 The continuation browser pass verified export, clearing storage, import and reload with the original capture time preserved. After reloading and reconnecting the bundled server, comparison reported matching definitions. Calling the synthetic add_tool fixture, refreshing the list, and comparing then reported exactly one added definition, inspect_imported_part. No remote server or provider was used. The earlier broad checks above describe the preceding candidate, not a fresh full-suite run of this change. [GitHub run 36335788802](https://github.com/nazeeh111/ToolScope/actions/runs/36335788802) passed on `3f3c9164cc3cef2698c97cc896c63a384ed446b4`: complete validation, per-file coverage across all four clients, build safety/externalization gates, launcher/CLI/TUI/web smoke checks, Chromium flows, and Storybook interactions. The final source-release commit only records this evidence; unchanged code checks are reused.
 
+## Offline baseline comparison and maintenance, September 30, 2026
+
+The source candidate was checked in an isolated checkout with Node.js 24.14.0 and installs from all five lockfiles. The new offline command reuses the existing parser and comparison policy in `core/toolContracts.ts`; the browser wrapper retains file admission. An independent review identified a missing coverage entry after that move. The entry was added before coverage ran: the shared module reached 100% statements, functions and lines, and 98.7% branches; the browser wrapper reached 100% in all four measures.
+
+| Check | Result |
+| --- | --- |
+| Actual offline-command tests | 6 passed, covering matches, stable differences, invalid/foreign files, duplicate keys, numeric overflow, malformed UTF-8, input limits and unchanged input bytes |
+| Existing browser baseline tests | 27 passed across the parser and panel |
+| `npm run validate` | Passed; 369 maintenance tests, 6,683 web unit tests, 391 CLI tests, 436 terminal tests and 5 launcher tests |
+| `npm run coverage` | Passed all four per-file gates; web 439 files / 8,481 cases, plus the CLI, terminal and launcher suites |
+| `npm run verify:build-gate` | Passed the deliberate Node-only browser-import refusal |
+| `npm run verify:bundle-externals` | Passed for all three bundles |
+| `npm run smoke` | Passed built launcher, CLI, terminal, authenticated HTTP, Chromium startup, embedded apps, elicitation and inspector tabs |
+| `npm --prefix clients/web run test:storybook` | 123 files / 527 interactions passed |
+| Bundled offline examples | Different definitions returned status 1 with one addition and one changed description; identical files returned status 0 with no changes |
+
+The final help text and coverage configuration also passed their focused formatting, lint and command checks after those small edits. The updated root runtime lock returned no current advisory matches; see [dependency maintenance](dependency-maintenance.md). Existing Vite configuration and bundle-size warnings remain. Hosted checks are reported separately by the [validation workflow](https://github.com/nazeeh111/ToolScope/actions/workflows/main.yml).
+
+The new command does not call a server, assess backward compatibility or authenticate a file's history. Its tests exercise independently authored local files. Browser baseline export/import was not repeated manually in this continuation; the earlier browser evidence above and current parser/panel tests are distinct checks. No external provider or production deployment was exercised.
+
 ## Scope and remaining limits
 
 The interface was inspected at 1470 pixels wide. It retains a 1280-pixel desktop minimum; mobile readiness is not claimed. The comparison reports changed top-level definition fields and does not determine backward compatibility. Baselines are stored in this browser; exported files can now restore a baseline for the same catalog server identity. Imported files are not authenticated historical evidence, and the explicit import limits are documented in the README.

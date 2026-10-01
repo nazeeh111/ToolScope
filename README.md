@@ -37,6 +37,22 @@ Baselines contain advertised tool definitions, including input/output schemas an
 
 ## CLI and terminal interface
 
+Compare two exported baselines without starting a server or opening a browser:
+
+```sh
+node scripts/compare-tool-baselines.mjs baseline.json current.json
+```
+
+The command writes a JSON report to stdout. Exit status `0` means the definitions match, `1` means definitions differ, and `2` means an input or argument is invalid. Use the status directly in a CI check, or save the report with `> comparison.json`. Both files must identify the same catalog server. Capture times and object-key order do not count as changes; array order does. The report lists added or removed tools and changed top-level fields. It does not determine backward compatibility. Neither input file is modified.
+
+Try the bundled synthetic example after installing the root dependencies:
+
+```sh
+node scripts/compare-tool-baselines.mjs examples/tool-baselines/before.json examples/tool-baselines/after.json
+```
+
+This example exits `1` and reports an updated `lookup` description and an added `inspect_part` tool. Files must be regular UTF-8 JSON files and satisfy the same format, schema and size limits as browser imports. Validation errors go to stderr without a successful JSON report. This command compares supplied definitions; it makes no connection and calls no tools.
+
 The same example catalog works across all three clients:
 
 ```sh
@@ -64,6 +80,8 @@ node --test scripts/toolscope.test.mjs
 ```
 
 See [verification](docs/toolscope-verification.md), [adaptation notes](docs/toolscope-changes.md), and the inherited [architecture](docs/architecture.md). The validation workflow checks all four clients, coverage, and built application flows. See the [quality gate](docs/quality-gate.md) for exact commands. The repository does not publish an npm package or deploy a public backend.
+
+Weekly grouped dependency update PRs cover all five npm lockfiles and GitHub Actions. See [dependency maintenance](docs/dependency-maintenance.md) for the current runtime updates and review policy.
 
 ## Attribution and licenses
 
