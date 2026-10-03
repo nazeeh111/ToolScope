@@ -1,6 +1,6 @@
 # ToolScope
 
-Inspect MCP servers from a browser, terminal interface, or command line. ToolScope adapts MCP Inspector v2 with a connection workspace, saved tool-definition baselines, and bundled local examples.
+Inspect MCP servers from a browser, terminal interface, or command line. ToolScope provides a connection workspace, saved tool-definition baselines, schema checks, a local launcher and bundled local examples.
 
 MCP (Model Context Protocol) lets applications expose tools, resources, and prompts to AI clients. ToolScope exercises those interfaces directly. No language model, subscription, API key, or remote server is needed for the included examples.
 
@@ -79,12 +79,12 @@ npm --prefix clients/web test
 node --test scripts/toolscope.test.mjs
 ```
 
-See [verification](docs/toolscope-verification.md), [adaptation notes](docs/toolscope-changes.md), and the inherited [architecture](docs/architecture.md). The validation workflow checks all four clients, coverage, and built application flows. See the [quality gate](docs/quality-gate.md) for exact commands. The repository does not publish an npm package or deploy a public backend.
+See [verification](docs/toolscope-verification.md), [implementation notes](docs/toolscope-changes.md), and the inherited [architecture](docs/architecture.md). The validation workflow checks all four clients, coverage, and built application flows. See the [quality gate](docs/quality-gate.md) for exact commands. The repository does not publish an npm package or deploy a public backend.
 
 Weekly grouped dependency update PRs cover all five npm lockfiles and GitHub Actions. See [dependency maintenance](docs/dependency-maintenance.md) for the current runtime updates and review policy.
 
 ## Attribution and licenses
 
-ToolScope is an independent derivative of [MCP Inspector](https://github.com/modelcontextprotocol/inspector), baseline `1e31c78fbf81a989e8eb47021c6281d7876ad7fd` (v2.8.0). The protocol core, clients, authentication, connection management, inspectors, fixtures and most tests originate upstream. ToolScope's workspace, visual identity, schema checks and local launcher are adaptations by nazeeh111.
+Based on [MCP Inspector](https://github.com/modelcontextprotocol/inspector), baseline `1e31c78fbf81a989e8eb47021c6281d7876ad7fd` (v2.8.0). The protocol core, clients, authentication, connection management, inspectors, fixtures and most tests originate upstream.
 
 The upstream licensing transition preserves Apache-2.0 and MIT code notices; upstream documentation is CC-BY-4.0 except specifications. See [LICENSE](LICENSE), [NOTICE](NOTICE), and the [original README](UPSTREAM_README.md). New ToolScope code is Apache-2.0 and documentation is CC-BY-4.0.
