@@ -4,7 +4,20 @@ Inspect MCP servers from a browser, terminal interface, or command line. ToolSco
 
 MCP (Model Context Protocol) lets applications expose tools, resources, and prompts to AI clients. ToolScope exercises those interfaces directly. No language model, subscription, API key, or remote server is needed for the included examples.
 
-## Run locally
+## See a contract change first
+
+Start with the offline comparison. From a clone, this installs only the root dependencies, starts no server and needs no browser:
+
+```sh
+INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci
+node scripts/compare-tool-baselines.mjs examples/tool-baselines/before.json examples/tool-baselines/after.json
+```
+
+The bundled synthetic files produce two changes: `inspect_part` is **added**, and `lookup` has a **changed description**. Exit `1` means the comparison found differences; it is the expected result here. Compare `before.json` with itself for exit `0` and `"matched": true`. Neither command edits the inputs.
+
+[Follow the offline comparison](docs/offline-comparison.md) for the actual output, a saved report, and invalid-input recovery. To inspect a running MCP server and capture your own definitions, continue with the desktop app below.
+
+## Run the desktop app
 
 Use Node.js 24 (upstream minimum: 22.19). Install from the five committed lockfiles:
 
