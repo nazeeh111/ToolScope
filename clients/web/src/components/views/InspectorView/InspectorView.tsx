@@ -83,10 +83,13 @@ const LIST_COMPACT_DEFAULT = true;
 // Same shape as the sort adapters: store the boolean as `"true"` / `"false"`
 // so the localStorage value stays human-readable, and clamp any other value
 // back to the default rather than coercing it to `false`.
-function deserializeListCompact(raw: string | undefined): boolean {
+function deserializeListCompact(
+  raw: string | undefined,
+  defaultValue: boolean,
+): boolean {
   if (raw === "true") return true;
   if (raw === "false") return false;
-  return LIST_COMPACT_DEFAULT;
+  return defaultValue;
 }
 
 function serializeListCompact(value: boolean): string {
@@ -115,7 +118,7 @@ function useListCompact(
   return useLocalStorage<boolean>({
     key: `inspector.listCompact.${scope}`,
     defaultValue,
-    deserialize: deserializeListCompact,
+    deserialize: (raw) => deserializeListCompact(raw, defaultValue),
     serialize: serializeListCompact,
     getInitialValueInEffect: false,
   });

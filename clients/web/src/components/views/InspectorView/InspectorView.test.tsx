@@ -1807,6 +1807,22 @@ describe("InspectorView", () => {
     ).toBeNull();
   });
 
+  it("uses the expanded Servers default when its stored compact value is corrupted", async () => {
+    window.localStorage.setItem("inspector.listCompact.servers", "garbage");
+    renderWithMantine(
+      <StatefulInspectorViewHost
+        {...makeProps({
+          servers: {
+            servers: [sampleServer],
+          },
+        })}
+      />,
+    );
+    expect(
+      await screen.findByRole("button", { name: "Collapse all" }),
+    ).toBeInTheDocument();
+  });
+
   it("toggles the Servers list compact state from the list toggle", async () => {
     const user = userEvent.setup({ delay: null });
     renderWithMantine(

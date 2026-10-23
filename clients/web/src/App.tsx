@@ -1393,7 +1393,7 @@ function App() {
       // toasts. Keyed by server so a *different* server's clear is unaffected.
       //
       // "Different server" is the OAuth storage key, not the catalog id
-      // (#2217, Copilot): two entries against one URL share one blob, one
+      // (#2217): two entries against one URL share one blob, one
       // grant and one revocation, so an id-keyed guard lets exactly the race
       // above through between them. And for anything touching the live
       // session the key is the *client's*, not the entry's — an entry edited
