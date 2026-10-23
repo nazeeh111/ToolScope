@@ -28,7 +28,7 @@ export function tokenize(command) {
  * still reached). Every spelling npm accepts for `run` is followed —
  * `run-script` is the canonical command and `run`, `rum` and `urn` are its
  * aliases — so a chain written as `npm run-script validate:web` reaches the
- * same scripts as `npm run validate:web` (Copilot, #2341). A gate harvested from a script that nothing reachable from
+ * same scripts as `npm run validate:web` (#2341). A gate harvested from a script that nothing reachable from
  * `entry` invokes gates nothing, so callers restrict to this set to assert "CI
  * actually runs this", not merely "the script exists".
  */

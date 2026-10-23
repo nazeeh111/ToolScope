@@ -78,7 +78,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.ENGINE_SCRIPT],
     },
     {
-      // Copilot, first review: the matrix form is exactly how a forbidden
+      // The matrix form is exactly how a forbidden
       // engine reaches CI without anyone typing its name.
       name: "flags an engine pass whose name is built from an expression",
       text: workflow("      - run: npm run smoke:web:${{ matrix.browser }}"),
@@ -90,7 +90,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.LOCAL_SCRIPT],
     },
     {
-      // Copilot, second review: an expression body can itself contain braces,
+      // An expression body can itself contain braces,
       // so a brace-balanced regex stops at the first `}` and misses the one
       // case worth catching. The rule keys off the `${{` prefix instead.
       name: "flags an expression whose own body contains braces",
@@ -105,7 +105,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.LOCAL_SCRIPT],
     },
     {
-      // Copilot, third review: a hand-rolled opener could not see either of
+      // A hand-rolled opener could not see either of
       // these, and each is a forbidden invocation that would have passed.
       name: "flags a block scalar opened with a trailing comment",
       text: workflow(
@@ -114,7 +114,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.LOCAL_SCRIPT],
     },
     {
-      // Copilot, fourth review: an alias carries no `.value`, so reading one as
+      // An alias carries no `.value`, so reading one as
       // a scalar sees an empty string — with the command anchored somewhere the
       // walk never visits, this invoked the gate while the guard saw nothing.
       name: "flags a command reached through a YAML alias",
@@ -159,7 +159,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.BROWSER_ENV],
     },
     {
-      // Copilot, third review: the flow spelling of the same mapping.
+      // The flow spelling of the same mapping.
       name: "flags an env override written as a flow mapping",
       text: workflow(
         "      - env: { SMOKE_BROWSER: firefox }\n        run: npm run smoke",
@@ -181,7 +181,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.BROWSER_ENV],
     },
     {
-      // Copilot, seventh review: a shell resolves the name itself, so the
+      // A shell resolves the name itself, so the
       // engine is just as unreadable as it is behind a `${{ }}` expression.
       name: "flags an engine pass named through a shell variable",
       text: workflow(
@@ -202,7 +202,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.LOCAL_SCRIPT],
     },
     {
-      // Copilot, seventh review: Windows environment variables are
+      // Windows environment variables are
       // case-insensitive, so this sets the very variable Node reads as
       // SMOKE_BROWSER.
       name: "flags a lower-cased env key, which Windows treats as the same var",
@@ -219,7 +219,7 @@ describe("findWorkflowViolations", () => {
       rules: [],
     },
     {
-      // Copilot, sixth review: PowerShell is the DEFAULT shell on a Windows
+      // PowerShell is the DEFAULT shell on a Windows
       // runner, so a POSIX-only pattern is silent on exactly the workflow least
       // likely to be read closely.
       name: "flags a PowerShell assignment",
@@ -236,7 +236,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.BROWSER_ENV],
     },
     {
-      // Copilot, ninth review: an unquoted second argument sets the environment
+      // An unquoted second argument sets the environment
       // just the same, and an engine the guard cannot read is forbidden for the
       // reason `smoke:web:engine` is.
       name: "flags a SetEnvironmentVariable call with a dynamic value",
@@ -260,7 +260,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.BROWSER_ENV],
     },
     {
-      // Copilot, eighth review: the bare-value pattern used to run to
+      // The bare-value pattern used to run to
       // whitespace, so a QUOTED assignment captured the closing quote —
       // rejecting a permitted `chromium`. A false positive on the allowed value
       // fails a workflow that is doing the right thing, which is the worse
@@ -306,7 +306,7 @@ describe("findWorkflowViolations", () => {
       rules: [],
     },
     {
-      // Copilot, ninth review: a custom `shell:` is a COMMAND TEMPLATE Actions
+      // A custom `shell:` is a COMMAND TEMPLATE Actions
       // runs around every script, so the invocation hides beside a `run:` value
       // that looks harmless.
       name: "flags a command in a step's shell template",
@@ -354,7 +354,7 @@ describe("findWorkflowViolations", () => {
       rules: [],
     },
     {
-      // Copilot, eleventh review: PowerShell's Env: drive is the other standard
+      // PowerShell's Env: drive is the other standard
       // way to write the environment there.
       name: "flags a Set-Item write to the Env: drive",
       text: workflow(
@@ -384,7 +384,7 @@ describe("findWorkflowViolations", () => {
       rules: [],
     },
     {
-      // Copilot, tenth review: GitHub's multiline environment-file syntax.
+      // GitHub's multiline environment-file syntax.
       // Reported as unreadable rather than parsed — see the comment on the
       // pattern for why parsing it would be a coverage claim that only holds
       // for the shapes someone thought of.
@@ -413,7 +413,7 @@ describe("findWorkflowViolations", () => {
       rules: [VIOLATION.BROWSER_ENV],
     },
     {
-      // Copilot, fifth review: `container.env` is job-wide too — every step in
+      // `container.env` is job-wide too — every step in
       // the container sees it, so it redirects `npm run smoke` exactly as a
       // job-level `env` would.
       name: "flags a SMOKE_BROWSER override under container.env",
@@ -443,7 +443,7 @@ describe("findWorkflowViolations", () => {
       rules: [],
     },
     {
-      // Copilot, fifth review: a blanket text match rejected a script that
+      // A blanket text match rejected a script that
       // merely PRINTS the variable name, which sets nothing.
       name: "does not read a script printing the variable as setting it",
       text: workflow(
@@ -502,7 +502,7 @@ describe("findWorkflowViolations", () => {
       rules: [],
     },
     {
-      // Copilot, second review: metadata executes nothing, so a finding there
+      // Metadata executes nothing, so a finding there
       // is simply false — and the fastest way to get a guard deleted.
       name: "does not read a step name as an invocation",
       text: workflow(
@@ -518,7 +518,7 @@ describe("findWorkflowViolations", () => {
       rules: [],
     },
     {
-      // Copilot, fourth review: workflow input ids are user-defined, so an
+      // Workflow input ids are user-defined, so an
       // input legitimately named `env` would have its own docs scanned by a
       // key-name match — failing the gate on documentation of the gate.
       name: "does not scan a workflow input that happens to be named env",
@@ -551,7 +551,7 @@ describe("findWorkflowViolations", () => {
       rules: [],
     },
     {
-      // Copilot, third review: this fixture used to be a YAML comment, which
+      // This fixture used to be a YAML comment, which
       // the parser strips — so it asserted nothing. Inside a `run:` block the
       // comment text really does survive into the scalar, which is where the
       // "a comment invokes nothing" rule has to be applied.
@@ -586,7 +586,7 @@ describe("findWorkflowViolations", () => {
 
   it("names the file in a parse error, rather than a placeholder", () => {
     // The filename is passed in for diagnostics; forgetting to forward it left
-    // a malformed real workflow reported as `<workflow>` (Copilot).
+    // a malformed real workflow reported as `<workflow>`.
     assert.throws(
       () => findWorkflowViolations("jobs:\n  - a\n  b: c\n", "main.yml"),
       /could not parse main\.yml/,
@@ -658,7 +658,7 @@ describe("the gate's name", () => {
       // Nothing reachable from the WHOLE gate — not just its first stage —
       // may run `validate` or a client's `validate:*`: those are the doors
       // through which the bare `test` leg would come back, and a later stage
-      // could open one just as easily as the first (Copilot).
+      // could open one just as easily as the first.
       const reached = reachableScripts(scripts, "local:gate");
       assert.ok(!reached.has("validate"), "local:gate must not reach validate");
       for (const c of clients)
@@ -668,7 +668,7 @@ describe("the gate's name", () => {
         );
       // Each client is visited AND its `check` is the very next command —
       // matched together, so dropping one client's `npm run check` while the
-      // `cd` and another client's `check` remain cannot stay green (Copilot).
+      // `cd` and another client's `check` remain cannot stay green.
       for (const c of clients)
         assert.match(
           scripts["local:validate"],
@@ -715,7 +715,7 @@ describe("the gate's name", () => {
           );
         // `reachableScripts` follows `npm run <name>` only, so also reject the
         // spellings that reach the suite without one: a direct `vitest`, and
-        // npm's built-in `npm test` / `npm t` / `npm tst` aliases (Copilot).
+        // npm's built-in `npm test` / `npm t` / `npm tst` aliases.
         const checkCommands = [...fromCheck].map((n) => s[n]).join(" ");
         assert.doesNotMatch(
           checkCommands,
@@ -749,7 +749,7 @@ describe("the gate's name", () => {
     // The rename is only worth anything if the old name is GONE (#2146): an
     // alias preserves exactly the association being scrubbed, and leaves
     // something copy-pasteable for a workflow author. Nothing else notices a
-    // reintroduced `ci`, so assert it here (Copilot).
+    // reintroduced `ci`, so assert it here.
     const revived = Object.keys(scripts).filter(
       (name) => name === "ci" || name.startsWith("ci:"),
     );

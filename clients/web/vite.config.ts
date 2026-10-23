@@ -199,9 +199,8 @@ export default defineConfig(({ command }) => {
         reporter: ["text", "html", "json-summary"],
         // Whitelist of gated directories. Deliberate top-level-file omissions
         // (every src *directory* below is gated):
-        //   • `src/App.tsx` — a ~3.2k-line composition root at ~42% branch
-        //     coverage; gating it is a dedicated testing/decomposition effort,
-        //     not a whitelist tweak.
+        //   • `src/App.tsx` — composition root, excluded from this per-file
+        //     gate and exercised by App.test.tsx.
         //   • `src/main.tsx` / `src/index.ts` — the browser and bin bootstraps
         //     (createRoot render / `runWeb` re-export), the analog of
         //     clients/cli's excluded `src/index.ts`.
@@ -234,8 +233,8 @@ export default defineConfig(({ command }) => {
           // `npm run dev` (Hono plugin attaches, banner prints, /api/* serves).
           // `vite-hono-plugin.ts` requires standing up a real Vite server with
           // an HTTP listener to drive `configureServer`; `server.ts` is the
-          // production Hono entry that the v2 launcher (not yet ported, #1246)
-          // will invoke; `start-vite-dev-server.ts` is its dev counterpart.
+          // production Hono entry invoked by the web launcher;
+          // `start-vite-dev-server.ts` is its dev counterpart.
           // The non-glue parts are extracted to `web-server-config.ts` (fully
           // tested) and `sandbox-controller.ts` (HTTP behavior tested).
           "clients/web/server/vite-hono-plugin.ts",
