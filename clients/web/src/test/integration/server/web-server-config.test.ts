@@ -729,6 +729,7 @@ describe("printServerBanner", () => {
 
   it("includes the auth token in the URL when auth is enabled", () => {
     const url = printServerBanner(baseConfig(), 6274, "secret", undefined);
+    expect(logSpy.lines[0]).toContain("ToolScope Web is up and running at:");
     expect(url).toBe(
       `http://127.0.0.1:6274?${API_SERVER_ENV_VARS.AUTH_TOKEN}=secret`,
     );

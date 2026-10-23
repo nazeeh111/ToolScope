@@ -148,7 +148,7 @@ describe("runWeb", () => {
       }),
     );
     expect(startHonoServer.mock.calls[0]?.[0]?.staticRoot).toMatch(/dist$/);
-    expect(logLines.some((l) => l.includes("Starting MCP inspector..."))).toBe(
+    expect(logLines.some((l) => l.includes("Starting ToolScope..."))).toBe(
       true,
     );
   });
@@ -199,7 +199,7 @@ describe("runWeb", () => {
     expect(startViteDevServer).toHaveBeenCalledWith(
       expect.objectContaining({ initialMcpConfig: null, writable: true }),
     );
-    expect(logLines.some((l) => l.includes("development mode"))).toBe(true);
+    expect(logLines).toContain("Starting ToolScope in development mode...");
     // --dev uses Vite directly; no static build is required or attempted.
     expect(ensureWebBuild).not.toHaveBeenCalled();
   });

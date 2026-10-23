@@ -224,7 +224,7 @@ export function printServerBanner(
       ? baseUrl
       : `${baseUrl}?${API_SERVER_ENV_VARS.AUTH_TOKEN}=${resolvedToken}`;
 
-  console.log(`\nMCP Inspector Web is up and running at:\n   ${url}\n`);
+  console.log(`\nToolScope Web is up and running at:\n   ${url}\n`);
   if (sandboxUrl) {
     console.log(`   Sandbox (MCP Apps): ${sandboxUrl}\n`);
   }

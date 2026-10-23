@@ -24,7 +24,6 @@ import {
   type MonitoringToggleProps,
 } from "../../elements/MonitoringToggle/MonitoringToggle";
 import mcpLogo from "../../../theme/assets/ToolScope.svg";
-import mcpLogoDark from "../../../theme/assets/ToolScope.svg";
 
 // The single monitoring-sidebar affordance (#1661): its open state + toggle
 // callback (`MonitoringToggleProps`, reused as the one source of truth). Present
@@ -307,14 +306,12 @@ export function ViewHeader(props: ViewHeaderProps) {
   // direction for every connect/disconnect-animated region.
   const connectedAnim = props.connected ? "in" : "out";
 
-  const logoSrc = colorScheme === "dark" ? mcpLogoDark : mcpLogo;
-
   return (
     <HeaderBar>
       <LeftSection>
-        <Tooltip label="MCP Documentation">
+        <Tooltip label="ToolScope on GitHub">
           <LogoLink>
-            <LogoImage src={logoSrc} />
+            <LogoImage src={mcpLogo} />
           </LogoLink>
         </Tooltip>
         <Transition

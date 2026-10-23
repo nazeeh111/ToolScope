@@ -79,7 +79,7 @@ describe("ViewHeader", () => {
       ).toBeInTheDocument();
     });
 
-    it("shows an 'MCP Documentation' tooltip on the logo link (#1682)", async () => {
+    it("labels the logo link with its ToolScope repository destination", async () => {
       const user = userEvent.setup();
       renderWithMantine(
         <ViewHeader
@@ -88,8 +88,15 @@ describe("ViewHeader", () => {
           onOpenClientSettings={vi.fn()}
         />,
       );
-      await user.hover(screen.getByRole("link"));
-      expect(await screen.findByText("MCP Documentation")).toBeInTheDocument();
+      const logoLink = screen.getByRole("link");
+      expect(logoLink).toHaveAttribute(
+        "href",
+        "https://github.com/nazeeh111/ToolScope",
+      );
+      await user.hover(logoLink);
+      expect(
+        await screen.findByText("ToolScope on GitHub"),
+      ).toBeInTheDocument();
     });
 
     it("invokes onOpenClientSettings when the client settings button is clicked", async () => {
@@ -379,9 +386,8 @@ describe("ViewHeader", () => {
       );
     });
 
-    it("renders the dark-scheme icon/logo branch under a dark color scheme", () => {
-      // Rendering under a forced-dark provider exercises the
-      // `colorScheme === "dark"` branches for the theme icon and the logo src.
+    it("renders the logo and theme toggle under a dark color scheme", () => {
+      // The logo remains visible alongside the dark-scheme theme toggle.
       renderWithMantine(<ViewHeader {...connectedProps} />, {
         colorScheme: "dark",
       });

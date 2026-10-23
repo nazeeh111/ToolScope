@@ -71,7 +71,7 @@ export async function runWeb(argv: string[]): Promise<number> {
 
   program
     .name("mcp-inspector-web")
-    .description("Web UI for MCP Inspector")
+    .description("Web UI for ToolScope")
     .allowExcessArguments()
     .allowUnknownOption()
     .option(
@@ -294,8 +294,8 @@ export async function runWeb(argv: string[]): Promise<number> {
 
   console.log(
     isDev
-      ? "Starting MCP inspector in development mode..."
-      : "Starting MCP inspector...",
+      ? "Starting ToolScope in development mode..."
+      : "Starting ToolScope...",
   );
 
   let handle: { close(): Promise<void> };

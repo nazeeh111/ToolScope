@@ -1,22 +1,8 @@
-/**
- * Browser-side helpers for triggering file downloads from in-memory content.
- *
- * Centralized so the temp-anchor incantation (`appendChild` for Firefox,
- * deferred `revokeObjectURL` so the scheduled download can read the blob)
- * lives in one place — and so the wiring is unit-testable under happy-dom
- * without dragging React along.
- */
+/** Browser downloads, safe suggested filenames and HTTP(S) URL checks. */
 
 /**
- * Download an in-memory {@link Blob} as `filename`. Uses a temporary anchor
- * element to trigger the browser's save dialog. The append-to-body step is
- * for older Firefox versions that wouldn't fire `click()` on a detached
- * anchor; modern browsers don't require it but it stays as the safe path.
- *
- * The object-URL revoke is deferred to a task: `link.click()` only schedules
- * the download, and revoking the URL synchronously can abort it before the
- * browser reads the blob (Firefox/Safari, intermittently Chrome for larger
- * blobs).
+ * Click a temporary anchor to download a Blob. Attach it for Firefox support;
+ * defer URL revocation until the scheduled download can read the Blob.
  */
 export function downloadBlob(filename: string, blob: Blob): void {
   const url = URL.createObjectURL(blob);
@@ -69,11 +55,7 @@ export function isHttpUrl(url: string): URL | null {
   }
 }
 
-/**
- * The categories of in-memory data the Inspector can export. Tightening
- * `kind` to this union catches typos at call sites and documents the
- * stable on-disk filename prefix.
- */
+/** Export categories supported by the Inspector. */
 export type ExportKind =
   | "protocol"
   | "protocol-pinned"
@@ -83,16 +65,8 @@ export type ExportKind =
   | "console";
 
 /**
- * Build a sortable export filename in the shape
- * `inspector-<kind>-<server-id>-<ISO timestamp>.json`. The timestamp uses
- * the standard ISO-8601 form with `:` swapped for `-` so the result is
- * safe on Windows (which disallows `:` in filenames). Server id is
- * passed through `encodeURIComponent` for the same reason — config ids
- * are user-supplied and may contain slashes / spaces / colons.
- *
- * When `serverId` is falsy (undefined or empty) the segment is omitted;
- * the rest of the filename still uniquely identifies the export by kind
- * + time.
+ * Build inspector-<kind>[-<encoded server id>]-<timestamp>.json.
+ * Replace timestamp colons for Windows; omit an absent or empty server id.
  */
 export function buildExportFilename(
   kind: ExportKind,
