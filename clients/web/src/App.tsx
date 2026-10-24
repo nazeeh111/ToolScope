@@ -1576,12 +1576,12 @@ function App() {
         pending.taskId &&
         inspectorClient
       ) {
-        void inspectorClient.cancelRequestorTask(pending.taskId);
+        void onCancelTask(pending.taskId);
         return;
       }
       void pending.respond(result);
     },
-    [pendingElicitations, inspectorClient],
+    [pendingElicitations, inspectorClient, onCancelTask],
   );
 
   // --- InspectorView prop bundles (#2130) -----------------------------------

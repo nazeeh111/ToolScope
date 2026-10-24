@@ -1668,6 +1668,48 @@ describe("App task wiring", () => {
     expect(respond).not.toHaveBeenCalled();
   });
 
+  it("surfaces failures when cancelling task input without answering the request", async () => {
+    const user = userEvent.setup();
+    renderWithMantine(<App />);
+    await user.click(screen.getByText("connect"));
+    await waitFor(() => expect(clientInstances).toHaveLength(1));
+    const client = clientInstances[0] as EventTarget & {
+      cancelRequestorTask: ReturnType<typeof vi.fn>;
+    };
+    client.cancelRequestorTask.mockRejectedValueOnce(
+      new Error("cancel denied"),
+    );
+    const respond = vi.fn().mockResolvedValue(undefined);
+    act(() => {
+      enqueuePendingElicitations(client, [
+        {
+          id: "failed-cancel-elicitation",
+          origin: "task-input-required",
+          taskId: "task-77",
+          request: {
+            params: {
+              message: "Approve before continuing?",
+              requestedSchema: { type: "object", properties: {} },
+            },
+          },
+          respond,
+        },
+      ]);
+    });
+    await user.click(await screen.findByRole("button", { name: "Cancel" }));
+    await waitFor(() =>
+      expect(notificationsMock.show).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "Failed to cancel task",
+          message: "cancel denied",
+          color: "red",
+        }),
+      ),
+    );
+    expect(client.cancelRequestorTask).toHaveBeenCalledWith("task-77");
+    expect(respond).not.toHaveBeenCalled();
+  });
+
   it("does not re-cancel on a rapid second Cancel click", async () => {
     const user = userEvent.setup();
     renderWithMantine(<App />);
