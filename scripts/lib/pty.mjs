@@ -182,7 +182,7 @@ export function probeScriptVersion(
     // A runner that throws outright (injected, or a future spawn shape) is
     // normalized onto the same path as one that returns `{ error }`, so the
     // timeout check below applies to both shapes — a thrown ETIMEDOUT must not
-    // slip back into "unavailable" (Copilot, #2333).
+    // slip back into "unavailable" (#2333).
     r = { error: err };
   }
   if (r?.error?.code === "ETIMEDOUT") {

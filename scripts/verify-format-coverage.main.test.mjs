@@ -1,5 +1,4 @@
-// Regression tests for `verify-format-coverage`'s sibling-guard vouch (Copilot,
-// #1962). The three root guards form a cycle so that dropping any one from
+// Regression tests for `verify-format-coverage`'s sibling-guard vouch (#1962). The three root guards form a cycle so that dropping any one from
 // `validate` is caught by another — but the vouch branch itself had no test, so
 // a typo in a sibling's name would leave `test:scripts` green while that guard
 // silently stopped being enforced. That is the same "a gate that stops gating"
@@ -90,7 +89,7 @@ for (const dropped of ALL_SIBLINGS) {
 test("vouch: a mention is not an invocation", () => {
   // `rootReachesScript` used to match any `npm run …` substring, so a `validate`
   // reading `echo npm run verify:dep-lockstep` satisfied the vouch while the guard
-  // never executed — the cycle protecting nothing (Copilot).
+  // never executed — the cycle protecting nothing.
   const scripts = scriptsRunning(ALL_SIBLINGS);
   scripts.validate = scripts.validate.replace(
     "npm run verify:dep-lockstep",
