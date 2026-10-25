@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { renderHook } from "@testing-library/react";
 import { StrictMode } from "react";
 import { renderWithMantine, act } from "../test/renderWithMantine";
 import { useScrollMemory, clearScrollMemory } from "./useScrollMemory";
@@ -91,6 +92,35 @@ describe("useScrollMemory", () => {
     (h.getByTestId("viewport") as HTMLDivElement).scrollTop = 180;
     h.rerender(<ScrollProbe scrollKey="logs" />);
     expect((h.getByTestId("viewport") as HTMLDivElement).scrollTop).toBe(180);
+  });
+
+  it("keeps the user's offset when the same viewport is attached twice", () => {
+    const first = renderWithMantine(<ScrollProbe scrollKey="logs" />);
+    (first.getByTestId("viewport") as HTMLDivElement).scrollTop = 180;
+    first.unmount();
+
+    const hook = renderHook(() => useScrollMemory("logs"));
+    const viewport = document.createElement("div");
+    act(() => hook.result.current(viewport));
+    expect(viewport.scrollTop).toBe(180);
+    viewport.scrollTop = 240;
+    viewport.scrollLeft = 15;
+    const scrollTo = vi.spyOn(viewport, "scrollTo");
+    act(() => hook.result.current(viewport));
+    expect(scrollTo).not.toHaveBeenCalled();
+    expect(viewport.scrollTop).toBe(240);
+    expect(viewport.scrollLeft).toBe(15);
+
+    act(() => hook.result.current(null));
+    scrollTo.mockRestore();
+    hook.unmount();
+    const next = renderWithMantine(<ScrollProbe scrollKey="logs" />);
+    expect((next.getByTestId("viewport") as HTMLDivElement).scrollTop).toBe(
+      240,
+    );
+    expect((next.getByTestId("viewport") as HTMLDivElement).scrollLeft).toBe(
+      15,
+    );
   });
 
   it("saves and restores independent positions when the key changes on one node", () => {
