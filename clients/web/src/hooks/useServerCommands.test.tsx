@@ -1823,3 +1823,192 @@ describe("onTogglePaginatedLists", () => {
     expect(h.spies.record).toHaveBeenLastCalledWith("a", false);
   });
 });
+
+describe("tool-call ownership", () => {
+  it.each([
+    ["success", undefined],
+    ["ordinary failure", new Error("old failure")],
+    ["cancellation", new ToolCallCancelledError("old cancellation")],
+    ["authorization challenge", authError()],
+    ["URL loop", new UrlElicitationLoopError("https://example/old")],
+    ["URL required", new UrlElicitationRequiredError([])],
+  ])(
+    "ignores a late %s after tool selection changes",
+    async (_label, error) => {
+      const done = deferred();
+      const c = client({
+        callTool: vi.fn(async () => {
+          await done.promise;
+          if (error) throw error;
+          return { success: true, result: { old: true } };
+        }),
+      });
+      const h = harness({
+        client: c,
+        activeServerId: "a",
+        tools: [tool("echo")],
+        selectedToolKey: "echo",
+      });
+      let call!: Promise<void>;
+      await act(async () => {
+        call = h.api().onCallTool("echo", { value: 1 });
+      });
+      expect(h.panels().toolCallState?.status).toBe("pending");
+      await act(async () =>
+        h
+          .api()
+          .onToolsUiChange({ ...EMPTY_TOOLS_UI, selectedToolKey: "other" }),
+      );
+      await act(async () => {
+        done.resolve();
+        await call;
+      });
+      expect(h.panels().toolCallState).toBeUndefined();
+      expect(notificationsMock.show).not.toHaveBeenCalled();
+      expect(h.spies.handleCommandScopedAuthRecovery).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each(["clear", "session reset"])(
+    "does not restore a pending result after %s",
+    async (action) => {
+      const done = deferred();
+      const c = client({
+        callTool: vi.fn(async () => {
+          await done.promise;
+          return { success: true, result: { old: true } };
+        }),
+      });
+      const h = harness({
+        client: c,
+        activeServerId: "a",
+        tools: [tool("echo")],
+      });
+      let call!: Promise<void>;
+      await act(async () => {
+        call = h.api().onCallTool("echo", {});
+      });
+      await act(async () => {
+        if (action === "clear") h.api().onClearToolResult();
+        else h.panels().clearResultPanels();
+      });
+      await act(async () => {
+        done.resolve();
+        await call;
+      });
+      expect(h.panels().toolCallState).toBeUndefined();
+    },
+  );
+
+  it.each(["client", "server"])(
+    "does not write across a changed %s identity",
+    async (identity) => {
+      const done = deferred();
+      const c = client({
+        callTool: vi.fn(async () => {
+          await done.promise;
+          return { success: true, result: { old: true } };
+        }),
+      });
+      const h = harness({
+        client: c,
+        activeServerId: "a",
+        tools: [tool("echo")],
+      });
+      let call!: Promise<void>;
+      await act(async () => {
+        call = h.api().onCallTool("echo", {});
+      });
+      h.rerender({
+        client: identity === "client" ? client() : c,
+        activeServerId: identity === "server" ? "b" : "a",
+        tools: [tool("echo")],
+      });
+      await act(async () =>
+        h
+          .panels()
+          .setToolCallState({ status: "error", error: "current session" }),
+      );
+      await act(async () => {
+        done.resolve();
+        await call;
+      });
+      expect(h.panels().toolCallState).toEqual({
+        status: "error",
+        error: "current session",
+      });
+    },
+  );
+
+  it("keeps the newer call result when the older call completes last", async () => {
+    const done = deferred();
+    const c = client({
+      callTool: vi
+        .fn()
+        .mockImplementationOnce(async () => {
+          await done.promise;
+          return { success: true, result: { old: true } };
+        })
+        .mockResolvedValueOnce({ success: true, result: { latest: true } }),
+    });
+    const h = harness({
+      client: c,
+      activeServerId: "a",
+      tools: [tool("echo")],
+    });
+    let oldCall!: Promise<void>;
+    await act(async () => {
+      oldCall = h.api().onCallTool("echo", {});
+    });
+    await act(async () => h.api().onCallTool("echo", {}));
+    await act(async () => {
+      done.resolve();
+      await oldCall;
+    });
+    expect(h.panels().toolCallState).toMatchObject({
+      status: "ok",
+      result: { latest: true },
+    });
+  });
+
+  it("keeps an active call across search and argument edits", async () => {
+    const done = deferred();
+    const args = { value: 1 };
+    const c = client({
+      callTool: vi.fn(async () => {
+        await done.promise;
+        return { success: true, result: { active: true } };
+      }),
+    });
+    const h = harness({
+      client: c,
+      activeServerId: "a",
+      tools: [tool("echo")],
+      selectedToolKey: "echo",
+    });
+    let call!: Promise<void>;
+    await act(async () => {
+      call = h.api().onCallTool("echo", args);
+    });
+    await act(async () =>
+      h.api().onToolsUiChange({
+        ...EMPTY_TOOLS_UI,
+        selectedToolKey: "echo",
+        search: "e",
+        formValues: { value: 2 },
+      }),
+    );
+    await act(async () => {
+      done.resolve();
+      await call;
+    });
+    expect(c.callTool).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "echo" }),
+      args,
+    );
+    expect(h.panels().toolCallState).toMatchObject({
+      status: "ok",
+      result: { active: true },
+    });
+  });
+});

@@ -67,6 +67,10 @@ export interface ResultPanels {
   setToolCallState: Dispatch<SetStateAction<ToolCallState | undefined>>;
   setGetPromptState: Dispatch<SetStateAction<GetPromptState | undefined>>;
   setReadResourceState: Dispatch<SetStateAction<ReadResourceState | undefined>>;
+  /** Private UI ownership check for a tool call, retired by clear/reset. */
+  beginToolCall: () => () => boolean;
+  /** Retires the current tool call UI without cancelling its transport. */
+  clearToolCall: () => void;
   /** Private UI ownership check for a resource read, retired by clear/reset. */
   beginResourceRead: () => () => boolean;
   /** Retires the current resource read and clears only its preview panel. */
@@ -98,6 +102,16 @@ export function useResultPanels(): ResultPanels {
     ReadResourceState | undefined
   >(undefined);
 
+  const toolCallSequence = useRef(0);
+  const beginToolCall = useCallback(() => {
+    const request = ++toolCallSequence.current;
+    return () => request === toolCallSequence.current;
+  }, []);
+  const clearToolCall = useCallback(() => {
+    toolCallSequence.current += 1;
+    setToolCallState(undefined);
+  }, []);
+
   const resourceReadSequence = useRef(0);
   const beginResourceRead = useCallback(() => {
     const request = ++resourceReadSequence.current;
@@ -108,10 +122,10 @@ export function useResultPanels(): ResultPanels {
     setReadResourceState(undefined);
   }, []);
   const clearResultPanels = useCallback(() => {
-    setToolCallState(undefined);
+    clearToolCall();
     setGetPromptState(undefined);
     clearResourceRead();
-  }, [clearResourceRead]);
+  }, [clearToolCall, clearResourceRead]);
 
   const setSourceScopedError = useCallback(
     (source: StepUpSource, message: string) => {
@@ -143,6 +157,8 @@ export function useResultPanels(): ResultPanels {
     setToolCallState,
     setGetPromptState,
     setReadResourceState,
+    beginToolCall,
+    clearToolCall,
     beginResourceRead,
     clearResourceRead,
     clearResultPanels,
@@ -333,6 +349,8 @@ export function useServerCommands({
     setToolCallState,
     setGetPromptState,
     setReadResourceState,
+    beginToolCall,
+    clearToolCall,
     beginResourceRead,
   } = panels;
 
@@ -370,7 +388,15 @@ export function useServerCommands({
       // repopulates it via the `toolCallTaskUpdated` listener below, an ordinary
       // call leaves it cleared (#1455).
       activeToolCallTaskIdRef.current = undefined;
-      setToolCallState({ status: "pending" });
+      const ownsCall = beginToolCall();
+      const pending: ToolCallState = { status: "pending" };
+      const isCurrentCall = () =>
+        ownsCall() &&
+        sessionRef.current.inspectorClient === inspectorClient &&
+        sessionRef.current.activeServerId === activeServerId;
+      const finishCall = (next: ToolCallState | undefined) =>
+        setToolCallState((current) => (current === pending ? next : current));
+      setToolCallState(pending);
       try {
         // ToolsScreen types the args as `Record<string, unknown>` (it accepts
         // anything the user types into the schema form). `callTool` requires
@@ -389,14 +415,16 @@ export function useServerCommands({
               tool,
               args as Record<string, JsonValue>,
             );
-        setToolCallState({
+        if (!isCurrentCall()) return;
+        finishCall({
           status: invocation.success ? "ok" : "error",
           result: invocation.result ?? undefined,
           error: invocation.error,
         });
       } catch (err) {
+        if (!isCurrentCall()) return;
         if (err instanceof AuthRecoveryRequiredError) {
-          setToolCallState(undefined);
+          finishCall(undefined);
           if (activeServerId) {
             await handleCommandScopedAuthRecovery(err, {
               serverId: activeServerId,
@@ -410,7 +438,7 @@ export function useServerCommands({
         // clear the executing state — surfacing it as an error would read as a
         // failure rather than the deliberate cancel it was (#1458).
         if (err instanceof ToolCallCancelledError) {
-          setToolCallState(undefined);
+          finishCall(undefined);
           notifications.show({
             title: "Tool call cancelled",
             message: "A cancellation request was sent to the server.",
@@ -423,7 +451,7 @@ export function useServerCommands({
         // so callTool aborted to avoid an endless re-prompt loop. Surface that
         // explicitly rather than as a generic failure.
         if (err instanceof UrlElicitationLoopError) {
-          setToolCallState({ status: "error", error: err.message });
+          finishCall({ status: "error", error: err.message });
           notifications.show({
             autoClose: false,
             title: "URL elicitation loop",
@@ -447,7 +475,7 @@ export function useServerCommands({
             toolName: name,
             details: formatErrorDetails(err),
           };
-          setToolCallState({ status: "error", error: errorMessage(err) });
+          finishCall({ status: "error", error: errorMessage(err) });
           notifications.show({
             autoClose: false,
             title: "URL elicitation required",
@@ -460,7 +488,7 @@ export function useServerCommands({
           });
           return;
         }
-        setToolCallState({
+        finishCall({
           status: "error",
           error: errorMessage(err),
           errorCode: errorCodeOf(err),
@@ -476,13 +504,15 @@ export function useServerCommands({
       handleCommandScopedAuthRecovery,
       activeToolCallTaskIdRef,
       setToolCallState,
+      beginToolCall,
+      sessionRef,
       setUrlElicitationErrorDetails,
     ],
   );
 
   const onClearToolResult = useCallback(() => {
-    setToolCallState(undefined);
-  }, [setToolCallState]);
+    clearToolCall();
+  }, [clearToolCall]);
 
   // Tools UI changes flow through here so selecting a *different* tool also
   // drops the previous tool's result — the result panel renders `toolCallState`
@@ -494,11 +524,11 @@ export function useServerCommands({
   const onToolsUiChange = useCallback(
     (next: ToolsUiState) => {
       if (next.selectedToolKey !== selectedToolKey) {
-        setToolCallState(undefined);
+        clearToolCall();
       }
       setToolsUi(next);
     },
-    [selectedToolKey, setToolsUi, setToolCallState],
+    [selectedToolKey, setToolsUi, clearToolCall],
   );
   const onGetPrompt = useCallback(
     async (name: string, args: Record<string, string>) => {
