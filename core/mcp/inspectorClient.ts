@@ -1655,6 +1655,8 @@ export class InspectorClient extends InspectorClientEventTarget {
             const samplingRequest = new SamplingCreateMessage(
               request,
               (result) => {
+                if (InspectorClient.isTerminalTaskStatus(record.task.status))
+                  return;
                 record.resolvePayload(result);
                 const now = new Date().toISOString();
                 const updated: Task = {
@@ -1666,6 +1668,8 @@ export class InspectorClient extends InspectorClientEventTarget {
                 this.upsertReceiverTask(updated);
               },
               (error) => {
+                if (InspectorClient.isTerminalTaskStatus(record.task.status))
+                  return;
                 record.rejectPayload(error);
                 const now = new Date().toISOString();
                 const updated: Task = {
@@ -1681,6 +1685,13 @@ export class InspectorClient extends InspectorClientEventTarget {
               (id) => this.removePendingSample(id),
             );
             this.addPendingSample(samplingRequest);
+            this.wirePendingAbort(record.abort.signal, () => {
+              // Task cancellation retires this prompt. Session teardown keeps
+              // it queued for clearPendingPeerRequests() to settle in order.
+              if (record.task.status === "cancelled") {
+                this.removePendingSample(samplingRequest.id);
+              }
+            });
           })();
           // Task-augmented (2025-11-25) response: the server sent a
           // task-augmented `sampling/createMessage`, so we reply with a

@@ -380,11 +380,15 @@ class SampleAfterConnectTransport implements Transport {
    * it takes; the timeout drops the waiter so a failing run leaves nothing in
    * the map.
    */
-  injectRequest(method: string, id: number): Promise<JSONRPCMessage> {
+  injectRequest(
+    method: string,
+    id: number,
+    params?: Record<string, unknown>,
+  ): Promise<JSONRPCMessage> {
     const reply = new Promise<JSONRPCMessage>((resolve) => {
       this.waiters.set(id, resolve);
     });
-    this.onmessage?.({ jsonrpc: "2.0", id, method });
+    this.onmessage?.({ jsonrpc: "2.0", id, method, ...(params && { params }) });
     return withTimeout(reply, `No reply to injected ${method} (id ${id})`, {
       onTimeout: () => this.waiters.delete(id),
     });
@@ -1285,5 +1289,95 @@ describe("InspectorClient peer-handler timing (#1797)", () => {
     // Still stored locally — only the announcement is withheld.
     expect(silent.getRoots()).toEqual([{ uri: "file:///a" }]);
     await silent.disconnect();
+  });
+});
+
+describe("receiver sampling cancellation", () => {
+  async function setup() {
+    const transport = new SampleAfterConnectTransport();
+    const client = new InspectorClient(
+      { type: "stdio", command: "noop", args: [] },
+      {
+        environment: { transport: () => ({ transport }) },
+        receiverTasks: true,
+      },
+    );
+    await client.connect();
+    const queued = waitForNewPendingRequest(client, "newPendingSample");
+    transport.sampleAsTask();
+    await queued;
+    const reply = (await transport.injectRequest("tasks/list", 9601)) as {
+      result?: { tasks?: { taskId: string; status: string }[] };
+    };
+    const taskId = reply.result?.tasks?.[0]?.taskId;
+    if (!taskId) throw new Error("Receiver task was not created");
+    return {
+      client,
+      transport,
+      taskId,
+      sample: client.getPendingSamples()[0]!,
+    };
+  }
+
+  it("removes and announces the cancelled task's pending sample", async () => {
+    const { client, transport, taskId } = await setup();
+    const counts: number[] = [];
+    client.addEventListener("pendingSamplesChange", (event) => {
+      counts.push((event as CustomEvent).detail.length);
+    });
+    try {
+      await transport.injectRequest("tasks/cancel", 9602, { taskId });
+      expect(client.getPendingSamples()).toEqual([]);
+      expect(counts.at(-1)).toBe(0);
+    } finally {
+      await client.disconnect();
+    }
+  });
+
+  it.each(["respond", "reject"] as const)(
+    "keeps a cancelled sampling task terminal after a late %s",
+    async (action) => {
+      const { client, transport, taskId, sample } = await setup();
+      try {
+        await transport.injectRequest("tasks/cancel", 9602, { taskId });
+        const notifications = transport.sentNotifications.length;
+        if (action === "respond") {
+          await sample.respond({
+            role: "assistant",
+            model: "offline",
+            content: { type: "text", text: "late" },
+          });
+        } else {
+          await sample.reject(new Error("late rejection"));
+        }
+        expect(
+          await transport.injectRequest("tasks/get", 9603, { taskId }),
+        ).toMatchObject({ result: { status: "cancelled" } });
+        expect(transport.sentNotifications.length).toBe(notifications);
+      } finally {
+        await client.disconnect();
+      }
+    },
+  );
+
+  it("still completes an active sampling task with its result", async () => {
+    const { client, transport, taskId, sample } = await setup();
+    const result = {
+      role: "assistant" as const,
+      model: "offline",
+      content: { type: "text" as const, text: "answer" },
+    };
+    try {
+      await sample.respond(result);
+      expect(client.getPendingSamples()).toEqual([]);
+      expect(
+        await transport.injectRequest("tasks/get", 9603, { taskId }),
+      ).toMatchObject({ result: { status: "completed" } });
+      expect(
+        await transport.injectRequest("tasks/result", 9604, { taskId }),
+      ).toMatchObject({ result });
+    } finally {
+      await client.disconnect();
+    }
   });
 });
