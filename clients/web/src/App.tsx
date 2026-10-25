@@ -1810,7 +1810,15 @@ function App() {
     resourcesUi: ui.resourcesUi,
     readResourceState: effectiveReadResourceState,
     resourcesPagination: resourcesPaginationControls,
-    onResourcesUiChange: setUi.setResourcesUi,
+    onResourcesUiChange: (next) => {
+      if (
+        next.selectedResourceUri !== ui.resourcesUi.selectedResourceUri ||
+        next.selectedTemplateUri !== ui.resourcesUi.selectedTemplateUri
+      ) {
+        panels.clearResourceRead();
+      }
+      setUi.setResourcesUi(next);
+    },
     onReadResource: dispatchReadResource,
     onSubscribeResource,
     onUnsubscribeResource,

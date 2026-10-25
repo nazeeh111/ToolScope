@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
@@ -67,6 +67,10 @@ export interface ResultPanels {
   setToolCallState: Dispatch<SetStateAction<ToolCallState | undefined>>;
   setGetPromptState: Dispatch<SetStateAction<GetPromptState | undefined>>;
   setReadResourceState: Dispatch<SetStateAction<ReadResourceState | undefined>>;
+  /** Private UI ownership check for a resource read, retired by clear/reset. */
+  beginResourceRead: () => () => boolean;
+  /** Retires the current resource read and clears only its preview panel. */
+  clearResourceRead: () => void;
   /** Drops every in-flight result panel. */
   clearResultPanels: () => void;
   /**
@@ -94,11 +98,20 @@ export function useResultPanels(): ResultPanels {
     ReadResourceState | undefined
   >(undefined);
 
+  const resourceReadSequence = useRef(0);
+  const beginResourceRead = useCallback(() => {
+    const request = ++resourceReadSequence.current;
+    return () => request === resourceReadSequence.current;
+  }, []);
+  const clearResourceRead = useCallback(() => {
+    resourceReadSequence.current += 1;
+    setReadResourceState(undefined);
+  }, []);
   const clearResultPanels = useCallback(() => {
     setToolCallState(undefined);
     setGetPromptState(undefined);
-    setReadResourceState(undefined);
-  }, []);
+    clearResourceRead();
+  }, [clearResourceRead]);
 
   const setSourceScopedError = useCallback(
     (source: StepUpSource, message: string) => {
@@ -130,6 +143,8 @@ export function useResultPanels(): ResultPanels {
     setToolCallState,
     setGetPromptState,
     setReadResourceState,
+    beginResourceRead,
+    clearResourceRead,
     clearResultPanels,
     setSourceScopedError,
   };
@@ -314,7 +329,12 @@ export function useServerCommands({
   runWithCommandAuthRecovery,
   runCommandInBackground,
 }: UseServerCommandsOptions): ServerCommands {
-  const { setToolCallState, setGetPromptState, setReadResourceState } = panels;
+  const {
+    setToolCallState,
+    setGetPromptState,
+    setReadResourceState,
+    beginResourceRead,
+  } = panels;
 
   const onCallTool = useCallback(
     async (
@@ -520,21 +540,35 @@ export function useServerCommands({
     ],
   );
 
+  // Only the newest read in the current client/session owns the preview.
+  // A later selection or refresh must not be replaced by an older response.
   const onReadResource = useCallback(
     async (uri: string) => {
       if (!inspectorClient) return;
-      setReadResourceState({ status: "pending", uri });
+      const ownsRead = beginResourceRead();
+      const pending: ReadResourceState = { status: "pending", uri };
+      const isCurrentRead = () =>
+        ownsRead() &&
+        sessionRef.current.inspectorClient === inspectorClient &&
+        sessionRef.current.activeServerId === activeServerId;
+      const finishRead = (next: ReadResourceState | undefined) =>
+        setReadResourceState((current) =>
+          current === pending ? next : current,
+        );
+      setReadResourceState(pending);
       try {
         const invocation = await inspectorClient.readResource(uri);
-        setReadResourceState({
+        if (!isCurrentRead()) return;
+        finishRead({
           status: "ok",
           uri,
           result: invocation.result,
           lastUpdated: invocation.timestamp,
         });
       } catch (err) {
+        if (!isCurrentRead()) return;
         if (err instanceof AuthRecoveryRequiredError) {
-          setReadResourceState(undefined);
+          finishRead(undefined);
           if (activeServerId) {
             await handleCommandScopedAuthRecovery(err, {
               serverId: activeServerId,
@@ -543,7 +577,7 @@ export function useServerCommands({
           }
           return;
         }
-        setReadResourceState({
+        finishRead({
           status: "error",
           uri,
           error: err instanceof Error ? err.message : String(err),
@@ -555,6 +589,8 @@ export function useServerCommands({
       activeServerId,
       handleCommandScopedAuthRecovery,
       setReadResourceState,
+      beginResourceRead,
+      sessionRef,
     ],
   );
 

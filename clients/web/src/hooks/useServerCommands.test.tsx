@@ -779,6 +779,125 @@ describe("onReadResource", () => {
   });
 });
 
+describe("resource read ownership", () => {
+  it.each(["success", "error", "auth"] as const)(
+    "ignores an older read's late %s after a newer resource loads",
+    async (outcome) => {
+      const pending = deferred();
+      const c = client({
+        readResource: vi.fn().mockImplementation(async (uri: string) => {
+          if (uri === "old") {
+            await pending.promise;
+            if (outcome === "error") throw new Error("old failure");
+            if (outcome === "auth") throw authError();
+          }
+          return { result: { contents: [{ uri, text: uri }] }, timestamp: 7 };
+        }),
+      });
+      const h = harness({ client: c, activeServerId: "a" });
+      let older!: Promise<void>;
+      act(() => {
+        older = h.api().onReadResource("old");
+      });
+      await act(async () => h.api().onReadResource("current"));
+      const current = h.panels().readResourceState;
+      await act(async () => {
+        pending.resolve();
+        await older;
+      });
+      expect(h.panels().readResourceState).toEqual(current);
+      expect(h.spies.handleCommandScopedAuthRecovery).not.toHaveBeenCalled();
+    },
+  );
+
+  it("keeps the newer refresh when two reads target the same URI", async () => {
+    const pending = deferred();
+    const c = client({
+      readResource: vi
+        .fn()
+        .mockImplementationOnce(async () => {
+          await pending.promise;
+          return {
+            result: { contents: [{ uri: "u", text: "old" }] },
+            timestamp: 1,
+          };
+        })
+        .mockResolvedValueOnce({
+          result: { contents: [{ uri: "u", text: "new" }] },
+          timestamp: 2,
+        }),
+    });
+    const h = harness({ client: c });
+    let older!: Promise<void>;
+    act(() => {
+      older = h.api().onReadResource("u");
+    });
+    await act(async () => h.api().onReadResource("u"));
+    await act(async () => {
+      pending.resolve();
+      await older;
+    });
+    expect(h.panels().readResourceState).toMatchObject({
+      status: "ok",
+      uri: "u",
+      lastUpdated: 2,
+      result: { contents: [{ uri: "u", text: "new" }] },
+    });
+  });
+
+  it("does not restore a result after the session changes and panels clear", async () => {
+    const pending = deferred();
+    const c = client({
+      readResource: vi.fn().mockImplementation(async () => {
+        await pending.promise;
+        return {
+          result: { contents: [{ uri: "u", text: "old session" }] },
+          timestamp: 1,
+        };
+      }),
+    });
+    const h = harness({ client: c, activeServerId: "a" });
+    let older!: Promise<void>;
+    act(() => {
+      older = h.api().onReadResource("u");
+    });
+    act(() => h.panels().clearResultPanels());
+    h.rerender({ client: client(), activeServerId: "b" });
+    await act(async () => {
+      pending.resolve();
+      await older;
+    });
+    expect(h.panels().readResourceState).toBeUndefined();
+  });
+});
+
+describe("resource read cancellation", () => {
+  it.each(["clearResourceRead", "clearResultPanels"] as const)(
+    "does not recover a late auth challenge after %s",
+    async (clear) => {
+      const pending = deferred();
+      const c = client({
+        readResource: vi.fn().mockImplementation(async () => {
+          await pending.promise;
+          throw authError();
+        }),
+      });
+      const h = harness({ client: c, activeServerId: "a" });
+      let older!: Promise<void>;
+      act(() => {
+        older = h.api().onReadResource("u");
+      });
+      act(() => h.panels()[clear]());
+      await act(async () => {
+        pending.resolve();
+        await older;
+      });
+      expect(h.panels().readResourceState).toBeUndefined();
+      expect(h.spies.handleCommandScopedAuthRecovery).not.toHaveBeenCalled();
+    },
+  );
+});
+
 describe("onReadResourceContents", () => {
   it("throws when there is no client", async () => {
     const h = harness();
