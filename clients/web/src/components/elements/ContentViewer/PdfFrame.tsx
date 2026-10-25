@@ -29,6 +29,9 @@ export function PdfFrame({ data }: PdfFrameProps) {
   if (!bytes) {
     return <BinaryNotice mimeType="application/pdf" />;
   }
+  // The layout-owned URL is empty during the first commit. A fragment-only
+  // src would point an unsandboxed PDF frame at this application's document.
+  if (!url) return null;
   return (
     // Box+iframe is a native element (not a Mantine primitive), so the
     // `.withProps()` extraction rule doesn't apply.

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderWithMantine } from "../../../test/renderWithMantine";
 import { PdfFrame } from "./PdfFrame";
+import { useLayoutEffect, useRef } from "react";
 
 const PDF_BASE64 = Buffer.from("%PDF-1.4 fake", "utf-8").toString("base64");
 
@@ -37,5 +38,28 @@ describe("PdfFrame", () => {
     const { container } = renderWithMantine(<PdfFrame data="not%%base64" />);
     expect(container.querySelector("iframe")).toBeNull();
     expect(container.textContent).toContain("preview not supported");
+  });
+
+  it("mounts no iframe before the object URL is published", () => {
+    let firstCommitSrc: string | null | undefined;
+    function FirstCommitProbe() {
+      const container = useRef<HTMLDivElement>(null);
+      useLayoutEffect(() => {
+        firstCommitSrc =
+          container.current?.querySelector("iframe")?.getAttribute("src") ??
+          null;
+      }, []);
+      return (
+        <div ref={container}>
+          <PdfFrame data={PDF_BASE64} />
+        </div>
+      );
+    }
+    const { container } = renderWithMantine(<FirstCommitProbe />);
+    expect(firstCommitSrc).toBeNull();
+    expect(container.querySelector("iframe")).toHaveAttribute(
+      "src",
+      "blob:pdf-url#view=FitH",
+    );
   });
 });
