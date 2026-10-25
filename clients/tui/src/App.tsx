@@ -1057,6 +1057,12 @@ function App({
       try {
         await disconnectInspector();
       } catch (err) {
+        if (
+          clearOAuthAttemptRef.current !== attempt ||
+          selectedServerRef.current !== attemptServer
+        ) {
+          return;
+        }
         setDisconnectError(err instanceof Error ? err.message : String(err));
       }
       // Revalidate: the disconnect is a second await, and a switch during it

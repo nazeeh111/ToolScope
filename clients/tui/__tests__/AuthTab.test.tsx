@@ -365,6 +365,68 @@ describe("AuthTab", () => {
     expect(frame).toContain("Connect (C) to authorize");
   });
 
+  it("ignores an OAuth state read that settles after switching clients", async () => {
+    const previous = makeClient();
+    let settle!: (state: OAuthConnectionState) => void;
+    previous.getOAuthState.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          settle = resolve;
+        }),
+    );
+    const current = makeClient({
+      ...sampleOAuthState,
+      configuredScope: "current-only",
+    });
+    const props = {
+      ...baseProps,
+      oauthStatus: "idle" as const,
+      oauthMessage: null,
+    };
+    const r = render(<AuthTab {...props} inspectorClient={previous.client} />);
+    await tick();
+    r.rerender(
+      <AuthTab {...props} serverName="next" inspectorClient={current.client} />,
+    );
+    await tick();
+    expect(r.lastFrame() ?? "").toContain("current-only");
+    settle({ ...sampleOAuthState, configuredScope: "retired-only" });
+    await tick();
+    expect(r.lastFrame() ?? "").toContain("current-only");
+    expect(r.lastFrame() ?? "").not.toContain("retired-only");
+  });
+
+  it("keeps the newest OAuth refresh when reads settle out of order", async () => {
+    const { client, getOAuthState, fire } = makeClient();
+    let settle!: (state: OAuthConnectionState) => void;
+    getOAuthState.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          settle = resolve;
+        }),
+    );
+    const r = render(
+      <AuthTab
+        {...baseProps}
+        inspectorClient={client}
+        oauthStatus="idle"
+        oauthMessage={null}
+      />,
+    );
+    await tick();
+    getOAuthState.mockResolvedValue({
+      ...sampleOAuthState,
+      configuredScope: "newest-only",
+    });
+    fire("oauthComplete");
+    await tick();
+    expect(r.lastFrame() ?? "").toContain("newest-only");
+    settle({ ...sampleOAuthState, configuredScope: "retired-only" });
+    await tick();
+    expect(r.lastFrame() ?? "").toContain("newest-only");
+    expect(r.lastFrame() ?? "").not.toContain("retired-only");
+  });
+
   it("renders authenticating and error status messages", async () => {
     const { client } = makeClient(undefined);
     const { lastFrame, rerender } = render(

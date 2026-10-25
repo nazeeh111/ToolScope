@@ -1551,6 +1551,33 @@ describe("App (mid-session auth lifecycle events)", () => {
     await expectFrame(r, "plain-disconnect-string");
   });
 
+  it.each([false, true])(
+    "drops a post-clear disconnect rejection after a server switch (round trip: %s)",
+    async (roundTrip) => {
+      h.ctrl.status = "connected";
+      let rejectDisconnect!: (error: Error) => void;
+      h.disconnect.mockImplementationOnce(
+        () =>
+          new Promise<void>((_resolve, reject) => {
+            rejectDisconnect = reject;
+          }),
+      );
+      const r = await mount(twoHttp());
+      await press(r, ["a", "s"]);
+      await waitUntil(() => h.disconnect.mock.calls.length > 0);
+      await press(r, [STAB, STAB, DOWN]);
+      await expectFrame(r, "▶ api");
+      if (roundTrip) {
+        await press(r, [UP]);
+        await expectFrame(r, "▶ web");
+      }
+      rejectDisconnect(new Error("retired-clear-disconnect"));
+      await tick();
+      await tick();
+      expect(r.lastFrame() ?? "").not.toContain("retired-clear-disconnect");
+    },
+  );
+
   // A clear while still CONNECTING tears the attempt down too — the session is
   // half-built, and leaving it up with its OAuth state gone is worse than not
   // having it.

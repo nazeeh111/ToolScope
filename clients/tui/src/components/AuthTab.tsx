@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, Text, useInput, type Key } from "ink";
 import { ScrollView, type ScrollViewRef } from "ink-scroll-view";
 import { SelectableItem } from "./SelectableItem.js";
@@ -87,9 +87,16 @@ export function AuthTab({
   const isLiveConnection =
     connectionStatus === "connected" || connectionStatus === "connecting";
   const scrollViewRef = useRef<ScrollViewRef>(null);
-  const [oauthState, setOauthState] = useState<
-    OAuthConnectionState | undefined
-  >(undefined);
+  const [oauthDetails, setOauthDetails] = useState<{
+    client: InspectorClient | null;
+    serverName: string | null;
+    state: OAuthConnectionState | undefined;
+  }>();
+  const oauthState =
+    oauthDetails?.client === inspectorClient &&
+    oauthDetails?.serverName === serverName
+      ? oauthDetails?.state
+      : undefined;
   const [clearState, setClearState] = useState<
     "idle" | "clearing" | "cleared" | "failed"
   >("idle");
@@ -134,18 +141,28 @@ export function AuthTab({
   const [lastClearDisconnected, setLastClearDisconnected] = useState(false);
   const [stepUpChoiceIndex, setStepUpChoiceIndex] = useState(0);
 
-  const refreshOAuthState = useCallback(async () => {
-    if (!inspectorClient) {
-      setOauthState(undefined);
-      return;
-    }
-    const state = await inspectorClient.getOAuthState();
-    setOauthState(state);
-  }, [inspectorClient]);
-
   useEffect(() => {
+    // Reads can finish after a server switch or a newer oauthComplete event.
+    // Only the newest read in this selection/revision may update its details.
+    let active = true;
+    let latestRead = 0;
+    const refreshOAuthState = async () => {
+      const read = ++latestRead;
+      const state = await inspectorClient?.getOAuthState();
+      if (active && read === latestRead) {
+        setOauthDetails({ client: inspectorClient, serverName, state });
+      }
+    };
+    const update = () => {
+      void refreshOAuthState();
+    };
     void refreshOAuthState();
-  }, [refreshOAuthState, oauthRevision, connectionStatus]);
+    inspectorClient?.addEventListener("oauthComplete", update);
+    return () => {
+      active = false;
+      inspectorClient?.removeEventListener("oauthComplete", update);
+    };
+  }, [inspectorClient, serverName, oauthRevision, connectionStatus]);
 
   useEffect(() => {
     // Skip exactly the revision bump our own clear caused; reset on the next.
@@ -161,18 +178,6 @@ export function AuthTab({
   useEffect(() => {
     setStepUpChoiceIndex(0);
   }, [pendingStepUp]);
-
-  useEffect(() => {
-    if (!inspectorClient) return;
-
-    const update = () => {
-      void refreshOAuthState();
-    };
-    inspectorClient.addEventListener("oauthComplete", update);
-    return () => {
-      inspectorClient.removeEventListener("oauthComplete", update);
-    };
-  }, [inspectorClient, refreshOAuthState]);
 
   useInput(
     (input: string, key: Key) => {
