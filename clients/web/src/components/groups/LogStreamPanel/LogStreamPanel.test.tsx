@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import type { LoggingLevel } from "@modelcontextprotocol/client";
 import { renderWithMantine, screen } from "../../../test/renderWithMantine";
 import { LogStreamPanel } from "./LogStreamPanel";
+import { clearScrollMemory } from "../../../hooks/useScrollMemory";
 import type { LogEntryData } from "../../elements/LogEntry/LogEntry";
 
 const allVisible: Record<LoggingLevel, boolean> = {
@@ -183,5 +184,25 @@ describe("LogStreamPanel", () => {
     );
     await user.click(await screen.findByText("Oldest First"));
     expect(onSortChange).toHaveBeenCalledWith("oldest-first");
+  });
+  it("remembers scroll after an empty stream receives its first entries", () => {
+    clearScrollMemory();
+    const first = renderWithMantine(
+      <LogStreamPanel {...baseProps} entries={[]} />,
+    );
+    first.rerender(<LogStreamPanel {...baseProps} />);
+    const viewport = first
+      .getByText("Server started")
+      .closest<HTMLDivElement>(".mantine-ScrollArea-viewport");
+    expect(viewport).not.toBeNull();
+    viewport!.scrollTop = 240;
+    viewport!.scrollLeft = 15;
+    first.unmount();
+    const second = renderWithMantine(<LogStreamPanel {...baseProps} />);
+    const restored = second
+      .getByText("Server started")
+      .closest<HTMLDivElement>(".mantine-ScrollArea-viewport");
+    expect(restored?.scrollTop).toBe(240);
+    expect(restored?.scrollLeft).toBe(15);
   });
 });

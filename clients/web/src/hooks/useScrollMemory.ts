@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 // Scroll positions survive a screen unmount by living in this module-scope map
 // rather than React state: the screens unmount on tab switch (#1417), so a
@@ -17,27 +17,29 @@ export function clearScrollMemory(): void {
 }
 
 /**
- * Remember and restore a scroll container's position across unmount/remount.
- * Returns a ref to attach to a Mantine `ScrollArea`/`ScrollArea.Autosize` via
- * its `viewportRef` prop. On mount the saved offset (if any) is restored before
- * paint; on unmount the current offset is captured. The captured viewport node
- * is closed over so the offset is still readable during the cleanup phase.
+ * Remember and restore a scroll container's position across detach/reattach.
+ * Returns a stable ref to attach to a Mantine scroll area's `viewportRef`.
+ * Following the node rather than the owner's mount also covers an initially
+ * empty stream and filtering that temporarily removes its viewport.
  */
 export function useScrollMemory(key: string) {
-  const viewportRef = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport) return;
-    const saved = scrollPositions.get(key);
-    if (saved) {
-      viewport.scrollTo({ left: saved.x, top: saved.y });
-    }
-    return () => {
-      scrollPositions.set(key, {
-        x: viewport.scrollLeft,
-        y: viewport.scrollTop,
-      });
-    };
-  }, [key]);
-  return viewportRef;
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  return useCallback(
+    (viewport: HTMLDivElement | null) => {
+      const previous = viewportRef.current;
+      if (previous === viewport) return;
+      if (previous) {
+        scrollPositions.set(key, {
+          x: previous.scrollLeft,
+          y: previous.scrollTop,
+        });
+      }
+      viewportRef.current = viewport;
+      if (viewport) {
+        const saved = scrollPositions.get(key);
+        if (saved) viewport.scrollTo({ left: saved.x, top: saved.y });
+      }
+    },
+    [key],
+  );
 }
