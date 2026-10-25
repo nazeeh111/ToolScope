@@ -5,7 +5,7 @@
  * to stay in sync with the on-disk truth).
  */
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { mcpConfigToServerEntries } from "../mcp/serverList.js";
 import type { ImportSourceResult } from "../mcp/import/types.js";
 import type {
@@ -151,6 +151,12 @@ export function useServers(opts: UseServersOptions): UseServersResult {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | undefined>(undefined);
 
+  // Only the newest read may replace the catalog. Reordering invalidates
+  // reads that saw the pre-write order, and suppresses reads while a PUT is
+  // pending; its final refresh reconciles with disk after the write settles.
+  const readVersion = useRef(0);
+  const pendingReorders = useRef(0);
+
   // The list read itself, throwing on failure. Every refresh path goes
   // through it; they differ only in what they do with a rejection.
   const loadServers = useCallback(async (): Promise<ServerEntry[]> => {
@@ -177,12 +183,18 @@ export function useServers(opts: UseServersOptions): UseServersResult {
   // a rejection. Post-write reloads use `refreshAfterWrite` instead.
   const refreshInternal = useCallback(
     async (background: boolean): Promise<void> => {
+      const version = ++readVersion.current;
       if (!background) setLoading(true);
       setError(undefined);
       try {
-        setServers(await loadServers());
+        const next = await loadServers();
+        if (version === readVersion.current && pendingReorders.current === 0) {
+          setServers(next);
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
+        if (version === readVersion.current && pendingReorders.current === 0) {
+          setError(err instanceof Error ? err.message : String(err));
+        }
       } finally {
         if (!background) setLoading(false);
       }
@@ -190,7 +202,7 @@ export function useServers(opts: UseServersOptions): UseServersResult {
     [loadServers],
   );
 
-  // Post-write reload, used by every mutator. Unlike `refreshInternal` it
+  // Post-write reload, used by the catalog entry mutators. Unlike `refreshInternal` it
   // rethrows, because a mutator's caller learns that something went wrong
   // only from a rejection — `ServerConfigModal` renders `submitError` for a
   // thrown error and nothing else, so a successful POST followed by a failed
@@ -207,13 +219,19 @@ export function useServers(opts: UseServersOptions): UseServersResult {
   // rollback — reverting here would contradict what is actually on disk.
   const refreshAfterWrite = useCallback(
     async (verb: string): Promise<void> => {
+      const version = ++readVersion.current;
       setLoading(true);
       setError(undefined);
       try {
-        setServers(await loadServers());
+        const next = await loadServers();
+        if (version === readVersion.current && pendingReorders.current === 0) {
+          setServers(next);
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
-        setError(message);
+        if (version === readVersion.current && pendingReorders.current === 0) {
+          setError(message);
+        }
         throw new ServerListReloadError(
           `The server was ${verb}, but the server list could not be reloaded: ${message}`,
           { cause: err },
@@ -270,16 +288,16 @@ export function useServers(opts: UseServersOptions): UseServersResult {
         // canonical state regardless — so we just count frames and fire a
         // single background refresh per decode chunk. Two `change`
         // broadcasts landing in the same chunk become one re-fetch instead
-        // of two concurrent ones whose setState order is unspecified.
+        // of two concurrent ones. Response ownership below keeps the newest
+        // read authoritative if separate chunks still trigger overlapping GETs.
         // Frames carrying no `event:`/`data:` field are skipped: the backend
         // opens the stream with an inert `:` comment frame so Firefox
         // resolves this fetch at all (see SSE_PRIMING_COMMENT in the remote
         // server), and that must not read as a change.
         // Cross-chunk debounce is not added: `awaitWriteFinish`'s 100ms
         // stability threshold already serializes external edits at the
-        // source, and chained fetches against the same GET endpoint are
-        // idempotent enough that a rare back-to-back pair just costs one
-        // extra round-trip.
+        // source. A rare back-to-back pair just costs one extra round-trip;
+        // an older response cannot replace the newer read's result.
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -403,6 +421,8 @@ export function useServers(opts: UseServersOptions): UseServersResult {
 
   const reorderServers = useCallback(
     async (orderedIds: string[]): Promise<void> => {
+      ++readVersion.current;
+      ++pendingReorders.current;
       // Optimistic reorder: rebuild the local list in the requested order so
       // the grid reflows immediately, before the round-trip resolves. Built
       // from a lookup off the previous state (inside the setter) so we never
@@ -422,6 +442,7 @@ export function useServers(opts: UseServersOptions): UseServersResult {
         }
         return reordered;
       });
+      let succeeded = false;
       try {
         const res = await doFetch(`${base}/api/servers/order`, {
           method: "PUT",
@@ -431,13 +452,19 @@ export function useServers(opts: UseServersOptions): UseServersResult {
         if (!res.ok) {
           throw new Error(await readErrorMessage(res));
         }
+        succeeded = true;
       } catch (err) {
-        // Revert to disk truth — the optimistic order may not have landed.
-        await refresh();
         throw err instanceof Error ? err : new Error(String(err));
+      } finally {
+        --pendingReorders.current;
+        // Reconcile after success as well as failure: a read suppressed during
+        // the PUT may have contained an external edit. refresh records reload
+        // failures without turning a successful reorder into a rejected write.
+        // Success stays in the background so dragging does not flash a skeleton.
+        await refreshInternal(succeeded);
       }
     },
-    [base, authToken, doFetch, refresh],
+    [base, authToken, doFetch, refreshInternal],
   );
 
   return {
