@@ -152,9 +152,18 @@ block until a human completes the flow in a browser, and `--print-handoff` to
 emit the deep link + port-forward command a remote VM needs (see
 [clients/cli/README.md](../clients/cli/README.md)).
 
-Connection state persists in `~/.mcp-inspector/` between runs. For a clean
-slate between reviews of different servers, `rm -rf ~/.mcp-inspector` before
-launching.
+Connection state persists in `~/.mcp-inspector/` between runs. Do not delete
+that directory to reset a review: it may contain unrelated catalogs, settings
+and OAuth state. Preserve existing user state; clear only review-owned entries
+whose scope you have verified.
+
+This recipe does not establish a fully isolated review profile. The web backend
+can use `MCP_STORAGE_DIR` for its storage API, and CLI OAuth persistence honors
+that override, but the CLI's default client settings and the default catalog
+still resolve separately from the home directory. A fresh browser profile also
+does not isolate backend files or the OS secret store. Use only disposable
+review state with every relevant destination explicitly scoped, or keep the
+existing state and report that the review was not a clean-state run.
 
 ## 6. Reaching the web inspector remotely (SSH port-forward)
 

@@ -66,7 +66,13 @@ const ErrorAlert = Alert.withProps({
  * the full read result inline as formatted JSON (via {@link ContentViewer}).
  * The fetched result is cached so collapsing and re-expanding does not re-read.
  */
-export function ResourceLink({
+export function ResourceLink(props: ResourceLinkProps) {
+  // Result rows can be reused for a different URI. Its cache and pending read
+  // belong to that URI, so replace the state owner when the URI changes.
+  return <ResourceLinkContent key={props.uri} {...props} />;
+}
+
+function ResourceLinkContent({
   uri,
   name,
   mimeType,
