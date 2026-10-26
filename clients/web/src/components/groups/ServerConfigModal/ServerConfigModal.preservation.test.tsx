@@ -24,7 +24,7 @@ function open(config: StdioServerConfig, mode: "edit" | "clone" = "edit") {
 async function save(onSubmit: ReturnType<typeof vi.fn>, label = "Save") {
   await userEvent
     .setup({ delay: null })
-    .click(screen.getByRole("button", { name: label, exact: true }));
+    .click(screen.getByRole("button", { name: label }));
   await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
   return onSubmit.mock.calls[0];
 }
@@ -167,7 +167,7 @@ describe("ServerConfigModal configuration preservation", () => {
     });
     await userEvent
       .setup({ delay: null })
-      .click(screen.getByRole("button", { name: "Save", exact: true }));
+      .click(screen.getByRole("button", { name: "Save" }));
     expect(screen.getByRole("alert")).toHaveTextContent(/Invalid env/);
     expect(onSubmit).not.toHaveBeenCalled();
   });

@@ -31,7 +31,6 @@ async function submit(
   await userEvent.setup({ delay: null }).click(
     screen.getByRole("button", {
       name: mode === "edit" ? "Save" : "Add",
-      exact: true,
     }),
   );
   await waitFor(() => expect(onSubmit).toHaveBeenCalledOnce());
