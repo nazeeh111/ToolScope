@@ -15,7 +15,6 @@
     "url": "git+https://github.com/nazeeh111/ToolScope.git"
   },
   "license": "SEE LICENSE IN LICENSE",
-  "author": "The MCP Maintainers and Community",
   "type": "module",
   "bin": {
     "mcp-inspector": "./clients/launcher/build/index.js"

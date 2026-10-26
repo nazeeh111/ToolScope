@@ -27,6 +27,10 @@ The browser wrapper retains file reading in `clients/web/src/utils/toolContracts
 
 The launcher generates local examples and supplies a separate default-catalog hint. Each client applies it after parsing its own arguments, so an explicit catalog, session file, or ad-hoc server takes precedence. This avoids duplicating three clients' argument grammars in a wrapper and prevents an inherited personal catalog from becoming the default.
 
+## Documentation refinements
+
+The root and client READMEs use ToolScope names and local launcher examples. The redundant upstream README archive and optional package author field were removed; source attribution and license terms remain in NOTICE and LICENSE.
+
 ## Changed source
 
 Modified upstream files at adaptation time:

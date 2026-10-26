@@ -1,6 +1,6 @@
-# MCP Inspector Launcher
+# ToolScope launcher
 
-The launcher is the package that provides the global `mcp-inspector` binary (e.g. when users run `npx @modelcontextprotocol/inspector`). It is not a separate user-facing app—it is the single entrypoint that selects and runs one of the clients (web, CLI, or TUI).
+The launcher selects the web, CLI or terminal client. Use `node scripts/toolscope.mjs` from the repository root after `npm run build:toolscope`; the compatible `mcp-inspector` binary remains available.
 
 ## Responsibility
 

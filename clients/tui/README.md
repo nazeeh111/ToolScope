@@ -1,26 +1,26 @@
-# MCP Inspector TUI Client
+# ToolScope terminal client
 
 The Terminal User Interface (TUI) client brings the interactive exploration capabilities of the Web Client directly to your terminal. It is built using [Ink](https://github.com/vadimdemedes/ink) to provide a rich, React-like component experience in a command-line environment.
 
-![MCP Inspector TUI Screenshot](../../docs/images/tui-screenshot.png)
+![ToolScope terminal interface](../../docs/images/tui-screenshot.png)
 
 ## Running the TUI
 
-You can run the TUI client via `npx`:
+Run from the repository root after `npm run build:toolscope`:
 
 ```bash
-npx @modelcontextprotocol/inspector --tui node build/index.js
+node scripts/toolscope.mjs --tui node build/index.js
 ```
 
 ### With Configuration Files
 
 The TUI can load all servers from an MCP catalog/config file. With no source
-flag it uses the default writable catalog `~/.mcp-inspector/mcp.json` (seeded
-empty if missing):
+flag the ToolScope wrapper uses its example catalog in `.toolscope/mcp.json`
+(or `TOOLSCOPE_DATA_DIR`):
 
 ```bash
-npx @modelcontextprotocol/inspector --tui --catalog mcp.json   # writable catalog (seeded empty if missing)
-npx @modelcontextprotocol/inspector --tui --config mcp.json    # read-only session (errors if absent)
+node scripts/toolscope.mjs --tui --catalog mcp.json   # writable catalog (seeded empty if missing)
+node scripts/toolscope.mjs --tui --config mcp.json    # read-only session (errors if absent)
 ```
 
 (It does not use `--server`; all servers in the file are available in the TUI.)

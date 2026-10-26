@@ -96,8 +96,6 @@ See [verification](docs/toolscope-verification.md), [implementation notes](docs/
 
 Weekly grouped dependency update PRs cover all five npm lockfiles and GitHub Actions. See [dependency maintenance](docs/dependency-maintenance.md) for the current runtime updates and review policy.
 
-## Attribution and licenses
+## License
 
-Based on [MCP Inspector](https://github.com/modelcontextprotocol/inspector), baseline `1e31c78fbf81a989e8eb47021c6281d7876ad7fd` (v2.8.0). The protocol core, clients, authentication, connection management, inspectors, fixtures and most tests originate upstream.
-
-The upstream licensing transition preserves Apache-2.0 and MIT code notices; upstream documentation is CC-BY-4.0 except specifications. See [LICENSE](LICENSE), [NOTICE](NOTICE), and the [original README](UPSTREAM_README.md). New ToolScope code is Apache-2.0 and documentation is CC-BY-4.0.
+See [LICENSE](LICENSE) for the applicable Apache-2.0, MIT and CC-BY-4.0 terms. [NOTICE](NOTICE) identifies the retained source, copyright holders and ToolScope modifications.

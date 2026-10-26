@@ -1,13 +1,13 @@
-# MCP Inspector CLI Client
+# ToolScope CLI client
 
 CLI for the Inspector: connect, run a `--method`, disconnect. Invoked as `mcp-inspector --cli`.
 
 ## Running the CLI
 
-You can run the CLI via `npx`:
+Run from the repository root after `npm run build:toolscope`:
 
 ```bash
-npx @modelcontextprotocol/inspector --cli node build/index.js
+node scripts/toolscope.mjs --cli node build/index.js
 ```
 
 Supports tools, resources, and prompts (plus `--method servers/list` / `servers/show` for catalog entries without connecting).
@@ -19,43 +19,43 @@ Supports tools, resources, and prompts (plus `--method servers/list` / `servers/
 **Basic usage**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli node build/index.js
+node scripts/toolscope.mjs --cli node build/index.js
 ```
 
 **With a configuration file**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli --config path/to/config.json --server myserver
+node scripts/toolscope.mjs --cli --config path/to/config.json --server myserver
 ```
 
 **List available tools**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli node build/index.js --method tools/list
+node scripts/toolscope.mjs --cli node build/index.js --method tools/list
 ```
 
 **Call a specific tool**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli node build/index.js --method tools/call --tool-name mytool --tool-arg key=value --tool-arg another=value2
+node scripts/toolscope.mjs --cli node build/index.js --method tools/call --tool-name mytool --tool-arg key=value --tool-arg another=value2
 ```
 
 **Call a tool with JSON arguments**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli node build/index.js --method tools/call --tool-name mytool --tool-arg 'options={"format": "json", "max_tokens": 100}'
+node scripts/toolscope.mjs --cli node build/index.js --method tools/call --tool-name mytool --tool-arg 'options={"format": "json", "max_tokens": 100}'
 ```
 
 **List available resources**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli node build/index.js --method resources/list
+node scripts/toolscope.mjs --cli node build/index.js --method resources/list
 ```
 
 **List available prompts**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli node build/index.js --method prompts/list
+node scripts/toolscope.mjs --cli node build/index.js --method prompts/list
 ```
 
 ### Remote Servers
@@ -65,19 +65,19 @@ You can also connect to remote MCP servers using HTTP or SSE transports.
 **Connect to a remote MCP server (default is SSE)**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli https://my-mcp-server.example.com
+node scripts/toolscope.mjs --cli https://my-mcp-server.example.com
 ```
 
 **Connect with Streamable HTTP transport**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli https://my-mcp-server.example.com --transport http --method tools/list
+node scripts/toolscope.mjs --cli https://my-mcp-server.example.com --transport http --method tools/list
 ```
 
 **Pass custom headers**
 
 ```bash
-npx @modelcontextprotocol/inspector --cli https://my-mcp-server.example.com --transport http --method tools/list --header "X-API-Key: your-api-key"
+node scripts/toolscope.mjs --cli https://my-mcp-server.example.com --transport http --method tools/list --header "X-API-Key: your-api-key"
 ```
 
 When a server is loaded from a `--catalog`/`--config` file, its per-server settings (headers, connection/request timeouts, OAuth, and `roots`) are applied to the connection — the same resolution the TUI uses. A `--header` flag overrides the file's headers for that run while leaving the file's timeouts and OAuth in place.
@@ -298,7 +298,7 @@ Register `http://127.0.0.1:6276/oauth/callback` on static or enterprise IdPs tha
 **Example** — list tools on an OAuth-protected server using stored tokens and CIMD from the command line:
 
 ```bash
-npx @modelcontextprotocol/inspector --cli --catalog mcp.json --server my-http-server \
+node scripts/toolscope.mjs --cli --catalog mcp.json --server my-http-server \
   --client-metadata-url https://example.com/.well-known/oauth/client-metadata.json \
   --method tools/list
 ```

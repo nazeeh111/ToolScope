@@ -1,6 +1,6 @@
 # ToolScope publication scope
 
-ToolScope is a local adaptation of MCP Inspector with web, CLI, and TUI interfaces plus tool-schema baselines. The original project and its maintainers retain attribution through `LICENSE`, `NOTICE`, `UPSTREAM_README.md`, and the web-served license and notice files. The implementation and adaptation notes are in this source tree; the original source checkout is preserved separately for recovery.
+ToolScope is a local adaptation of MCP Inspector with web, CLI, and TUI interfaces plus tool-schema baselines. The original project and its maintainers retain attribution through `LICENSE`, `NOTICE`, and the web-served license and notice files. The implementation and adaptation notes are in this source tree; the original source checkout is preserved separately for recovery.
 
 The public repository may accept ordinary source contributions, but the copied upstream organization policies, issue bots, agent-skill evaluation, npm publish path, and container release path do not apply here. The active CI workflow checks source and built behavior only. It has no publishing or deployment job and requires no paid model service, account secret, or separately billed API.
 

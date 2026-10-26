@@ -1,6 +1,6 @@
 # ToolScope contributor instructions
 
-ToolScope is a local MCP inspector adapted from MCP Inspector. It provides a web app, a scriptable CLI, and an Ink terminal UI over shared `core/` code. Preserve all three surfaces and the launcher when changing behavior. Read the implementation and relevant tests before editing. The upstream source and attribution are retained in the original source checkout, `UPSTREAM_README.md`, `LICENSE`, and `NOTICE`.
+ToolScope is a local MCP inspector adapted from MCP Inspector. It provides a web app, a scriptable CLI, and an Ink terminal UI over shared `core/` code. Preserve all three surfaces and the launcher when changing behavior. Read the implementation and relevant tests before editing. Applicable source attribution and terms are retained in `LICENSE` and `NOTICE`.
 
 ## Project layout and setup
 

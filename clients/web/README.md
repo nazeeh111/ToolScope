@@ -1,4 +1,4 @@
-# MCP Inspector Web Client
+# ToolScope web client
 
 The browser incarnation of the Inspector: a **Vite + React + [Mantine](https://mantine.dev)** single-page app backed by a small **Node (Hono)** server. The SPA is presentational — it renders data and fires callbacks; all MCP state comes from the shared `@inspector/core` hooks. The backend proxies MCP connections, serves the built SPA, and exposes `/api/*`.
 
