@@ -54,6 +54,8 @@ interface FormState {
   command: string;
   argsText: string;
   envText: string;
+  argsEdited: boolean;
+  envEdited: boolean;
   cwd: string;
   // sse / streamable-http
   url: string;
@@ -116,6 +118,8 @@ function configToFormState(
       command: "",
       argsText: "",
       envText: "",
+      argsEdited: false,
+      envEdited: false,
       cwd: "",
       url: "",
     };
@@ -130,6 +134,8 @@ function configToFormState(
       envText: Object.entries(c.env ?? {})
         .map(([k, v]) => `${k}=${v}`)
         .join("\n"),
+      argsEdited: false,
+      envEdited: false,
       cwd: c.cwd ?? "",
       url: "",
     };
@@ -145,6 +151,8 @@ function configToFormState(
     command: "",
     argsText: "",
     envText: "",
+    argsEdited: false,
+    envEdited: false,
     cwd: "",
     url: url ?? "",
   };
@@ -167,10 +175,7 @@ function parseEnv(raw: string):
       error: string;
     } {
   const out: Record<string, string> = {};
-  const lines = raw
-    .split("\n")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+  const lines = raw.split("\n").filter((s) => s.trim().length > 0);
   for (const line of lines) {
     const eq = line.indexOf("=");
     if (eq <= 0) {
@@ -180,9 +185,6 @@ function parseEnv(raw: string):
     // env values preserve trailing whitespace — they're shell-style strings
     // where spaces / tabs can be load-bearing.
     const value = line.slice(eq + 1);
-    /* v8 ignore next 2 -- unreachable: the line is already trimmed and eq>0,
-       so the key slice always starts with a non-whitespace char and can never
-       trim to empty; kept as a defensive guard. */
     if (!key)
       return { ok: false, error: `Invalid env line "${line}". Empty key.` };
     out[key] = value;
@@ -208,6 +210,16 @@ export function ServerConfigModal({
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
+  // Track editing intent even when the text returns to its initial value:
+  // an empty field can mean either an untouched [""] argument or a user clear.
+  const updateTextField = (field: TextField, value: string) =>
+    setForm((f) => ({
+      ...f,
+      [field]: value,
+      argsEdited: f.argsEdited || field === "argsText",
+      envEdited: f.envEdited || field === "envText",
+    }));
+
   // The six text fields all update the same way. Capture the value before the
   // functional updater closes over it — React nulls SyntheticEvent.currentTarget
   // after the synchronous handler returns, so reading it inside `setForm((f) =>
@@ -216,10 +228,9 @@ export function ServerConfigModal({
     (field: TextField) =>
     (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const next = e.currentTarget.value;
-      setForm((f) => ({ ...f, [field]: next }));
+      updateTextField(field, next);
     };
-  const clearTextField = (field: TextField) => () =>
-    setForm((f) => ({ ...f, [field]: "" }));
+  const clearTextField = (field: TextField) => () => updateTextField(field, "");
 
   // Reset the form whenever the modal opens, or whenever `initial` changes
   // while it is open. Keying on `opened ? initial : undefined` collapses both
@@ -257,13 +268,27 @@ export function ServerConfigModal({
       if (!form.command.trim()) {
         return { ok: false, error: "Command is required for stdio." };
       }
-      const env = parseEnv(form.envText);
+      // The line editors cannot represent every existing string losslessly
+      // (empty args and embedded newlines are ambiguous). Reuse untouched
+      // values when saving another field or cloning, rather than reparsing them.
+      const originalStdio =
+        initialConfig &&
+        (initialConfig.type === undefined || initialConfig.type === "stdio")
+          ? initialConfig
+          : undefined;
+      const env =
+        originalStdio && !form.envEdited
+          ? { ok: true as const, value: { ...originalStdio.env } }
+          : parseEnv(form.envText);
       if (!env.ok) return env;
       const config: StdioServerConfig = {
         type: "stdio",
         command: form.command.trim(),
       };
-      const args = parseArgs(form.argsText);
+      const args =
+        originalStdio && !form.argsEdited
+          ? [...(originalStdio.args ?? [])]
+          : parseArgs(form.argsText);
       if (args.length > 0) config.args = args;
       if (Object.keys(env.value).length > 0) config.env = env.value;
       const cwd = form.cwd.trim();
