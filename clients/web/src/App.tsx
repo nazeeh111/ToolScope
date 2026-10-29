@@ -1,4 +1,4 @@
-// Modified for ToolScope: pass successful tool-list readiness. See NOTICE.
+// Modified for ToolScope: pass successful tool-list readiness. See LICENSE.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@mantine/core";
 import { notifications } from "@mantine/notifications";

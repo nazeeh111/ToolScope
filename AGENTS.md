@@ -1,6 +1,6 @@
 # ToolScope contributor instructions
 
-ToolScope is a local MCP inspector adapted from MCP Inspector. It provides a web app, a scriptable CLI, and an Ink terminal UI over shared `core/` code. Preserve all three surfaces and the launcher when changing behavior. Read the implementation and relevant tests before editing. Applicable source attribution and terms are retained in `LICENSE` and `NOTICE`.
+ToolScope is a local MCP inspector adapted from MCP Inspector. It provides a web app, a scriptable CLI, and an Ink terminal UI over shared `core/` code. Preserve all three surfaces and the launcher when changing behavior. Read the implementation and relevant tests before editing. Applicable source attribution and terms are retained in `LICENSE`.
 
 ## Project layout and setup
 
@@ -27,7 +27,7 @@ Run the smallest relevant checks while developing. Before handing off a publicat
 
 The workflow in `.github/workflows/main.yml` is a validation workflow for pushes and pull requests. It does not publish npm packages, containers, or a backend. `scripts/lib/workflow-gate.mjs` keeps local-only scripts and non-Chromium engine passes out of CI. Keep its tests aligned with the real workflow. Pin third-party actions to verified immutable commits and keep the token at `contents: read` unless a concrete read-only verification step needs a narrower documented exception.
 
-Preserve unrelated staged, unstaged, and untracked work. Do not commit, push, post, publish, deploy, change credentials, or spend money without the current user's authorization. Keep license and notice files in the source and web output.
+Preserve unrelated staged, unstaged, and untracked work. Do not commit, push, post, publish, deploy, change credentials, or spend money without the current user's authorization. Keep license terms and required documentation attribution in the source and web output.
 
 ## Source conventions
 

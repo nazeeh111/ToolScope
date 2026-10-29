@@ -1,4 +1,4 @@
-// Modified for ToolScope: workspace, schema workflow, or visual identity. See NOTICE.
+// Modified for ToolScope: workspace, schema workflow, or visual identity. See LICENSE.
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   AppShell,

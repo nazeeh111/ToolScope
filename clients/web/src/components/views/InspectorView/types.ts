@@ -1,4 +1,4 @@
-// Modified for ToolScope: successful tool-list readiness. See NOTICE.
+// Modified for ToolScope: successful tool-list readiness. See LICENSE.
 // Domain prop bundles for `InspectorView` (#2130).
 //
 // The view used to take ~130 flat props, which made App.tsx's JSX a prop wall

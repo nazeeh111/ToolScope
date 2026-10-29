@@ -1,4 +1,4 @@
-// Modified for ToolScope: verify its default catalog follows parsed web source flags. See NOTICE.
+// Modified for ToolScope: verify its default catalog follows parsed web source flags. See LICENSE.
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { mkdtemp, writeFile, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";

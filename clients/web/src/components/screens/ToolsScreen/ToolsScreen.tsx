@@ -1,4 +1,4 @@
-// Modified for ToolScope: workspace, schema workflow, or visual identity. See NOTICE.
+// Modified for ToolScope: workspace, schema workflow, or visual identity. See LICENSE.
 import { ToolContractPanel } from "../../groups/ToolContractPanel/ToolContractPanel";
 import { Card, Flex, Stack, Text } from "@mantine/core";
 import type { MalformedListItem } from "@inspector/core/mcp";

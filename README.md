@@ -98,4 +98,4 @@ Weekly grouped dependency update PRs cover all five npm lockfiles and GitHub Act
 
 ## License
 
-See [LICENSE](LICENSE) for the applicable Apache-2.0, MIT and CC-BY-4.0 terms. [NOTICE](NOTICE) identifies the retained source, copyright holders and ToolScope modifications.
+See [LICENSE](LICENSE) for the applicable Apache-2.0, MIT and CC-BY-4.0 terms. The same file records documentation attribution and ToolScope modifications.

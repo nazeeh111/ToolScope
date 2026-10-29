@@ -6,6 +6,6 @@ A useful bug report includes the affected client (web, CLI, or terminal), operat
 
 Follow the [README setup](README.md#run-the-desktop-app) and [quality-gate guide](docs/quality-gate.md). Run checks relevant to the changed behavior and add a regression test for a bug where it can reproduce the failure. CI checks formatting, lint, types, builds, tests, coverage, and runtime behavior. Explain unavailable checks rather than reporting them as passed.
 
-Keep changes focused, preserve existing error handling and applicable notices, and follow [AGENTS.md](AGENTS.md) for repository conventions. Contributions follow the licensing described in [LICENSE](LICENSE) and [NOTICE](NOTICE).
+Keep changes focused, preserve existing error handling and applicable notices, and follow [AGENTS.md](AGENTS.md) for repository conventions. Contributions follow the licensing described in [LICENSE](LICENSE).
 
 Report vulnerabilities through the private process in [SECURITY.md](SECURITY.md), not public issues. This repository's contribution policy is separate from MCP Inspector's upstream policy.
