@@ -1,4 +1,4 @@
-// Modified for ToolScope: use its example catalog only when no CLI source was selected. See NOTICE.
+// Modified for ToolScope: use its example catalog only when no CLI source was selected. See LICENSE.
 import { Command } from "commander";
 type McpResponse = Record<string, unknown>;
 import { awaitableLog } from "./utils/awaitable-log.js";

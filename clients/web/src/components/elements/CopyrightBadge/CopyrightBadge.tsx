@@ -1,4 +1,4 @@
-// Modified for ToolScope: workspace, schema workflow, or visual identity. See NOTICE.
+// Modified for ToolScope: workspace, schema workflow, or visual identity. See LICENSE.
 import { Anchor, Text } from "@mantine/core";
 
 /** The project's copyright notice. */

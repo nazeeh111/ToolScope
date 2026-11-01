@@ -1,4 +1,4 @@
-// Modified for ToolScope: workspace, schema workflow, or visual identity. See NOTICE.
+// Modified for ToolScope: workspace, schema workflow, or visual identity. See LICENSE.
 import { createTheme, type MantineColorsTuple } from "@mantine/core";
 import {
   ThemeAccordion,

@@ -1,4 +1,4 @@
-// Modified for ToolScope: observable tool-list readiness. See NOTICE.
+// Modified for ToolScope: observable tool-list readiness. See LICENSE.
 /**
  * ManagedToolsState: holds the full tool list, in sync with the server.
  * A thin subclass of ManagedListState — behavior lives in the base (#1444).

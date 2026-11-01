@@ -1,4 +1,4 @@
-// Modified for ToolScope: carry list readiness to schema checks. See NOTICE.
+// Modified for ToolScope: carry list readiness to schema checks. See LICENSE.
 import { useCallback, useRef, useState } from "react";
 import type {
   Prompt,

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Modified for ToolScope: use its example catalog only when no TUI source was selected. See NOTICE.
+// Modified for ToolScope: use its example catalog only when no TUI source was selected. See LICENSE.
 
 import { Command } from "commander";
 import { render } from "ink";

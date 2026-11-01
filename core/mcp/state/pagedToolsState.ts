@@ -1,4 +1,4 @@
-// Modified for ToolScope: observable tool-list readiness. See NOTICE.
+// Modified for ToolScope: observable tool-list readiness. See LICENSE.
 /**
  * PagedToolsState: holds the tools accumulated so far, loaded one page at a time
  * via loadPage(cursor). Backs paginated mode (the `paginatedLists` setting,

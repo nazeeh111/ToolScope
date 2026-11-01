@@ -1,4 +1,4 @@
-// Modified for ToolScope: expose list readiness to schema checks. See NOTICE.
+// Modified for ToolScope: expose list readiness to schema checks. See LICENSE.
 import { useCallback } from "react";
 import type { InspectorClientProtocol } from "../mcp/inspectorClientProtocol.js";
 import type { ManagedToolsState } from "../mcp/state/managedToolsState.js";

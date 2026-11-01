@@ -29,7 +29,7 @@ The launcher generates local examples and supplies a separate default-catalog hi
 
 ## Documentation refinements
 
-The root and client READMEs use ToolScope names and local launcher examples. The redundant upstream README archive and optional package author field were removed; source attribution and license terms remain in NOTICE and LICENSE.
+The root and client READMEs use ToolScope names and local launcher examples. The redundant upstream README archive and optional package author field were removed; source attribution and license terms remain in LICENSE.
 
 ## Changed source
 
