@@ -91,7 +91,7 @@
     "toolscope:compare": "node scripts/compare-tool-baselines.mjs"
   },
   "dependencies": {
-    "@hono/node-server": "^2.0.12",
+    "@hono/node-server": "^2.1.5",
     "@modelcontextprotocol/client": "2.3.1",
     "@modelcontextprotocol/core": "2.3.1",
     "@modelcontextprotocol/ext-apps": "^2.0.0",
@@ -109,10 +109,10 @@
     "pino": "^9.14.0",
     "proper-lockfile": "^4.1.2",
     "react": "^19.0.0",
-    "undici": "^8.11.2",
+    "undici": "^8.12.2",
     "vite": "8.2.4",
     "yaml": "^2.9.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.6"
   },
   "engines": {
     "node": ">=22.19.0"
@@ -134,7 +134,7 @@
   },
   "private": true,
   "overrides": {
-    "fast-uri": "^3.1.8",
-    "ip-address": "^10.7.2"
+    "fast-uri": "^3.1.9",
+    "ip-address": "^10.7.4"
   }
 }

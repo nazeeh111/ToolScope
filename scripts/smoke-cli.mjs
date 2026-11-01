@@ -419,7 +419,9 @@ try {
   }
   let envelope;
   try {
-    envelope = JSON.parse(badCallback.stderr.trim());
+    // Secret-store caveats may precede the CLI's documented final JSON line.
+    // Keep those warnings enabled and validate the error envelope itself.
+    envelope = JSON.parse(badCallback.stderr.trim().split(/\r?\n/).at(-1));
   } catch {
     fail(
       `bad --callback-url should emit a JSON {"error":…} envelope through the launcher; got:\n${badCallback.stderr}`,
@@ -452,7 +454,7 @@ try {
   }
   let authEnvelope;
   try {
-    authEnvelope = JSON.parse(noStoredAuth.stderr.trim());
+    authEnvelope = JSON.parse(noStoredAuth.stderr.trim().split(/\r?\n/).at(-1));
   } catch {
     fail(
       `--use-stored-auth should emit a JSON envelope through the launcher; got:\n${noStoredAuth.stderr}`,
