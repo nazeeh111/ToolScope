@@ -1,15 +1,16 @@
 # From exported definitions to a reviewable change
 
-ToolScope can compare two saved tool-definition exports without connecting to the server. This path uses Node.js 24 and the root lockfile only. The desktop browser, CLI and terminal clients have their own setup in the [README](../README.md).
+ToolScope can compare two saved tool-definition exports without connecting to the server. This path uses Node.js 24. The desktop browser, CLI and terminal clients have their own setup in the [README](../README.md).
 
 ## Try the included files
 
-From the repository root:
+Download the ZIP from the [v0.3.1 release](https://github.com/nazeeh111/ToolScope/releases/tag/v0.3.1), check it against the release's `SHA256SUMS`, and extract it. From the extracted directory:
 
 ```sh
-INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci
 node scripts/compare-tool-baselines.mjs examples/tool-baselines/before.json examples/tool-baselines/after.json
 ```
+
+No clone or npm install is needed for the kit. It contains the bundled comparison command, these synthetic files, licenses and a `manifest.json` listing source and output hashes. To run from source instead, clone the repository and run `INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci` before the same command.
 
 Actual output reproduced on 2026-10-23 with the checked-in synthetic examples:
 
@@ -71,3 +72,13 @@ If you redirected an invalid comparison, the destination may exist but be empty.
 In the desktop app, save and export a baseline, then capture/export a later definition list for the same catalog server. Compare those two JSON files with the same command. Both files must identify that server; unrelated server exports are rejected. Refresh and load every page before capture. See [browser capture and import boundaries](../README.md#check-a-changing-tool-interface).
 
 The comparison never calls tools, modifies either input, authenticates the files' origin or classifies breaking changes. Definitions can contain private descriptions. Inspect both exports and the result before sharing them. The bundled examples above are synthetic, not a recorded third-party server or a compatibility benchmark.
+
+## Build the kit from source
+
+After installing the root lockfile, choose an output directory that does not already exist:
+
+```sh
+npm run build:offline-kit -- /path/to/new-offline-kit
+```
+
+The builder uses the already-declared Vite dependency to bundle the existing command and shared validator. It refuses unexpected runtime dependencies and preserves bundled package licenses. No source parser is replaced. The manifest records the source commit, tree, dirty state, bundle inputs and output hashes; build from a clean, pinned checkout to identify a release. An existing output directory is left unchanged. A failed new build may leave a partial directory for inspection; use a fresh destination after correcting the cause.

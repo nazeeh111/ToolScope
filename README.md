@@ -6,16 +6,17 @@ MCP (Model Context Protocol) lets applications expose tools, resources, and prom
 
 ## See a contract change first
 
-Start with the offline comparison. From a clone, this installs only the root dependencies, starts no server and needs no browser:
+Download and extract the [offline comparison kit](https://github.com/nazeeh111/ToolScope/releases/tag/v0.3.1). With Node.js 24 installed, run this from the extracted directory. No clone, npm install, server or browser is needed:
 
 ```sh
-INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci
 node scripts/compare-tool-baselines.mjs examples/tool-baselines/before.json examples/tool-baselines/after.json
 ```
 
 The bundled synthetic files produce two changes: `inspect_part` is **added**, and `lookup` has a **changed description**. Exit `1` means the comparison found differences; it is the expected result here. Compare `before.json` with itself for exit `0` and `"matched": true`. Neither command edits the inputs.
 
 [Follow the offline comparison](docs/offline-comparison.md) for the actual output, a saved report, and invalid-input recovery. To inspect a running MCP server and capture your own definitions, continue with the desktop app below.
+
+Prefer the source checkout? Run `INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci` first, then use the same comparison command. The kit bundles that command and its shared validator, with examples, dependency licenses and a source/hash manifest. It is separate from the full desktop app and is not an npm package.
 
 ## Run the desktop app
 
@@ -58,7 +59,7 @@ node scripts/compare-tool-baselines.mjs baseline.json current.json
 
 The command writes a JSON report to stdout. Exit status `0` means the definitions match, `1` means definitions differ, and `2` means an input or argument is invalid. Use the status directly in a CI check, or save the report with `> comparison.json`. Both files must identify the same catalog server. Capture times and object-key order do not count as changes; array order does. The report lists added or removed tools and changed top-level fields. It does not determine backward compatibility. Neither input file is modified.
 
-Try the bundled synthetic example after installing the root dependencies:
+Try the bundled synthetic example from the kit, or from a checkout with root dependencies installed:
 
 ```sh
 node scripts/compare-tool-baselines.mjs examples/tool-baselines/before.json examples/tool-baselines/after.json
