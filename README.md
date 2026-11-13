@@ -20,9 +20,11 @@ Prefer the source checkout? Run `INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci` first, 
 
 ## Run the desktop app
 
-Use Node.js 24 (upstream minimum: 22.19). Install from the five committed lockfiles:
+Use Node.js 24 (upstream minimum: 22.19). Clone the repository and install from the five committed lockfiles:
 
 ```sh
+git clone https://github.com/nazeeh111/ToolScope.git
+cd ToolScope
 INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci
 npm --prefix clients/web ci
 npm --prefix clients/cli ci
