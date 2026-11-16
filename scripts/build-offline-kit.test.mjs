@@ -41,7 +41,13 @@ test("offline kit runs independently and preserves validation and existing outpu
     assert.equal(changed.status, 1, changed.stderr);
     assert.deepEqual(JSON.parse(changed.stdout).changes, [
       { name: "inspect_part", kind: "added", fields: [] },
-      { name: "lookup", kind: "changed", fields: ["description"] },
+      {
+        name: "lookup",
+        kind: "changed",
+        fields: ["description"],
+        details: [{ path: "/description", kind: "changed" }],
+        detailsTruncated: false,
+      },
     ]);
     const matched = run(before, before);
     assert.equal(matched.status, 0, matched.stderr);

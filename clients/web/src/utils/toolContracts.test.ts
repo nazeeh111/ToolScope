@@ -41,7 +41,16 @@ describe("tool contract snapshots", () => {
       { name: "new", inputSchema: { type: "object" } },
     ]);
     expect(changes).toEqual([
-      { name: "lookup", kind: "changed", fields: ["inputSchema"] },
+      {
+        name: "lookup",
+        kind: "changed",
+        fields: ["inputSchema"],
+        details: [
+          { path: "/inputSchema/properties", kind: "removed" },
+          { path: "/inputSchema/required", kind: "added" },
+        ],
+        detailsTruncated: false,
+      },
       { name: "new", kind: "added", fields: [] },
       { name: "old", kind: "removed", fields: [] },
     ]);
@@ -114,7 +123,15 @@ describe("baseline import boundary", () => {
     expect(parseContracts(JSON.stringify(imported), "local")).toEqual(saved);
     expect(
       compareContracts(imported, [{ ...tool, description: "new" }]),
-    ).toEqual([{ name: "lookup", kind: "changed", fields: ["description"] }]);
+    ).toEqual([
+      {
+        name: "lookup",
+        kind: "changed",
+        fields: ["description"],
+        details: [{ path: "/description", kind: "added" }],
+        detailsTruncated: false,
+      },
+    ]);
   });
   it("rejects wrong versions, servers, timestamps, shapes and mismatched names", () => {
     for (const value of [

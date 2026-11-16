@@ -34,7 +34,8 @@
   },
   "overrides": {
     "ink-select-input": "^6.2.0",
-    "esbuild": "^0.28.2"
+    "esbuild": "^0.28.2",
+    "minimatch": "11.0.5"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

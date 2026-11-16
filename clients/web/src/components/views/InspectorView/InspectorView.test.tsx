@@ -21,16 +21,12 @@ import {
 import { InspectorView, type InspectorViewProps } from "./InspectorView";
 import { noopPagination } from "../../../test/fixtures/pagination";
 
-// happy-dom's viewport is 1024px, narrower than the app's 1280px floor, so any
-// viewport media query would read "narrow". Force every `useMediaQuery` "wide"
-// so the connected header renders its full form (the only surviving query is
-// ServerStatusIndicator's 1500px status-text gate — the monitoring sidebar's old
-// 1040px gate was removed when the app gained its 1280px floor).
+// Keep the desktop inspector path in this suite; narrow navigation has its own control.
 vi.mock("@mantine/hooks", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@mantine/hooks")>();
   return {
     ...actual,
-    useMediaQuery: (): boolean => true,
+    useMediaQuery: (query: string): boolean => !query.includes("max-width"),
   };
 });
 import type { BridgeFactory } from "../../elements/AppRenderer/AppRenderer";

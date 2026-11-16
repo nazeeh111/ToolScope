@@ -592,8 +592,8 @@ export function NetworkEntry({
           </Stack>
         ) : (
           <>
-            <HeaderRow>
-              <WideHeaderCluster>
+            <HeaderRow className="network-entry-wide-header">
+              <WideHeaderCluster className="network-entry-wide-content">
                 <TimestampText>
                   {formatTimestamp(entry.timestamp)}
                 </TimestampText>

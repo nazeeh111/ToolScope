@@ -8,7 +8,7 @@ import {
   Transition,
   type MantineTransition,
 } from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
+import { useLocalStorage, useMediaQuery } from "@mantine/hooks";
 import type { Implementation, Tool } from "@modelcontextprotocol/client";
 import type { ServerEntry } from "@inspector/core/mcp/types.js";
 import { isTerminalStatus } from "@inspector/core/mcp/types.js";
@@ -758,9 +758,11 @@ export function InspectorView({
   // at a 1280px min-width, so there's always room for the split — no viewport
   // gate.) This also gates the header MonitoringToggle (#1661) — the toggle is
   // hidden entirely when the column can't exist.
+  const narrowViewport = useMediaQuery("(max-width: 800px)");
   const monitorColumnAvailable =
-    (connected || failed) && monitorAvailable.length > 0;
-  const effectivePinned = monitorPinned && monitorColumnAvailable;
+    !narrowViewport && (connected || failed) && monitorAvailable.length > 0;
+  const effectivePinned =
+    monitorPinned && monitorColumnAvailable && !narrowViewport;
 
   // The header loses the monitor group while the column is open (its screens
   // live in the column instead); otherwise it shows every available tab.
@@ -768,8 +770,10 @@ export function InspectorView({
     () =>
       effectivePinned
         ? availableTabs.filter((t) => !MONITOR_TABS.includes(t))
-        : availableTabs,
-    [effectivePinned, availableTabs],
+        : narrowViewport && failed
+          ? [...availableTabs, ...monitorAvailable]
+          : availableTabs,
+    [effectivePinned, availableTabs, narrowViewport, failed, monitorAvailable],
   );
 
   // Clamp the rendered primary tab to whatever the header currently shows. If
@@ -1164,6 +1168,15 @@ export function InspectorView({
         ) : (
           <ViewHeader
             connected={false}
+            diagnosticViews={
+              narrowViewport && failed && monitorAvailable.length > 0
+                ? {
+                    tabs: headerTabs,
+                    value: activeTab,
+                    onChange: onActiveTabChange,
+                  }
+                : undefined
+            }
             onToggleTheme={onToggleTheme}
             onOpenClientSettings={onOpenClientSettings}
             monitorToggle={monitorToggle}

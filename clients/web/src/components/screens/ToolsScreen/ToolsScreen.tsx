@@ -109,12 +109,14 @@ const SCROLL_MAX_HEIGHT =
 // see the Prompts/Resources preview panes this mirrors).
 const ScreenLayout = Flex.withProps({
   variant: "screen",
+  className: "tools-layout",
   h: "calc(100dvh - var(--app-shell-header-height, 0px) - var(--app-shell-footer-height, 0px))",
   gap: "md",
   p: "xl",
 });
 
 const Sidebar = Stack.withProps({
+  className: "tools-sidebar",
   // Widened from 340 to comfortably fit the pagination controls
   // (Load-next-page button + status) without cramping list entries (#1721).
   w: 360,
@@ -317,7 +319,12 @@ export function ToolsScreen({
         // Empty placeholder fills the full screen height (like Prompts/Resources)
         // rather than shrinking to its text.
         <DetailCard flex={1}>
-          <EmptyState>Select a tool to view details</EmptyState>
+          <Stack gap="xs" align="center" py="xl">
+            <Text fw={600}>Select a tool to view details</Text>
+            <EmptyState py={0} size="sm">
+              Choose a tool from the list to inspect its schema and run it.
+            </EmptyState>
+          </Stack>
         </DetailCard>
       )}
     </ScreenLayout>

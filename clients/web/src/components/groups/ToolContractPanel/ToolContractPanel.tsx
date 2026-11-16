@@ -26,15 +26,15 @@ const Panel = Card.withProps({
   padding: "md",
   flex: "0 0 auto",
 });
-const Actions = Group.withProps({ gap: "xs", mt: "xs" });
-const Action = Button.withProps({ size: "compact-xs", variant: "light" });
-const Caption = Text.withProps({ size: "xs", c: "dimmed" });
+const Actions = Group.withProps({ gap: "xs", mt: "sm" });
+const Action = Button.withProps({ size: "xs", variant: "light" });
+const Caption = Text.withProps({ size: "sm", c: "dimmed" });
 const ChangeList = ScrollArea.Autosize.withProps({
   mah: 180,
   offsetScrollbars: true,
 });
 const ChangeRow = Group.withProps({ gap: "xs", wrap: "nowrap" });
-const ChangeName = Text.withProps({ size: "xs", truncate: "end" });
+const ChangeName = Text.withProps({ size: "sm", truncate: "end" });
 
 export interface ToolContractPanelProps {
   serverIdentity: string;
@@ -133,8 +133,10 @@ export function ToolContractPanel({
 
   return (
     <Panel>
-      <Text fw={600}>Schema check</Text>
-      <Caption>
+      <Text fw={600} size="md">
+        Schema check
+      </Text>
+      <Caption mt={4}>
         Save tool definitions, then compare after refreshing or reconnecting.
         Stored in this browser.
       </Caption>
@@ -153,6 +155,7 @@ export function ToolContractPanel({
         </Action>
         <Action
           onClick={compare}
+          variant="filled"
           disabled={!baseline || incomplete || reading || !!pendingImport}
         >
           Compare tools
@@ -228,17 +231,35 @@ export function ToolContractPanel({
           </Text>
           <ChangeList>
             {changes.map((change) => (
-              <ChangeRow key={change.name}>
-                <Badge size="xs">{change.kind}</Badge>
-                <ChangeName
-                  title={`${change.name}: ${change.fields.join(", ")}`}
-                >
-                  {change.name}
-                  {change.fields.length > 0
-                    ? ` · ${change.fields.join(", ")}`
-                    : ""}
-                </ChangeName>
-              </ChangeRow>
+              <Stack key={change.name} gap={2}>
+                <ChangeRow>
+                  <Badge size="xs">{change.kind}</Badge>
+                  <ChangeName
+                    title={`${change.name}: ${change.fields.join(", ")}`}
+                  >
+                    {change.name}
+                    {change.fields.length > 0
+                      ? ` · ${change.fields.join(", ")}`
+                      : ""}
+                  </ChangeName>
+                </ChangeRow>
+                {change.details?.map((detail) => (
+                  <Text
+                    key={detail.path}
+                    size="sm"
+                    ff="monospace"
+                    style={{ overflowWrap: "anywhere" }}
+                  >
+                    {detail.kind} {detail.path || "(root)"}
+                  </Text>
+                ))}
+                {change.detailsTruncated && (
+                  <Caption>
+                    More locations differ. Details reached the output limit;
+                    compare the exported definitions for the full change.
+                  </Caption>
+                )}
+              </Stack>
             ))}
           </ChangeList>
         </Stack>

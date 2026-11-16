@@ -33,13 +33,16 @@ import { HEADER_ANIM_MS, ViewHeader } from "./ViewHeader";
 const TRANSITION_SETTLE_MS = HEADER_ANIM_MS + RAF_SLACK_MS;
 
 // Mock @mantine/hooks so we can control useMediaQuery results per test.
-const mediaQueryMock = vi.hoisted(() => ({ value: false }));
+const mediaQueryMock = vi.hoisted(() => ({ value: false, narrow: false }));
 vi.mock("@mantine/hooks", async () => {
   const actual =
     await vi.importActual<typeof import("@mantine/hooks")>("@mantine/hooks");
   return {
     ...actual,
-    useMediaQuery: () => mediaQueryMock.value,
+    useMediaQuery: (query: string) =>
+      query.includes("max-width")
+        ? mediaQueryMock.narrow
+        : mediaQueryMock.value,
   };
 });
 
@@ -59,6 +62,7 @@ const connectedProps = {
 describe("ViewHeader", () => {
   beforeEach(() => {
     mediaQueryMock.value = false;
+    mediaQueryMock.narrow = false;
   });
 
   describe("when not connected", () => {
@@ -216,6 +220,18 @@ describe("ViewHeader", () => {
       expect(onDisconnect).toHaveBeenCalledTimes(1);
     });
 
+    it("offers a view selector at narrow widths", async () => {
+      mediaQueryMock.narrow = true;
+      const onTabChange = vi.fn();
+      const user = userEvent.setup();
+      renderWithMantine(
+        <ViewHeader {...connectedProps} onTabChange={onTabChange} />,
+      );
+      await user.click(screen.getByRole("textbox", { name: "Inspector view" }));
+      await user.click(screen.getByRole("option", { name: "Resources" }));
+      expect(onTabChange).toHaveBeenCalledWith("Resources");
+    });
+
     it("renders all available tabs", () => {
       renderWithMantine(<ViewHeader {...connectedProps} />);
       expect(screen.getAllByText("Resources").length).toBeGreaterThan(0);
@@ -290,6 +306,34 @@ describe("ViewHeader", () => {
       await waitFor(() =>
         expect(screen.queryAllByRole("radio").length).toBe(0),
       );
+    });
+
+    it("announces a view added after connection on narrow screens", () => {
+      vi.useFakeTimers();
+      try {
+        mediaQueryMock.narrow = true;
+        const { rerender } = renderWithMantine(
+          <ViewHeader {...connectedProps} />,
+        );
+        expect(screen.queryByRole("status")).toBeNull();
+        act(() => {
+          vi.advanceTimersByTime(2000);
+        });
+        rerender(
+          <ViewHeader
+            {...connectedProps}
+            availableTabs={[...connectedProps.availableTabs, "Tasks"]}
+          />,
+        );
+        expect(screen.getByRole("status")).toHaveTextContent(
+          "New views: Tasks",
+        );
+        expect(
+          screen.getByRole("textbox", { name: "Inspector view" }),
+        ).toBeInTheDocument();
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it("glows a tab added after the connect grace window, not during it (#1450)", () => {

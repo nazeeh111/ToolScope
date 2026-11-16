@@ -13,6 +13,38 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 describe("ToolContractPanel", () => {
+  it("shows nested locations and explicitly warns when details are incomplete", async () => {
+    const user = userEvent.setup();
+    const schema = (type: string) => ({
+      type: "object" as const,
+      properties: Object.fromEntries(
+        Array.from({ length: 101 }, (_, index) => [
+          `field/${String(index).padStart(3, "0")}`,
+          { type },
+        ]),
+      ),
+    });
+    const saved = [{ name: "lookup", inputSchema: schema("string") }];
+    localStorage.setItem(
+      "toolscope.contracts.local",
+      JSON.stringify(captureContracts("local", saved)),
+    );
+    renderWithMantine(
+      <ToolContractPanel
+        serverIdentity="local"
+        tools={[{ name: "lookup", inputSchema: schema("number") }]}
+        incomplete={false}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Compare tools" }));
+    expect(
+      screen.getByText("changed /inputSchema/properties/field~1000/type"),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/More locations differ/)).toBeInTheDocument();
+    expect(
+      screen.queryByText("changed /inputSchema/properties/field~1100/type"),
+    ).not.toBeInTheDocument();
+  });
   it("saves a baseline, restores on reconnect and compares current definitions", async () => {
     const user = userEvent.setup();
     const initial = renderWithMantine(
@@ -71,6 +103,7 @@ describe("ToolContractPanel", () => {
     );
     await user.click(screen.getByRole("button", { name: "Compare tools" }));
     expect(screen.getByText("lookup · description")).toBeInTheDocument();
+    expect(screen.getByText("added /description")).toBeInTheDocument();
     view.rerender(
       <ToolContractPanel
         serverIdentity="local"

@@ -102,6 +102,12 @@ test("reports deterministic changed fields, additions and removals with exit 1",
             name: "lookup",
             kind: "changed",
             fields: ["description", "inputSchema"],
+            details: [
+              { path: "/description", kind: "added" },
+              { path: "/inputSchema/properties", kind: "removed" },
+              { path: "/inputSchema/required", kind: "added" },
+            ],
+            detailsTruncated: false,
           },
           { name: "new", kind: "added", fields: [] },
           { name: "old", kind: "removed", fields: [] },
@@ -138,6 +144,33 @@ test("refuses invalid and foreign baselines without a successful JSON report", (
       assert.ok(result.stderr.length > 0);
     });
   }
+});
+
+test("offline nested diagnostics are capped and inputs remain intact", () => {
+  const schema = (type) => ({
+    type: "object",
+    properties: Object.fromEntries(
+      Array.from({ length: 101 }, (_, i) => [
+        `field/${String(i).padStart(3, "0")}`,
+        { type },
+      ]),
+    ),
+  });
+  inFiles(
+    snapshot([{ ...tool, inputSchema: schema("string") }]),
+    snapshot([{ ...tool, inputSchema: schema("number") }]),
+    (result) => {
+      assert.equal(result.status, 1, result.stderr);
+      const change = JSON.parse(result.stdout).changes[0];
+      assert.deepEqual(change.fields, ["inputSchema"]);
+      assert.equal(change.details.length, 100);
+      assert.deepEqual(change.details[0], {
+        path: "/inputSchema/properties/field~1000/type",
+        kind: "changed",
+      });
+      assert.equal(change.detailsTruncated, true);
+    },
+  );
 });
 
 test("rejects non-finite numbers and malformed UTF-8", () => {

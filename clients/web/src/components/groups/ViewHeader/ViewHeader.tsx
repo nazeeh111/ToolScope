@@ -7,13 +7,16 @@ import {
   Group,
   Image,
   SegmentedControl,
+  Select,
   Text,
   Title,
   Tooltip,
   Transition,
+  VisuallyHidden,
   useComputedColorScheme,
   type MantineTransition,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import type { Implementation } from "@modelcontextprotocol/client";
 import { MdLightMode, MdDarkMode, MdSettings } from "react-icons/md";
 import { VscDebugDisconnect } from "react-icons/vsc";
@@ -46,6 +49,11 @@ interface ConnectedProps {
 
 interface UnconnectedProps {
   connected: false;
+  diagnosticViews?: {
+    tabs: string[];
+    value: string;
+    onChange: (value: string) => void;
+  };
   onToggleTheme: () => void;
   onOpenClientSettings: () => void;
   /** Monitoring-sidebar toggle, shown to the right of the theme icon. */
@@ -124,6 +132,7 @@ function toGlowingTabData(tabs: string[], glowing: string[]) {
 }
 
 const HeaderBar = Group.withProps({
+  className: "workspace-header",
   h: "100%",
   px: "md",
   wrap: "nowrap",
@@ -131,6 +140,7 @@ const HeaderBar = Group.withProps({
 });
 
 const LeftSection = Group.withProps({
+  className: "workspace-header-left",
   gap: "md",
   wrap: "nowrap",
   flex: 1,
@@ -162,6 +172,7 @@ const ServerName = Text.withProps({
 });
 
 const RightSection = Group.withProps({
+  className: "workspace-header-right",
   gap: "sm",
   wrap: "nowrap",
   flex: 1,
@@ -227,6 +238,7 @@ const toggleSlide: MantineTransition = {
 
 export function ViewHeader(props: ViewHeaderProps) {
   const colorScheme = useComputedColorScheme();
+  const narrowViewport = useMediaQuery("(max-width: 800px)");
   // Retain the latest toggle props so the control keeps rendering its final
   // state while it slides out after `monitorToggle` clears (the Transition below
   // keeps it mounted for the exit). Adjust-state-during-render, gated on the
@@ -342,7 +354,7 @@ export function ViewHeader(props: ViewHeaderProps) {
       {/* Box (not a flex primitive via `.withProps()`): this is a CSS grid
           container, and no Mantine flex primitive is a grid — converting to
           Group/Stack would break the shared-cell stack overlay. */}
-      <Box display="grid" flex="0 0 auto">
+      <Box className="workspace-header-center" display="grid" flex="0 0 auto">
         {/* The Transitions are keep-alive only: when `mounted` flips false the
             cell stays in the DOM for `exitDuration` while its CSS exit animation
             (`data-anim="out"`) plays, then unmounts. `data-anim` selects the
@@ -357,12 +369,49 @@ export function ViewHeader(props: ViewHeaderProps) {
           {() =>
             headerData ? (
               <HeaderStackCell data-anim={connectedAnim}>
-                <SegmentedControl
-                  value={headerData.activeTab}
-                  onChange={handleTabChange}
-                  data={toGlowingTabData(headerData.availableTabs, glowing)}
-                  size="sm"
-                />
+                {narrowViewport ? (
+                  <Group
+                    className="workspace-mobile-tabs"
+                    gap="xs"
+                    wrap="nowrap"
+                  >
+                    <Select
+                      aria-label="Inspector view"
+                      value={headerData.activeTab}
+                      onChange={(value) => value && handleTabChange?.(value)}
+                      data={headerData.availableTabs.map((tab) => ({
+                        value: tab,
+                        label: glowing.includes(tab) ? `${tab} (new)` : tab,
+                      }))}
+                      allowDeselect={false}
+                      flex={1}
+                      miw={0}
+                    />
+                    {glowing.length > 0 && (
+                      <Text
+                        size="xs"
+                        fw={600}
+                        c="teal"
+                        role="status"
+                        title={`New views: ${glowing.join(", ")}`}
+                      >
+                        New
+                        <VisuallyHidden component="span">
+                          {" "}
+                          views: {glowing.join(", ")}
+                        </VisuallyHidden>
+                      </Text>
+                    )}
+                  </Group>
+                ) : (
+                  <SegmentedControl
+                    className="workspace-desktop-tabs"
+                    value={headerData.activeTab}
+                    onChange={handleTabChange}
+                    data={toGlowingTabData(headerData.availableTabs, glowing)}
+                    size="sm"
+                  />
+                )}
               </HeaderStackCell>
             ) : (
               // Unreachable in practice — the Transition only mounts while
@@ -381,7 +430,20 @@ export function ViewHeader(props: ViewHeaderProps) {
         >
           {() => (
             <HeaderStackCell data-anim={props.connected ? "out" : "in"}>
-              <Title order={2}>ToolScope</Title>
+              {!props.connected && props.diagnosticViews ? (
+                <Select
+                  aria-label="Inspector view"
+                  data={props.diagnosticViews.tabs}
+                  value={props.diagnosticViews.value}
+                  onChange={(value) =>
+                    value && props.diagnosticViews?.onChange(value)
+                  }
+                  allowDeselect={false}
+                  w="100%"
+                />
+              ) : (
+                <Title order={2}>ToolScope</Title>
+              )}
             </HeaderStackCell>
           )}
         </Transition>

@@ -14,6 +14,7 @@ export {
 } from "@inspector/core/toolContracts";
 export type {
   ContractChange,
+  ContractDetail,
   ContractSnapshot,
 } from "@inspector/core/toolContracts";
 

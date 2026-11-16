@@ -16,6 +16,66 @@ export interface ContractChange {
   name: string;
   kind: "added" | "removed" | "changed";
   fields: string[];
+  details?: ContractDetail[];
+  detailsTruncated?: boolean;
+}
+export interface ContractDetail {
+  path: string;
+  kind: "added" | "removed" | "changed";
+}
+
+// Bound diagnostics without shortening a pointer into a different location.
+const MAX_DETAILS = 100;
+const MAX_DETAIL_CHARS = 16_000;
+
+/** Structural locations only: array positions are significant, not schema compatibility. */
+function contractDetails(before: unknown, after: unknown) {
+  const details: ContractDetail[] = [];
+  let characters = 0;
+  let detailsTruncated = false;
+  function emit(path: string, kind: ContractDetail["kind"]) {
+    if (
+      details.length >= MAX_DETAILS ||
+      characters + path.length > MAX_DETAIL_CHARS
+    ) {
+      detailsTruncated = true;
+      return;
+    }
+    details.push({ path, kind });
+    characters += path.length;
+  }
+  function child(path: string, key: string) {
+    return `${path}/${key.replace(/~/g, "~0").replace(/\//g, "~1")}`;
+  }
+  function visit(left: unknown, right: unknown, path: string) {
+    if (detailsTruncated || Object.is(left, right)) return;
+    if (Array.isArray(left) && Array.isArray(right)) {
+      for (
+        let index = 0;
+        index < Math.max(left.length, right.length);
+        index++
+      ) {
+        const next = child(path, String(index));
+        if (index >= left.length) emit(next, "added");
+        else if (index >= right.length) emit(next, "removed");
+        else visit(left[index], right[index], next);
+        if (detailsTruncated) break;
+      }
+    } else if (isRecord(left) && isRecord(right)) {
+      const keys = [
+        ...new Set([...Object.keys(left), ...Object.keys(right)]),
+      ].sort();
+      for (const key of keys) {
+        const next = child(path, key);
+        if (!Object.hasOwn(left, key)) emit(next, "added");
+        else if (!Object.hasOwn(right, key)) emit(next, "removed");
+        else visit(left[key], right[key], next);
+        if (detailsTruncated) break;
+      }
+    } else emit(path, "changed");
+  }
+  visit(before, after, "");
+  return { details, detailsTruncated };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -182,7 +242,12 @@ export function compareContracts(
             Object.hasOwn(before, key) !== Object.hasOwn(after, key) ||
             canonical(before[key]) !== canonical(after[key]),
         );
-      changes.push({ name, kind: "changed", fields });
+      changes.push({
+        name,
+        kind: "changed",
+        fields,
+        ...contractDetails(before, after),
+      });
     }
   }
   return changes;

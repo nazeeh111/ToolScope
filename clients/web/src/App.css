@@ -262,19 +262,86 @@ body {
   background-color: var(--inspector-surface-body);
 }
 
-/* Floor the app at 1280px so the header, split panes, and footer never reflow
-   into a broken layout; below this the whole app scrolls horizontally instead.
-   Scoped to the app mount (#root) rather than `body` so it doesn't leak into
-   Storybook, which shares App.css but renders stories into its own root.
-
-   The `transform` makes #root the containing block for the AppShell's
-   position:fixed header + footer, so they honor the 1280px floor too — spanning
-   the full 1280 and scrolling horizontally with the content — instead of staying
-   pinned to a narrower viewport. Body-portalled overlays (modals, tooltips,
-   dropdowns) render outside #root, so they stay viewport-fixed as intended. */
-#root {
-  min-width: 1280px;
-  transform: translateZ(0);
+/* The desktop inspector keeps its split panes. On narrow screens monitoring
+   returns to the view selector and the tool panes stack within the workspace. */
+.workspace-mobile-tabs {
+  display: none;
+}
+@media (max-width: 800px) {
+  .workspace-header {
+    gap: 4px;
+    padding-inline: 8px;
+  }
+  .workspace-header-left {
+    flex: 0 0 auto;
+  }
+  .workspace-header-left .header-anim {
+    display: none;
+  }
+  .workspace-header-center {
+    flex: 1 1 0 !important;
+    min-width: 0;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-header-center > .header-anim {
+    width: 100%;
+    min-width: 0;
+  }
+  .workspace-header-right {
+    flex: 0 0 auto;
+    gap: 0;
+  }
+  .workspace-header-right .header-anim {
+    gap: 0;
+  }
+  .workspace-desktop-tabs {
+    display: none;
+  }
+  .workspace-mobile-tabs {
+    display: flex;
+    width: 100%;
+  }
+  /* Screens with a filter/list sidebar stack both panes rather than clipping
+     the second pane outside the viewport. */
+  .mantine-Flex-root[data-variant="screen"] {
+    flex-direction: column !important;
+    overflow: auto !important;
+    padding: 16px !important;
+  }
+  .mantine-Flex-root[data-variant="screen"] > * {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+  .mantine-Flex-root[data-variant="screen"] > :last-child {
+    min-height: 320px;
+  }
+  .network-entry-wide-header,
+  .network-entry-wide-content {
+    flex-wrap: wrap !important;
+    justify-content: flex-start;
+  }
+  .network-entry-wide-content {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .tools-layout {
+    flex-direction: column !important;
+    overflow: auto !important;
+    padding: 16px !important;
+  }
+  .tools-sidebar {
+    width: 100% !important;
+  }
+  .tools-sidebar > :last-child {
+    min-height: 280px;
+    max-height: 360px;
+  }
+  .tools-layout > :last-child {
+    flex: 0 0 auto;
+    min-height: 240px;
+    max-height: none !important;
+  }
 }
 
 /* ── Animations ──────────────────────────────────────────── */
@@ -515,7 +582,18 @@ body {
   background-color: var(--mantine-primary-color-light);
 }
 
+/* Keep keyboard focus visible against the dark workspace surfaces. */
+[data-mantine-color-scheme="dark"] .mantine-focus-auto:focus-visible {
+  outline: 2px solid var(--mantine-color-teal-3);
+  outline-offset: 2px;
+}
+
 /* ── Segmented control label (dark mode) ──────────────────────── */
+
+[data-mantine-color-scheme="dark"]
+  .mantine-SegmentedControl-label[data-active] {
+  color: var(--mantine-color-gray-0);
+}
 
 [data-mantine-color-scheme="dark"] .mantine-SegmentedControl-indicator {
   background-color: var(--mantine-primary-color-light);

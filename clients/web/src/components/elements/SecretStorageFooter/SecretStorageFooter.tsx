@@ -15,10 +15,8 @@ import {
 } from "@inspector/core/auth/secret-storage-info.js";
 
 /**
- * Height of the footer band. Matches `InspectorView`'s `FOOTER_HEIGHT`
- * deliberately: these are the app's only permanent status strips, and a
- * modal footer standing a few pixels taller than the one behind it would
- * read as a different kind of thing.
+ * Minimum height of the footer band, matching `InspectorView`'s status strip.
+ * It grows when the statement wraps, so its warning remains visible.
  */
 export const SECRET_STORAGE_FOOTER_HEIGHT = 32;
 
@@ -36,11 +34,10 @@ export interface SecretStorageFooterProps {
 // `Modal.Footer`, so it renders as the last child of `Modal.Content`, after the
 // `Modal.Body`, and its theme variant pins it with `position: sticky` — the
 // mirror of Mantine's own sticky header, because `Modal.Content` scrolls
-// header, body and footer as one. `nowrap` keeps it to one line at any modal
-// width; the truncating detail text on the right absorbs a narrow modal.
+// header, body and footer as one. The row stays together while the text wraps.
 const FooterBand = Group.withProps({
   variant: "stickyModalFooter",
-  h: SECRET_STORAGE_FOOTER_HEIGHT,
+  mih: SECRET_STORAGE_FOOTER_HEIGHT,
   gap: 0,
   align: "center",
   wrap: "nowrap",
@@ -51,9 +48,9 @@ const FooterBand = Group.withProps({
 // so that when the row is a copy button it covers the band edge to edge — a
 // click target with dead margins is a click target people miss.
 const FooterRow = Group.withProps({
-  h: "100%",
   w: "100%",
   px: "md",
+  py: 6,
   gap: 6,
   align: "center",
   wrap: "nowrap",
@@ -63,28 +60,18 @@ const FooterRow = Group.withProps({
 // `UnstyledButton` rather than a click handler on the Group: this is a real
 // action, so it needs to be reachable by keyboard and announced as a button.
 const CopyTarget = UnstyledButton.withProps({
-  h: "100%",
   w: "100%",
 });
 
-// The whole statement, prefix included, as one clamped line.
-//
-// `lineClamp` rather than `truncate`, and the difference is load-bearing.
-// `Modal.Content` sizes its scroll container to its children's **max-content**
-// width, and `truncate` sets `white-space: nowrap`, whose max-content is the
-// entire sentence — so the band grew the container to 770px inside a 620px
-// modal and the *form above it* got clipped at the right edge (measured).
-// Clamped text still wraps internally, so its max-content is merely its
-// longest word, and the container stays the modal's width; the clamp then
-// keeps it to the one line this 32px band has room for. `miw: 0` + `flex: 1`
-// let it shrink to the leftover space rather than to its content.
+// Let the complete status wrap without forcing the modal wider than its form.
+// Breaking unusually long words also bounds intrinsic width on narrow screens.
 const FooterMessage = Text.withProps({
   size: "xs",
   fw: 500,
-  lineClamp: 1,
   miw: 0,
   flex: 1,
   ta: "left",
+  style: { overflowWrap: "anywhere" },
 });
 
 // "Secrets:" carries the heavier weight so the band reads as a labelled fact
@@ -243,9 +230,8 @@ function footerTooltip(info: SecretStorageInfo): string | undefined {
  * When the store is lossy or unencrypted the caveat is rendered *inline*
  * rather than left to the tooltip. That is the whole point of the
  * "plaintext gets a loud warning" decision: a warning you have to hover to
- * discover is not one. The tooltip carries the full sentence for the case
- * where a narrow modal truncates it, and — for the quiet stores — the file
- * path.
+ * discover is not one. The tooltip carries further details and, for quiet
+ * file stores, the path.
  *
  * Deliberately read-only for now. Choosing the store from here is the
  * obvious follow-up, but the gap this closes is that users could not find

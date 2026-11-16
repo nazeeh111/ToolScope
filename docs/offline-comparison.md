@@ -12,7 +12,7 @@ node scripts/compare-tool-baselines.mjs examples/tool-baselines/before.json exam
 
 No clone or npm install is needed for the kit. It contains the bundled comparison command, these synthetic files, licenses and a `manifest.json` listing source and output hashes. To run from source instead, clone the repository and run `INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci` before the same command.
 
-Actual output reproduced on 2026-10-23 with the checked-in synthetic examples:
+Source command output includes nested details as of 2026-11-16. The previously published v0.3.1 kit retains its original top-level-only output; rebuilding the kit from this source includes the new fields. With the checked-in synthetic examples:
 
 ```json
 {
@@ -28,13 +28,15 @@ Actual output reproduced on 2026-10-23 with the checked-in synthetic examples:
     {
       "name": "lookup",
       "kind": "changed",
-      "fields": ["description"]
+      "fields": ["description"],
+      "details": [{ "path": "/description", "kind": "changed" }],
+      "detailsTruncated": false
     }
   ]
 }
 ```
 
-The shell receives status **1**, meaning definitions differ. It is an expected comparison result, not an installation failure. `lookup` still exists; its advertised description changed. `inspect_part` appears only in the second file. This reports definition changes, not whether consumers remain compatible.
+The shell receives status **1**, meaning definitions differ. It is an expected comparison result, not an installation failure. `lookup` still exists; its advertised description changed. `inspect_part` appears only in the second file. This reports definition changes, not whether consumers remain compatible. Nested `details` identify structural locations using JSON Pointer syntax: `~0` encodes a tilde and `~1` a slash in a key. Arrays compare by position. A missing subtree is reported once, and replacing a container type reports its parent path. Each changed tool has at most 100 details and 16,000 total pointer UTF-16 code units. `detailsTruncated: true` means the diagnostic prefix is incomplete; the full exported definitions remain the reference. Details do not contain repeated schema values or executable patch instructions.
 
 ## Save a result without hiding its status
 
