@@ -515,7 +515,7 @@ describe("oauthResume", () => {
     // The whole global goes, not just its two methods — an exotic runtime with
     // no WebCrypto at all, matching `src/test/core/auth/utils.test.ts`. Hiding
     // only the methods would leave `globalThis.crypto` truthy and so would not
-    // catch a regression that reads it without the optional guard (Copilot).
+    // catch a regression that reads it without the optional guard.
     const mathSpy = vi.spyOn(Math, "random");
     // `crypto` IS an own property of the global (unlike the `Crypto.prototype`
     // members above), so there is always a descriptor to restore. Asserted

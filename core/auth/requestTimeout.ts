@@ -83,7 +83,7 @@ export class OAuthRequestTimeoutError extends Error {
    * verbatim by `createFetchTracker` into the Network log and the persisted
    * session, and an OAuth endpoint can carry a `code`, an `access_token` or a
    * `client_secret` in its query string — which `fetchTracking` already
-   * deliberately redacts everywhere else it records a URL (Copilot). The path
+   * deliberately redacts everywhere else it records a URL. The path
    * and every non-sensitive parameter survive, so the endpoint stays
    * identifiable, which was the point of naming it.
    */
@@ -103,7 +103,7 @@ export class OAuthRequestTimeoutError extends Error {
  * The largest delay `setTimeout` can actually schedule. Past `2 ** 31 - 1` the
  * delay overflows a 32-bit signed integer and Node falls back to **1ms**, so an
  * `Infinity` or an over-large budget produces an *immediate* timeout — the exact
- * opposite of what the caller asked for (Copilot).
+ * opposite of what the caller asked for.
  */
 const MAX_TIMER_DELAY_MS = 2_147_483_647;
 
@@ -133,7 +133,7 @@ function normalizeBudget(timeoutMs: number): number {
  * `createRemoteFetch` turns any non-OK answer into a plain `Error` — so a
  * timeout enforced by the *backend* would arrive as an untyped error and the
  * `instanceof OAuthRequestTimeoutError` checks downstream would all be false
- * (Copilot). Both ends run the same budget, so the client's race usually
+ * Both ends run the same budget, so the client's race usually
  * settles first; this matters when the backend's timer wins anyway — most
  * plausibly a backgrounded tab, where the browser throttles `setTimeout` while
  * the server's fires on schedule. Which of two equal deadlines happened to fire
@@ -179,7 +179,7 @@ export function isOAuthRequestTimeoutWire(
  * - **Streamable HTTP** sends every MCP request to the configured URL, so
  *   `origin + pathname` is exact. Same-origin OAuth work — a protected-resource
  *   document, or an authorization server deployed beside the resource — is a
- *   different path and stays bounded, which is what #2319 asks for (Copilot).
+ *   different path and stays bounded, which is what #2319 asks for.
  * - **Legacy SSE** opens the configured URL (`/sse`), is handed a *separate*
  *   message endpoint by the server, and POSTs every JSON-RPC message to that
  *   second pathname. We never see that URL — it arrives inside the stream, in
@@ -237,7 +237,7 @@ export function exemptMcpEndpoint(
     // any absolute URL, so a user may point it at the MCP endpoint's own URL,
     // and the transport-internal refresh then travels this chain to a path the
     // rules below would exempt — leaving the one request this whole change
-    // exists to bound running unbounded (Copilot). The token family is
+    // exists to bound running unbounded. The token family is
     // form-encoded and MCP never is, so the media type settles it before any
     // URL comparison happens.
     if (
@@ -250,7 +250,7 @@ export function exemptMcpEndpoint(
     // `getServerUrl()` throws for a non-HTTP configuration, and this wrapped
     // fetch can be handed to a transport or a custom factory that calls it
     // anyway — propagating a configuration error out of a fetch would turn the
-    // documented fail-open into a hard failure (Copilot). Caught here for the
+    // documented fail-open into a hard failure. Caught here for the
     // same reason `readNegotiatesEndpoint` catches.
     let serverUrl: string | undefined;
     try {
@@ -279,7 +279,7 @@ export function exemptMcpEndpoint(
  * `/api/fetch` must not time every request it serves — `createRemoteFetch` also
  * carries MCP traffic, and a Streamable HTTP tool call can legitimately withhold
  * its response headers for minutes — so the route needs to know which requests
- * are bounded and which are not (Copilot). A header would be the obvious
+ * are bounded and which are not. A header would be the obvious
  * carrier and is the wrong one: `serializeRequest` copies request headers
  * verbatim into the payload and the route re-sends them to the authorization
  * server, so a marker header would leak to a third party.
@@ -371,13 +371,13 @@ function requestUrlOf(input: RequestInfo | URL): string {
  * wrapper always passes a `signal` of its own in `init` — so reading `init`
  * alone would silently override the embedded one and change ordinary `fetch`
  * cancellation semantics for `withOAuthRequestTimeout(new Request(url, { signal }))`
- * (Copilot).
+ *
  *
  * An `init.signal` still wins, but only when it is not `undefined`. `RequestInit`
  * is a WebIDL dictionary, where a member present with the value `undefined` is
  * converted as *absent* — so `{ ...base, signal: undefined }`, which is what a
  * spread over an options object that had no signal produces, must inherit the
- * `Request`'s signal rather than clear it (Copilot). An explicit `null` is the
+ * `Request`'s signal rather than clear it. An explicit `null` is the
  * genuine "no signal" override and is honoured as one.
  */
 export function callerSignalOf(
@@ -437,7 +437,7 @@ export function withOAuthRequestTimeout(
   // a fractional delay (verified on Node 26) and so would fail before the
   // request was sent. This wrapper drives its deadline with `setTimeout` and an
   // `AbortController`, and `setTimeout` accepts a fractional delay and
-  // truncates it, so nothing here would throw (Copilot).
+  // truncates it, so nothing here would throw.
   //
   // The real reason is that the budget is *reported*: it is interpolated into
   // the timeout message and exposed as `OAuthRequestTimeoutError.timeoutMs`. A
@@ -463,7 +463,6 @@ export function withOAuthRequestTimeout(
     // would still evaluate `fetchFn(...)`, and a `fetchFn` that does not check
     // an already-aborted signal — the proxy hop was one until #2319 — would
     // send the OAuth request even though the caller cancelled before the call
-    // (Copilot).
     if (callerSignal?.aborted) throw callerSignal.reason;
 
     const signal = callerSignal
@@ -490,7 +489,7 @@ export function withOAuthRequestTimeout(
       // it is enough wherever the signal is honoured, but a `fetchFn` that
       // ignores it would otherwise leave this promise pending for the whole
       // budget instead of the outer cancellation winning as documented
-      // (Copilot). The caller's own `reason` is preserved, so it still sees its
+      // The caller's own `reason` is preserved, so it still sees its
       // abort rather than a substituted error.
       // Not aborted — the short-circuit above returned for that case.
       if (callerSignal) {
@@ -517,7 +516,7 @@ export function withOAuthRequestTimeout(
       // `fetch` resolves once the response *headers* arrive, so stopping here
       // would leave the body unbounded: an authorization server can send
       // headers, or half a JSON document, and then stall, and the caller's
-      // `response.json()` would hang with nothing watching it (Copilot). Every
+      // `response.json()` would hang with nothing watching it. Every
       // response on this path is a small, finite document — metadata,
       // a registration, a token — so buffering it under the same deadline
       // bounds the whole exchange. It is also the second reason `isExempt` is
@@ -531,7 +530,7 @@ export function withOAuthRequestTimeout(
       // response the caller gets is the one `fetch` produced.
       //
       // The alternative, rebuilding a `Response` around the buffered bytes,
-      // could never be faithful (Copilot). `url`, `redirected` and `type` are
+      // could never be faithful. `url`, `redirected` and `type` are
       // internal slots; shadowing them as own properties satisfies a direct
       // read and is lost again the moment a caller calls `clone()`, which
       // returns a fresh native `Response`. The headers guard differs too, and
@@ -548,7 +547,7 @@ export function withOAuthRequestTimeout(
       // read. `clone()` tees the body, so a drain still running would keep
       // pulling bytes *and* keep buffering them for the unread original branch
       // — unbounded memory on exactly the signal-ignoring body the race exists
-      // to contain (Copilot). Both branches are cancelled here, which is safe
+      // to contain. Both branches are cancelled here, which is safe
       // precisely because this path throws: the caller never receives the
       // response, so nothing is left to read it.
       cancelBoth(drainReader, settled);

@@ -437,7 +437,7 @@ test("main: no command is a usage error", async () => {
 });
 
 // Ctrl-C and a plain kill are the obvious ones; Ctrl-\ (SIGQUIT) is the one
-// that was missed (Copilot), and it matters for the same reason: the child
+// that was missed, and it matters for the same reason: the child
 // is in its own process group, so a signal the wrapper does not handle ends
 // the wrapper alone and orphans the gate.
 for (const [signal, code] of [

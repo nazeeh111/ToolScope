@@ -66,7 +66,7 @@ test("clientProjects: a NEUTERED project still contributes its program (#1965)",
   );
 });
 
-test("lockVersionsByPath: keyed by install path, nested entries included (Copilot, #1965 r1)", () => {
+test("lockVersionsByPath: keyed by install path, nested entries included (#1965 r1)", () => {
   // Keyed by PATH, not by package name: a nested copy that entered a program has
   // to be priced from its own entry. Reading only `node_modules/<pkg>` would
   // compare it against the install's top-level copy — a different version, or
@@ -152,7 +152,7 @@ test("findSkew: reports the copies one program loaded, with their paths", () => 
   ]);
 });
 
-test("findSkew: only the installs that MET in a program are compared (Copilot, #1965 r1)", () => {
+test("findSkew: only the installs that MET in a program are compared (#1965 r1)", () => {
   // `clients/cli` holds a different zod, but no program loads it beside another
   // copy — nothing has to relate the two, so it is not a finding, and naming cli
   // in a diagnostic about web's program would be wrong as well as noisy.
@@ -170,7 +170,7 @@ test("findSkew: only the installs that MET in a program are compared (Copilot, #
   assert.deepEqual(skewed, []);
 });
 
-test("findSkew: a nested copy is priced from its own entry (Copilot, #1965 r1)", () => {
+test("findSkew: a nested copy is priced from its own entry (#1965 r1)", () => {
   // The root loaded zod through `a`'s nested copy. Pricing it from the root's
   // TOP-LEVEL entry (4.4.3, aligned with web) would report the pair as agreeing.
   const { skewed } = findSkew(
@@ -250,7 +250,7 @@ test("findSkew: results are sorted by package name", () => {
   );
 });
 
-test("hasReadableLockShape: only a v2+ packages table with a root entry (Copilot, #1962)", () => {
+test("hasReadableLockShape: only a v2+ packages table with a root entry (#1962)", () => {
   assert.equal(
     hasReadableLockShape({ lockfileVersion: 3, packages: { "": {} } }),
     true,
@@ -338,7 +338,7 @@ test("partitionSkew: deny by default — nothing tolerated fails everything", ()
   assert.equal(partitionSkew(skewed, new Map()).failures.length, 1);
 });
 
-test("partitionSkew: the allowlist tolerates skew only within a major (Copilot, #1962)", () => {
+test("partitionSkew: the allowlist tolerates skew only within a major (#1962)", () => {
   // Each rationale establishes that a patch/minor difference is benign; that is
   // not evidence a React 18-vs-19 split is, so a listed package still fails
   // across a major boundary.
@@ -418,7 +418,7 @@ test("declaredPackages: dependencies, devDependencies and optionalDependencies f
   // npm installs for us", not "does it ship" — `@types/node` and the toolchain
   // are exactly the case #2226 is about, and all of them are devDependencies.
   // optionalDependencies count for the same reason: npm attempts to install one
-  // like any other direct declaration (Copilot, #2226).
+  // like any other direct declaration (#2226).
   assert.deepEqual(
     [
       ...declaredPackages([

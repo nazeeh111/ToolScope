@@ -119,7 +119,7 @@ describe("CLI interactive OAuth (integration)", () => {
     // No budget: stopping the server and unlinking a file is not the round trip
     // this file's constant describes, and the shared `hookTimeout` is already
     // 30000 — so a per-hook argument here would restate it and say the wrong
-    // thing about it (Copilot).
+    // thing about it.
   });
 
   it(

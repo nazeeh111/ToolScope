@@ -107,7 +107,7 @@ const repoRoot = path.resolve(
 // major version*. A rationale establishes that a patch/minor difference is
 // harmless, which is not evidence that a React 18-vs-19 or Hono 4-vs-5 split
 // across installs would be — that is a different type surface, and it fails like
-// anything else (Copilot, #1962).
+// anything else (#1962).
 //
 // The admission test is the one the zod incident established: does the
 // package's public type surface consist of deeply recursive generics that
@@ -148,7 +148,7 @@ const TOLERATED_DECLARED_SKEW = new Map();
  * writes — `node_modules/zod`, `node_modules/a/node_modules/zod`.
  *
  * Keyed by path rather than by package name so a version is read from the exact
- * copy a program resolved (Copilot, #1965 r1). Reading only top-level entries
+ * copy a program resolved (#1965 r1). Reading only top-level entries
  * would mean a nested copy that entered the program got compared against
  * whatever sits at the install's top level — a different version, or nothing at
  * all — and a real pair could pass. Nested copies are still not a *candidate* on
@@ -174,7 +174,7 @@ export function lockVersionsByPath(lock) {
  * `lockVersionsByPath` returns an empty map for anything else. An unreadable
  * lockfile would otherwise contribute no holders, and a real skew among the
  * remaining installs would be reported as aligned — the gate failing *open*,
- * which is the one way it must never fail (Copilot, #1962). A v1 lockfile
+ * which is the one way it must never fail (#1962). A v1 lockfile
  * (`dependencies` only, no `packages`) lands here too, correctly: this guard
  * cannot read it, so it must say so rather than skip the install.
  */
@@ -182,7 +182,7 @@ export function hasReadableLockShape(lock) {
   // The declared version is checked, not just inferred from the presence of a
   // `packages` key: this function and the diagnostic it drives both promise
   // "lockfileVersion 2+", so a file claiming v1 while carrying a `packages`
-  // table must be rejected rather than half-trusted (Copilot, #1962).
+  // table must be rejected rather than half-trusted (#1962).
   const version = lock?.lockfileVersion;
   if (typeof version !== "number" || !Number.isFinite(version) || version < 2)
     return false;
@@ -200,7 +200,7 @@ export function hasReadableLockShape(lock) {
  * skewed when the copies **one program** loaded, from two different installs,
  * carry more than one version. Only the installs that actually met in that
  * program are compared: a third install's copy that no program loads is not
- * evidence of anything (Copilot, #1965 r1).
+ * evidence of anything (#1965 r1).
  *
  * Returns `{ skewed, unresolved }`, sorted by name. `unresolved` names a copy
  * whose lockfile entry is missing — the tree and the lockfile disagree, so the
@@ -291,7 +291,7 @@ export function toleratesSkew(name, holders, tolerated) {
  *   • `optionalDependencies` — a direct declaration npm attempts to install like
  *     any other. Omitting it would leave an optional-only package free to hold
  *     conflicting top-level copies in two installs while this tier reported
- *     success (Copilot, #2226).
+ *     success (#2226).
  *
  * `peerDependencies` is the one exclusion, and it is not an oversight: a peer
  * range is a constraint the consumer places on its *host*, not a statement that
@@ -396,7 +396,7 @@ export function clientProjects(scripts, references) {
 /**
  * The `clients/*` directories that are real installs — one with a
  * `package.json`. Enrolment is by manifest, NOT by the presence of a lockfile
- * (Copilot, #1962): filtering on the lockfile made a missing one silently drop
+ * (#1962): filtering on the lockfile made a missing one silently drop
  * that install from the comparison.
  */
 function clientDirs() {

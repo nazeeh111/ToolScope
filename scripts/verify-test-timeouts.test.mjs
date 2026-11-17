@@ -148,7 +148,7 @@ test("discovery finds exactly the configs this guard is set up to check", () => 
 
 test("discovery knows every filename Vitest loads a config from", () => {
   // Deny-by-default only holds if discovery sees every config Vitest would; a
-  // `vitest.config.mts` this list did not name would be invisible (Copilot).
+  // `vitest.config.mts` this list did not name would be invisible.
   for (const ext of ["ts", "mts", "cts", "js", "mjs", "cjs"]) {
     assert.ok(
       VITEST_CONFIG_FILENAMES.includes(`vitest.config.${ext}`),

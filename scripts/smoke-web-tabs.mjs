@@ -100,7 +100,7 @@ const repoRoot = resolve(import.meta.dirname, "..");
 // passes `chromium` to both this and the installer, so an ambient
 // `SMOKE_BROWSER=firefox npm run local:gate` cannot silently redirect a gated tier that
 // claims to be Chromium-only — the same invariant `run-engine-smokes.test.mjs`
-// pins for the engine tiers (Copilot, #2148). Running another engine by hand is
+// pins for the engine tiers (#2148). Running another engine by hand is
 // still one argument away: `node scripts/smoke-web-tabs.mjs firefox`.
 //
 // Resolved before anything starts, so an unsupported value fails immediately
@@ -290,7 +290,7 @@ try {
     await waitForStage(page, {
       // Both the RPC status AND the rendered preview. The status flips the
       // moment `resources/read` resolves, so stopping there would stay green
-      // with the preview panel removed entirely (Copilot, #2148) — and #2148
+      // with the preview panel removed entirely (#2148) — and #2148
       // asks for the content to *render*, not merely for the call to return.
       selector:
         '[data-testid="resources-screen"][data-read-status="ok"]' +
@@ -315,7 +315,7 @@ try {
       .click({ timeout: BROWSER_TIMEOUTS.ui });
     await waitForStage(page, {
       // As with the resource preview: the messages panel must have rendered,
-      // not merely `prompts/get` returned (Copilot, #2148).
+      // not merely `prompts/get` returned (#2148).
       selector:
         '[data-testid="prompts-screen"][data-get-status="ok"]' +
         ' [data-testid="prompt-messages"]',

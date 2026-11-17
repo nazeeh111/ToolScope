@@ -633,7 +633,7 @@ function App({
   // the tab disappears from the bar when the gate goes false, but `activeTab`
   // is independent of the bar, so the render branch would keep showing the pane
   // for a server that never declared the extension — content the user can see
-  // but can no longer navigate back to (Copilot).
+  // but can no longer navigate back to.
   //
   // Gated on `connected` rather than on the extension alone: the declaration is
   // only knowable after the handshake, so resetting while a reconnect is in
@@ -1633,7 +1633,7 @@ function App({
   // Derived, not assumed. The bar wraps once the visible tabs exceed the
   // terminal width — which a stdio server with Skills does at any ordinary
   // width — and a hard-coded 1 sized every pane below it one row too tall,
-  // clipping the bottom of the TUI (Copilot).
+  // clipping the bottom of the TUI.
   const tabsHeight = tabBarRows(
     visibleTabs({
       showAuth: !!(

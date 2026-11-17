@@ -191,7 +191,7 @@ export const GetSkillEnvelopeSchema = z.looseObject({
  * **the result** — and the caching attributes SEP-2640 leaves open are members
  * a `looseObject` accepts and the transform then discards, so unwrapping for
  * everyone silently dropped them from a contract that promised not to reshape
- * anything (Copilot).
+ * anything.
  */
 export type GetSkillEnvelope = z.infer<typeof GetSkillEnvelopeSchema>;
 

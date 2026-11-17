@@ -1,5 +1,5 @@
-// End-to-end tests for the dep-lockstep guard's executable path (Copilot,
-// #1962). The sibling tests cover the pure helpers; nothing exercised `main()`,
+// End-to-end tests for the dep-lockstep guard's executable path (#1962).
+// The sibling tests cover the pure helpers; nothing exercised `main()`,
 // so a regression in candidate derivation, install discovery, lockfile loading,
 // the sibling-guard vouch, or the nonzero exit on real skew would have left the
 // whole suite green.
@@ -355,7 +355,7 @@ test("main: a package that reaches the program from ONE install is not a candida
   );
 });
 
-test("main: a third install's copy is not dragged into a comparison it never joined (Copilot, #1965 r1)", () => {
+test("main: a third install's copy is not dragged into a comparison it never joined (#1965 r1)", () => {
   // `clients/cli` holds `outer` at a different version, but its own program is
   // the only one that loads that copy and no second install meets it there.
   // Flattening the candidates to names would compare cli against web's aligned
@@ -370,7 +370,7 @@ test("main: a third install's copy is not dragged into a comparison it never joi
   );
 });
 
-test("main: a nested copy is priced from its own lockfile entry (Copilot, #1965 r1)", () => {
+test("main: a nested copy is priced from its own lockfile entry (#1965 r1)", () => {
   // The root reaches `inner` only through `node_modules/outer/node_modules/inner`
   // at 9.9.9, while its top-level entry still reads 4.5.6 — the version web
   // holds. Pricing the copy from the top-level entry would report the pair as
@@ -415,7 +415,7 @@ test("main: exits 1 when a program cannot be listed, rather than measuring nothi
   });
 });
 
-test("main: exits 1 on a lockfile it cannot read, rather than failing open (Copilot, #1962)", () => {
+test("main: exits 1 on a lockfile it cannot read, rather than failing open (#1962)", () => {
   // A v1 lockfile has `dependencies` and no `packages` table. Treating it as an
   // install that simply holds nothing would leave the *root's* copy unopposed
   // and the skew below reported as aligned — the gate failing open.
@@ -454,7 +454,7 @@ test("main: exits 1 on a lockfile with a `packages` table but no root entry", ()
   );
 });
 
-test("main: exits 1 on an install whose lockfile is missing (Copilot, #1962)", () => {
+test("main: exits 1 on an install whose lockfile is missing (#1962)", () => {
   // Enrolment is by `package.json`, so a missing lockfile is loud rather than a
   // silently absent row. The fixture IS skewed, so dropping the install instead
   // would leave the remaining holder unopposed and report aligned.
@@ -529,7 +529,7 @@ test("main: exits 1 when the root validate no longer runs the sibling guard", ()
 
 test("main: a DECLARED package skewed across installs fails even when no program holds both copies (#2226)", () => {
   // The exact shape the issue reported, and the client copy is deliberately
-  // UNDECLARED (Copilot): only the ROOT manifest names `solo`, while
+  // UNDECLARED: only the ROOT manifest names `solo`, while
   // `clients/web` merely holds a top-level copy — the way cli's `@types/node`
   // arrives, hoisted via `@types/express` with no range of ours governing it.
   // That is what makes the candidate set a UNION across installs rather than a

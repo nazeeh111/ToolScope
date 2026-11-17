@@ -149,7 +149,7 @@ describe("OAuth challenge resource_metadata (RFC 9728)", () => {
             // A fresh path per run. SDK `auth()` persists its discovery
             // state — the advertised metadata URL included — so a reused file
             // would let a watch-mode rerun satisfy discovery from the cache
-            // and pass even with the observer plumbing removed (Copilot).
+            // and pass even with the observer plumbing removed.
             storage: new NodeOAuthStorage(join(storageDir, "oauth.json")),
             navigation: new ConsoleNavigation(),
             redirectUrlProvider,
@@ -184,7 +184,7 @@ describe("OAuth challenge resource_metadata (RFC 9728)", () => {
   it("observes the SSE challenge through a caller-supplied eventSourceInit.fetch", async () => {
     // That explicit fetch is deliberately not proxy- or intercept-wrapped, so
     // it used to bypass the observer entirely and a first-time legacy SSE
-    // authorization lost the advertised URL the same way (Copilot).
+    // authorization lost the advertised URL the same way.
     const sseServer = createServer((_req, res) => {
       res.writeHead(401, {
         "WWW-Authenticate": `Bearer resource_metadata="${METADATA_URL_LITERAL}"`,
@@ -248,7 +248,7 @@ describe("OAuth challenge resource_metadata (RFC 9728)", () => {
     ["/a", true],
     // Both re-point the origin when resolved against the request base while
     // Express still registers the route locally, so the server would advertise
-    // a document it does not serve (Copilot).
+    // a document it does not serve.
     ["//other-host/doc", false],
     ["/\\other-host/doc", false],
     ["https://other-host/doc", false],

@@ -37,7 +37,7 @@ const PATH_VALIDATION_BASE = "http://config.invalid";
  * both re-point the origin when resolved against the request base (the URL
  * parser folds a backslash into a slash for special schemes), while Express
  * still registers the route locally — so the server would advertise a document
- * it does not serve (Copilot). Comparing the resolved href against the literal
+ * it does not serve. Comparing the resolved href against the literal
  * also rejects anything the parser would rewrite (spaces, unescaped
  * characters), which an Express route would not match either.
  *
@@ -45,7 +45,7 @@ const PATH_VALIDATION_BASE = "http://config.invalid";
  * direction: `href` preserves both, so `/doc?v=1` and `/doc#s` would pass the
  * comparison above, yet Express matches on the path alone (and treats `?` as a
  * pattern character) and a fragment is never sent on the wire at all — so the
- * advertised URL could not reach the registered route (Copilot).
+ * advertised URL could not reach the registered route.
  */
 export function isOriginRelativePath(value: unknown): value is string {
   if (typeof value !== "string" || !value.startsWith("/")) {
@@ -107,7 +107,7 @@ function asMetadataPath(config: OAuthConfig): string {
  * This path is not merely advertised: it becomes the document's own
  * `client_id`, so a value such as `//other-host/doc` would publish a client id
  * naming a host this server does not control, and `/doc?version=1` would
- * publish one that cannot reach the route Express registered (Copilot).
+ * publish one that cannot reach the route Express registered.
  */
 function clientMetadataPath(config: OAuthConfig): string {
   const path = config.clientMetadataPath;
@@ -174,7 +174,7 @@ export const MAX_STALL_MS = 2_147_483_647;
  * ⚠️ `JSON.stringify` returns the string `"null"` for `NaN` and `Infinity` — the
  * two values most likely to reach the `stallMs` check — so an error built with
  * it names the wrong offending value and sends the reader looking for a `null`
- * they did not write (Copilot). Strings keep their quotes, which is what makes
+ * they did not write. Strings keep their quotes, which is what makes
  * `"600"` distinguishable from `600` in the message.
  */
 function describeValue(value: unknown): string {
@@ -210,7 +210,7 @@ export interface StallTarget {
  * a path another endpoint already uses — `asMetadataPath: "/oauth/token"` is
  * valid. Keyed on path alone, selecting `token` would then also stall the
  * metadata GET and selecting `as-metadata` would stall the token POST, which
- * breaks the per-call contract this option exists to provide (Copilot).
+ * breaks the per-call contract this option exists to provide.
  *
  * `authorize` serves both GET (the consent page) and POST (the submission), so
  * it carries both: stalling "the authorize call" means either direction.
@@ -268,7 +268,7 @@ export function stallTargetsFor(
  * teardown test: a fixed sleep that lost the race would stop the server before
  * the request arrived, the fetch would then reject because the server closed,
  * and the test would pass without ever exercising `closeAllConnections()` on an
- * established request (Copilot).
+ * established request.
  *
  * ⚠️ **Per server, deliberately not a module-level counter.** A module global
  * was tried first and failed under Vitest, which can load this module more than
@@ -315,7 +315,7 @@ export function createOAuthStallMiddleware(
   // a `length`. A bare `.length === 0` check accepts `""` and `{ length: 0 }`
   // and silently returns "no stalling configured" — the precise misconfiguration
   // this startup validation exists to catch — while a non-empty string fails
-  // later with an incidental `.filter is not a function` (Copilot).
+  // later with an incidental `.filter is not a function`.
   if (
     config.stallEndpoints !== undefined &&
     !Array.isArray(config.stallEndpoints)
@@ -344,11 +344,11 @@ export function createOAuthStallMiddleware(
   // `stallMs > 0` false and silently becomes a PERMANENT stall, and a value past
   // the 32-bit timer range overflows and fires almost immediately — both of
   // which read as "the timeout behaved strangely" rather than "the config is
-  // wrong" (Copilot).
+  // wrong".
   // ⚠️ `?? 0` would turn an explicit `stallMs: null` from a config file into a
   // valid 0 and skip every check below, silently producing a permanent stall.
   // Only an OMITTED value gets the default; `null` falls through to the
-  // finite-number check and is rejected (Copilot).
+  // finite-number check and is rejected.
   const rawStallMs = config.stallMs === undefined ? 0 : config.stallMs;
   if (
     typeof rawStallMs !== "number" ||
@@ -366,7 +366,7 @@ export function createOAuthStallMiddleware(
   // for an endpoint that would otherwise 404 — turning a contradictory fixture
   // (`supportDCR: false` with `stallEndpoints: ["register"]`) into a hanging
   // registration endpoint rather than a configuration error, and inviting a
-  // timeout test that passes for entirely the wrong reason (Copilot).
+  // timeout test that passes for entirely the wrong reason.
   const unavailable = requested.filter(
     (endpoint) => !servesEndpoint(config, endpoint),
   );
@@ -620,7 +620,7 @@ function setupMetadataEndpoints(
       // carries a query string (`/client-metadata.json?profile=a`) still gets
       // a document whose `client_id` is byte-identical to the URL that was
       // fetched. Answering with the bare route instead would hand back a
-      // document that fails the very equality CIMD turns on (Copilot).
+      // document that fails the very equality CIMD turns on.
       const requestBaseUrl = `${req.protocol}://${req.get("host")}`;
       res.json({
         client_id: new URL(req.originalUrl, requestBaseUrl).href,

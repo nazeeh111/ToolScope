@@ -154,7 +154,7 @@ describe("CIMD showcase fixture (#2242)", () => {
     // CIMD turns on the document's `client_id` being the URL it was fetched
     // from. Answering `?profile=a` with the bare route would publish a
     // document that fails that equality for a client id the server just
-    // served (Copilot).
+    // served.
     expect(doc.client_id).toBe(documentUrl);
   });
 

@@ -527,7 +527,7 @@ export interface ServerConfig {
    *
    * Matched against **everything the list actually carries**, which is the
    * static registrations *and* whatever a resource template's `list` callback
-   * contributes — not `state.registeredResources` alone (Copilot). Both land in
+   * contributes — not `state.registeredResources` alone. Both land in
    * the same Resources sidebar list and collide on the same React key, so
    * scoping this to static registrations only would leave half the surface
    * unreproducible. A URI that appears in neither is ignored.
@@ -779,7 +779,7 @@ export interface ServerConfig {
      * in code. Unlike the other metadata paths this one is not merely
      * advertised: it becomes the document's own `client_id`, so an off-origin
      * or query-bearing value would publish a client id this server cannot
-     * honour (Copilot).
+     * honour.
      */
     clientMetadataPath?: string;
 

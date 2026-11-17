@@ -68,7 +68,7 @@ export default defineConfig({
     // AGENTS.md requires every root-declared package `core/` imports at runtime
     // in ALL three lists regardless, because which client reaches one is a
     // function of what `core/` imports rather than of what the client names —
-    // so the list must not depend on today's reachability (Copilot).
+    // so the list must not depend on today's reachability.
     "react",
   ],
   esbuildOptions(options) {

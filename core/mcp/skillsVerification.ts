@@ -89,7 +89,7 @@ export interface SkillVerifyReport {
    * mandatory frontmatter comparison needs — is recorded here as a synthetic
    * `read-error` row against the entry's URI, so the failure is visible and
    * fails the report rather than passing silently. A consumer must not assume
-   * `files` mirrors the manifest one-for-one (Copilot).
+   * `files` mirrors the manifest one-for-one.
    */
   files: SkillFileReport[];
   /**
@@ -104,7 +104,7 @@ export interface SkillVerifyReport {
    * that was wrong. The signal a consumer must branch on is {@link outcome}
    * being `"incomplete"`, never `!ok` — a manifest whose unread 513th file was
    * tampered with reports `ok: true`, and a consumer that prints "verified" on
-   * `ok` alone turns a denial of service into a false pass (Copilot). Both the
+   * `ok` alone turns a denial of service into a false pass. Both the
    * CLI summary and the TUI status line had exactly that bug.
    */
   incomplete?: string;
@@ -123,7 +123,7 @@ export interface SkillVerifyReport {
    * manifest whose unread 513th file is tampered with. Reporting failure
    * would call a server nonconformant for exceeding limits SEP-2640 states as
    * SHOULD NOT — with hosts free to support more — which contradicts this
-   * module's own rule that a warning never fails a report (Copilot).
+   * module's own rule that a warning never fails a report.
    */
   outcome: "verified" | "failed" | "incomplete";
   /**
@@ -271,7 +271,7 @@ export function utf8Length(value: string): number {
  * Charging `text.length` instead — UTF-16 code units — undercharged every
  * non-ASCII payload by up to 3×, so a decoy block of emoji or CJK kept the
  * counter under 16 MiB while the wire carried far more, and the walk read on
- * (Copilot). `blob` is charged in base64 characters, which is ~4/3 of what it
+ * `blob` is charged in base64 characters, which is ~4/3 of what it
  * decodes to: an OVERcharge, and deliberately left as one, since a blob that
  * fails to decode has no byte count to be exact about.
  */
@@ -320,7 +320,7 @@ export async function verifySkills(
   // caps bound what ONE entry can cost; nothing bounded how many entries there
   // are, and SEP-2640 puts no ceiling on a catalog — so a listing of a hundred
   // thousand skills, each individually conforming, made `--verify` run
-  // indefinitely and transfer unboundedly (Copilot). See
+  // indefinitely and transfer unboundedly. See
   // {@link SKILL_MAX_CATALOG_SKILLS}.
   //
   // The limits are the server's configured ones when set (#2294). Read through
@@ -338,7 +338,7 @@ export async function verifySkills(
     //
     // ⚠️ STRICT on bytes, like the count. A run whose charged bytes exactly
     // equal the limit has REACHED it, and `<=` read one more skill past a
-    // budget that was already spent (Copilot, #2294). The skill whose reads
+    // budget that was already spent (#2294). The skill whose reads
     // cross the limit is still reported in full — that is decided by charging
     // after the entry, below, not by this comparison.
     const withinBudget =
@@ -352,7 +352,7 @@ export async function verifySkills(
     // frontmatter comparison whenever a server returned the markdown as a
     // base64 `blob` — which is a legal `resources/read` shape, and which this
     // module already decodes for the digest — so a mandatory check silently did
-    // not run while the report still said `ok` (Copilot). Deriving the text from
+    // not run while the report still said `ok`. Deriving the text from
     // the same verified bytes also guarantees the digest and the frontmatter
     // describe one snapshot.
     let entryBytes: Uint8Array | undefined;
@@ -368,7 +368,7 @@ export async function verifySkills(
     //
     // The entry count alone is not enough: a manifest can sit at exactly 512
     // entries and declare a gigabyte each, so bounding only the count still let
-    // a server dictate unbounded bandwidth and time (Copilot). Both overages
+    // a server dictate unbounded bandwidth and time. Both overages
     // are reported by `resource-limit-exceeded` / `size-limit-exceeded`; what
     // stops here is *reading* them.
     //
@@ -388,7 +388,7 @@ export async function verifySkills(
     // those are server-controlled — a manifest advertising `size: 1` (or, since
     // the wire schema deliberately accepts it for reporting, no size at all)
     // sailed through the declared budget and then served arbitrarily large
-    // bodies, defeating the 16 MiB safeguard entirely (Copilot). The declared
+    // bodies, defeating the 16 MiB safeguard entirely. The declared
     // prefilter still earns its place by refusing to *schedule* an obviously
     // oversized set; this is what stops one that lied.
     let receivedBytes = 0;
@@ -397,7 +397,7 @@ export async function verifySkills(
     // the bounded slice contains it. The byte budget can break the loop before
     // a later self-entry, and a flag describing the slice stayed true — which
     // suppressed the fallback and skipped the mandatory frontmatter check
-    // entirely (Copilot). Set inside the loop, so it can only be true of a row
+    // entirely. Set inside the loop, so it can only be true of a row
     // the walk got to.
     //
     // Compared by NORMALIZED identity, like every other URI comparison here:
@@ -423,7 +423,7 @@ export async function verifySkills(
         // other URI (so `contentsFor` finds nothing) or one enormous invalid
         // base64 blob (so `skillFileBytes` throws), and the walk banked zero
         // against the cap and went on to issue up to 512 more of them
-        // (Copilot). The safeguard has to be paid for by the transfer, not by
+        // The safeguard has to be paid for by the transfer, not by
         // the parse.
         charged = responseBytes(invocation.result);
         const contents = contentsFor(invocation.result, resource.uri);
@@ -480,7 +480,7 @@ export async function verifySkills(
         // the line on the final entry stopped nothing — every manifest row was
         // fetched and checked — and reporting "Stopped after 3 of 3" there
         // both reads as a contradiction and demotes a fully-checked skill out
-        // of `verified` (Copilot). The prefilter's own reason, if it dropped
+        // of `verified`. The prefilter's own reason, if it dropped
         // entries before the walk, is already set and is not overwritten.
         if (index < manifest.length - 1) {
           incomplete = `Stopped after ${index + 1} of ${declared.length} manifest entries: the files actually served exceed the ${SKILL_MAX_TOTAL_BYTES}-byte interoperability limit, whatever sizes the manifest declared.`;
@@ -505,7 +505,7 @@ export async function verifySkills(
       // Recorded as a file result, not swallowed. Because a dynamic skill has
       // no manifest rows, `files` would otherwise stay empty and its only static
       // finding is a warning — so an unreadable SKILL.md returned `ok: true`
-      // for a skill whose mandatory frontmatter check never ran (Copilot).
+      // for a skill whose mandatory frontmatter check never ran.
       const fail = (reason: string) =>
         files.push({ uri: entry.uri, status: "read-error", reason });
       try {
@@ -514,7 +514,7 @@ export async function verifySkills(
         // length when larger. Uncharged, a catalog of `"dynamic"` skills (whose
         // ONLY read is this one) left `catalogBytes` at zero, so the run's byte
         // budget bounded nothing for it and even a configured limit of 1 read
-        // every skill up to the count limit (Copilot, #2294).
+        // every skill up to the count limit (#2294).
         let charged = responseBytes(invocation.result);
         const contents = contentsFor(invocation.result, entry.uri);
         if (!contents) {
@@ -534,7 +534,7 @@ export async function verifySkills(
         // excluded it, verify it here too. The fallback exists for the
         // frontmatter check, but reading a file and then not checking the
         // digest the manifest advertised for it would leave the entry's own
-        // SKILL.md the one file nobody verified (Copilot).
+        // SKILL.md the one file nobody verified.
         const declaredSelf = declared.find(
           (resource) => skillUriIdentity(resource.uri) === entryIdentity,
         );
@@ -545,7 +545,7 @@ export async function verifySkills(
             // form — and a consumer matching rows against the manifest then
             // finds nothing, while a normalized "extra files" filter suppresses
             // it as already covered. The result was a verdict that existed in
-            // the report and appeared nowhere on screen (Copilot).
+            // the report and appeared nowhere on screen.
             uri: declaredSelf.uri,
             ...(await verifySkillResource(declaredSelf, entryBytes)),
           });

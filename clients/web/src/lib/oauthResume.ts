@@ -244,7 +244,7 @@ function newAttemptId(): string {
   // `js/insecure-randomness` browser model recognizes a secure RNG by the
   // literal `crypto.getRandomValues(...)` method call, and an alias does not
   // match it — so the indirection would leave the `Math.random` last resort
-  // below classified as an unmitigated source (Copilot).
+  // below classified as an unmitigated source.
   if (globalThis.crypto?.getRandomValues) {
     const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16));
     return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");

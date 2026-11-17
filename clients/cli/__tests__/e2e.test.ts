@@ -17,7 +17,7 @@ const BIN = resolve(here, "../build/index.js");
  * timer's, so it has to be the bound that wins — and the way to arrange that is
  * to raise the test's budget above it, not to shrink the child's. Shrinking it
  * would take load tolerance away from the one suite here that spawns a real
- * process, which is the opposite of this change's purpose (Copilot).
+ * process, which is the opposite of this change's purpose.
  *
  * `E2E_SPAWN_MS` is therefore an exception to the cli project's shared 15000,
  * and one of the few sites that should be: booting the built binary in a fresh

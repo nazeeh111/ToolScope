@@ -79,7 +79,7 @@ describe("oidcDiscoveryCandidates", () => {
 
   it("does not claim a path that merely shares the well-known prefix", () => {
     // A bare prefix match would treat this as a discovery request and replace
-    // its failed response with a document from a derived URL (Copilot).
+    // its failed response with a document from a derived URL.
     expect(
       oidcDiscoveryCandidates(
         "https://as.example.com/.well-known/oauth-authorization-server-backup",
@@ -156,7 +156,7 @@ describe("withRfc8414OidcCompat", () => {
   it("does not touch a non-GET request to a matching path", async () => {
     // An authorization or token endpoint may legally live under the RFC 8414
     // well-known prefix; its ordinary OAuth error must reach the caller intact
-    // rather than being replaced with a metadata document (Copilot).
+    // rather than being replaced with a metadata document.
     const original = new Response(JSON.stringify({ error: "invalid_grant" }), {
       status: 400,
       headers: { "content-type": "application/json" },
@@ -205,7 +205,7 @@ describe("withRfc8414OidcCompat", () => {
 
   it("accepts a 2xx candidate whatever media type it carries", async () => {
     // The SDK parses a 2xx discovery body regardless of `content-type`, so
-    // gating on it here could skip a document the SDK would have used (Copilot).
+    // gating on it here could skip a document the SDK would have used.
     vi.spyOn(console, "warn").mockImplementation(() => {});
     const base = vi.fn<typeof fetch>(async (input) => {
       if (String(input) === OIDC_SUFFIXED) {
@@ -225,7 +225,7 @@ describe("withRfc8414OidcCompat", () => {
 
   it("stops at a candidate whose body will not parse", async () => {
     // Terminal for the SDK, so a later candidate must not be promoted over it
-    // — that would turn a failure into a success (Copilot).
+    // — that would turn a failure into a success.
     const original = notFound();
     const base = vi.fn<typeof fetch>(async (input) => {
       if (String(input) === OIDC_SUFFIXED) {
@@ -246,7 +246,7 @@ describe("withRfc8414OidcCompat", () => {
 
   it("releases the bodies it discards", async () => {
     // A response nobody reads still holds its connection on Node/undici, and
-    // this loop runs on every OAuth attempt (Copilot).
+    // this loop runs on every OAuth attempt.
     vi.spyOn(console, "warn").mockImplementation(() => {});
     const cancelled: string[] = [];
     const streamed = (name: string, body: string): Response =>
@@ -281,7 +281,7 @@ describe("withRfc8414OidcCompat", () => {
 
   it("names the URL the body came from after a redirect", async () => {
     // `fetch` follows redirects, so the candidate is where the probe was aimed
-    // — `probe.url` is where the document actually lives (Copilot).
+    // — `probe.url` is where the document actually lives.
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const redirected = "https://as.example.com/tenant/oidc-metadata";
     const base = vi.fn<typeof fetch>(async (input) => {
@@ -309,7 +309,7 @@ describe("withRfc8414OidcCompat", () => {
   it("stops at a candidate returning a status the SDK would not walk past", async () => {
     // A 500 on the first OIDC candidate is an outage the SDK surfaces; hiding
     // it behind a second candidate's document would be worse than the bug
-    // being worked around (Copilot).
+    // being worked around.
     const original = notFound();
     const base = vi.fn<typeof fetch>(async (input) => {
       const url = String(input);
@@ -326,7 +326,7 @@ describe("withRfc8414OidcCompat", () => {
   it("stops when a probe throws", async () => {
     // The SDK swallows only the browser's CORS `TypeError`; elsewhere a network
     // error propagates. Leave it to the SDK to make the same request and reach
-    // its own verdict (Copilot).
+    // its own verdict.
     const original = notFound();
     const base = vi.fn<typeof fetch>(async (input) => {
       if (String(input).includes("openid-configuration")) {

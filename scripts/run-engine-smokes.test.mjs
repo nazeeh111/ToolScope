@@ -51,7 +51,7 @@ describe("ENGINE_SMOKES", () => {
 
 describe("every engine tier consumes ENGINE_SMOKES", () => {
   // The point of the list is defeated if any tier enumerates the smokes itself.
-  // `npm run smoke` used to do exactly that (Copilot, #2133): a fourth entry in
+  // `npm run smoke` used to do exactly that (#2133): a fourth entry in
   // ENGINE_SMOKES would have reached the Firefox and on-demand runs and silently
   // skipped the DEFAULT Chromium run — which is the one GitHub CI executes. That
   // is invisible at runtime, because a tier running fewer smokes still passes.
@@ -82,7 +82,7 @@ describe("every engine tier consumes ENGINE_SMOKES", () => {
     // loadBrowser's launch-failure message tells the reader to run
     // `npm run smoke:web:<engine>`. If a supported engine has no such script,
     // that remedy is unrunnable — which is how the message shipped naming
-    // `smoke:web:webkit` before it existed (Copilot, #2133).
+    // `smoke:web:webkit` before it existed (#2133).
     for (const name of SUPPORTED_BROWSERS) {
       assert.match(
         scripts[`smoke:web:${name}`] ?? "",
@@ -97,7 +97,7 @@ describe("every engine tier consumes ENGINE_SMOKES", () => {
     // ENGINE_SMOKES — but "Chromium-only" is a claim the script has to keep.
     // Without the literal engine it followed ambient `SMOKE_BROWSER`, so
     // `SMOKE_BROWSER=firefox npm run local:gate` would have run it under Firefox
-    // (Copilot, #2148). Both halves are pinned because they must AGREE: an
+    // (#2148). Both halves are pinned because they must AGREE: an
     // install of one engine and a launch of another surfaces as a confusing
     // "Executable doesn't exist" rather than as the wiring error it is.
     assert.match(
@@ -136,7 +136,7 @@ describe("each smoke's own docs point at its own command", () => {
 
   it("never tells the reader to run a sibling smoke", () => {
     // `smoke-web-elicitation.mjs` shipped an on-demand example invoking
-    // `smoke:web:app` (Copilot, #2133) — a direct cost of my deciding the two
+    // `smoke:web:app` (#2133) — a direct cost of my deciding the two
     // App headers should be word-for-word identical so they could not drift.
     // The shared PROSE should be identical; the example command is the one line
     // that must not be, and copy-paste does not distinguish them.
