@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ToolScope contract witnesses</title><style>body{margin:0}svg{display:block;min-width:1200px}.diagram-container{overflow-x:auto}</style><div class="diagram-container"><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="contract-title contract-desc" font-family="Arial"><title id="contract-title">ToolScope synthetic contract change in both directions</title><desc id="contract-desc">An old millivolt call is rejected by the new input enum. A new warming result is rejected by the old ready-only consumer. Two other supplied examples remain accepted. These four examples do not prove universal compatibility.</desc><rect width="100%" height="100%" fill="#edf0f5"/>
+<text x="28" y="40" font-size="18" fill="#076b61" font-weight="400">ToolScope / Inspect the contract, then test the example</text>
+<text x="28" y="98" font-size="50" fill="#15232b" font-weight="700">One tool changed.</text>
+<text x="28" y="145" font-size="38" fill="#15232b" font-weight="700">Two compatibility directions.</text>
+<rect x="28" y="210" width="558" height="300" fill="white" stroke="#c6cdd8"/>
+<text x="46" y="248" font-size="25" fill="#15232b" font-weight="700">Input: old caller → new server</text>
+<text x="46" y="297" font-size="21" fill="#15232b" font-weight="400">Before: V, mV</text>
+<text x="46" y="334" font-size="21" fill="#15232b" font-weight="400">After: V</text>
+<text x="46" y="382" font-size="22" fill="#076b61" font-weight="700">{&quot;unit&quot;:&quot;mV&quot;}</text>
+<text x="46" y="425" font-size="21" fill="#973c2e" font-weight="700">Accepted before. Rejected after.</text>
+<text x="46" y="477" font-size="17" fill="#15232b" font-weight="400">/inputSchema/properties/unit/enum/1</text>
+<rect x="614" y="210" width="558" height="300" fill="white" stroke="#c6cdd8"/>
+<text x="632" y="248" font-size="25" fill="#15232b" font-weight="700">Output: new server → old consumer</text>
+<text x="632" y="297" font-size="21" fill="#15232b" font-weight="400">Before: ready</text>
+<text x="632" y="334" font-size="21" fill="#15232b" font-weight="400">After: ready, warming</text>
+<text x="632" y="382" font-size="22" fill="#076b61" font-weight="700">{&quot;status&quot;:&quot;warming&quot;}</text>
+<text x="632" y="425" font-size="21" fill="#973c2e" font-weight="700">New result. Old consumer rejects it.</text>
+<text x="632" y="477" font-size="17" fill="#15232b" font-weight="400">/outputSchema/properties/status/enum/1</text>
+<text x="28" y="580" font-size="28" fill="#076b61" font-weight="700">2 regressions. 2 accepted controls.</text>
+<text x="28" y="622" font-size="20" fill="#15232b" font-weight="400">Exact advertised schemas and four supplied examples.</text>
+<text x="28" y="657" font-size="18" fill="#15232b" font-weight="400">Synthetic values, not sensor measurements or a security test.</text>
+<text x="28" y="688" font-size="18" fill="#15232b" font-weight="400">Finite witnesses; compatibilityProven remains false.</text>
+</svg>
+</div></html>

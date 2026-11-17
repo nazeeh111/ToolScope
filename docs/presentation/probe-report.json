@@ -1,0 +1,73 @@
+{
+  "format": "toolscope.probe-report/v2",
+  "inputs": {
+    "before": {
+      "sha256": "1a7860de50853a56b32b66aa08ea701b502ed9b955be50d45c9904b6ddbc80b1",
+      "bytes": 941
+    },
+    "after": {
+      "sha256": "f3b2354b4cf0b07286fafd81f24ca0a39966bdde5a2d486d6c5fa810abaa83bb",
+      "bytes": 946
+    },
+    "cases": {
+      "sha256": "fe58437f67323f41d390e99353c625ab4e42d546817abd6701c89c010be258e4",
+      "bytes": 755
+    }
+  },
+  "server": "Voltage fixture",
+  "scope": "supplied-examples-only",
+  "compatibilityProven": false,
+  "regressions": 2,
+  "unknown": 0,
+  "invalidCases": 0,
+  "cases": [
+    {
+      "id": "V-call-control",
+      "tool": "read_voltage",
+      "direction": "input",
+      "before": {
+        "status": "valid"
+      },
+      "after": {
+        "status": "valid"
+      },
+      "verdict": "accepted-example"
+    },
+    {
+      "id": "mV-call-removed",
+      "tool": "read_voltage",
+      "direction": "input",
+      "before": {
+        "status": "valid"
+      },
+      "after": {
+        "status": "invalid"
+      },
+      "verdict": "input-regression"
+    },
+    {
+      "id": "ready-result-control",
+      "tool": "read_voltage",
+      "direction": "output",
+      "before": {
+        "status": "valid"
+      },
+      "after": {
+        "status": "valid"
+      },
+      "verdict": "accepted-example"
+    },
+    {
+      "id": "warming-result-added",
+      "tool": "read_voltage",
+      "direction": "output",
+      "before": {
+        "status": "invalid"
+      },
+      "after": {
+        "status": "valid"
+      },
+      "verdict": "output-regression"
+    }
+  ]
+}

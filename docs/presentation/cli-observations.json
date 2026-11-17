@@ -1,0 +1,43 @@
+{
+  "list_calls": [
+    {
+      "method": "tools/list",
+      "exit": 0,
+      "stdout": "{\"result\":{\"tools\":[{\"name\":\"read_voltage\",\"description\":\"Synthetic voltage-contract example; no sensor or hardware.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"unit\":{\"type\":\"string\",\"enum\":[\"V\",\"mV\"]}},\"required\":[\"unit\"],\"additionalProperties\":false},\"outputSchema\":{\"type\":\"object\",\"properties\":{\"value\":{\"type\":\"number\"},\"unit\":{\"type\":\"string\",\"enum\":[\"V\",\"mV\"]},\"status\":{\"type\":\"string\",\"enum\":[\"ready\"]}},\"required\":[\"value\",\"unit\",\"status\"],\"additionalProperties\":false}},{\"name\":\"advance_contract\",\"description\":\"Switch the task-owned synthetic definition from revision1 to revision2.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{},\"additionalProperties\":false}}]}}\n",
+      "stderr": "[mcp-inspector] Secrets are not written anywhere and are lost on exit.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\n"
+    },
+    {
+      "method": "resources/list",
+      "exit": 0,
+      "stdout": "{\"result\":{\"resources\":[{\"name\":\"Synthetic scope\",\"uri\":\"fixture://scope\",\"description\":\"Public fixture provenance and limits\",\"mimeType\":\"text/plain\"}]}}\n",
+      "stderr": "[mcp-inspector] Secrets are not written anywhere and are lost on exit.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\n"
+    },
+    {
+      "method": "prompts/list",
+      "exit": 0,
+      "stdout": "{\"result\":{\"prompts\":[{\"name\":\"review_contract\",\"description\":\"Prepare a review prompt without calling a model\",\"arguments\":[]}]}}\n",
+      "stderr": "[mcp-inspector] Secrets are not written anywhere and are lost on exit.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\n"
+    }
+  ],
+  "read_calls": [
+    {
+      "method": "tools/call",
+      "exit": 0,
+      "stdout": "{\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"value\\\":3300,\\\"unit\\\":\\\"mV\\\",\\\"status\\\":\\\"ready\\\"}\"}],\"structuredContent\":{\"value\":3300,\"unit\":\"mV\",\"status\":\"ready\"}}}\n",
+      "stderr": "[mcp-inspector] Secrets are not written anywhere and are lost on exit.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\n"
+    },
+    {
+      "method": "resources/read",
+      "exit": 0,
+      "stdout": "{\"result\":{\"contents\":[{\"uri\":\"fixture://scope\",\"mimeType\":\"text/plain\",\"text\":\"Public synthetic voltage-contract fixture. Values are fixed examples, not measured data. ToolScope inspects schema changes; finite probes do not prove semantic compatibility or security.\"}]}}\n",
+      "stderr": "[mcp-inspector] Secrets are not written anywhere and are lost on exit.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\n"
+    },
+    {
+      "method": "prompts/get",
+      "exit": 0,
+      "stdout": "{\"result\":{\"description\":\"Synthetic contract-review prompt; no model is invoked\",\"messages\":[{\"role\":\"user\",\"content\":{\"type\":\"text\",\"text\":\"Inspect whether old millivolt calls and old ready-only consumers accept the new advertised voltage contract.\"}}]}}\n",
+      "stderr": "[mcp-inspector] Secrets are not written anywhere and are lost on exit.\n[mcp-inspector] How the secret store is chosen, and how to secure it: https://github.com/modelcontextprotocol/inspector/blob/main/docs/secret-storage.md\n"
+    }
+  ],
+  "scope": "Exact real CLI output against only the public synthetic stdio fixture; stderr is ordinary memory-store guidance, not credentials"
+}

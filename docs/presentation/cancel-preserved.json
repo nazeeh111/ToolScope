@@ -1,0 +1,9 @@
+{
+  "format": "toolscope.schema/v1",
+  "server": "Voltage fixture",
+  "capturedAt": "2026-11-17T12:39:53.890Z",
+  "definitions": {
+    "read_voltage": "{\"description\":\"Synthetic voltage-contract example; no sensor or hardware.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{\"unit\":{\"enum\":[\"V\"],\"type\":\"string\"}},\"required\":[\"unit\"],\"type\":\"object\"},\"name\":\"read_voltage\",\"outputSchema\":{\"additionalProperties\":false,\"properties\":{\"status\":{\"enum\":[\"ready\",\"warming\"],\"type\":\"string\"},\"unit\":{\"enum\":[\"V\",\"mV\"],\"type\":\"string\"},\"value\":{\"type\":\"number\"}},\"required\":[\"value\",\"unit\",\"status\"],\"type\":\"object\"}}",
+    "advance_contract": "{\"description\":\"Switch the task-owned synthetic definition from revision1 to revision2.\",\"inputSchema\":{\"additionalProperties\":false,\"properties\":{},\"type\":\"object\"},\"name\":\"advance_contract\"}"
+  }
+}

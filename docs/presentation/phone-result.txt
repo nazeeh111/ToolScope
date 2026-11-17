@@ -1,0 +1,60 @@
+New
+views: Protocol, Console
+
+Schema check
+
+Save tool definitions, then compare after refreshing or reconnecting. Stored in this browser.
+
+Replace baseline
+Compare tools
+Export baseline
+Import baseline
+Clear baseline
+
+Captured 11/17/2026, 7:38:01 AM · 2 tools
+
+1 tool definition changed.
+
+CHANGED
+
+read_voltage · inputSchema, outputSchema
+
+removed /inputSchema/properties/unit/enum/1
+
+added /outputSchema/properties/status/enum/1
+
+Tools
+Paginated
+
+read_voltage
+
+advance_contract
+
+Results
+1
+2
+3
+4
+5
+{
+  "value": 3.3,
+  "unit": "V",
+  "status": "warming"
+}
+⎘
+Structured Output
+1
+2
+3
+4
+5
+{
+  "value": 3.3,
+  "unit": "V",
+  "status": "warming"
+}
+⎘
+
+v2.8.0
+
+About & licenses
