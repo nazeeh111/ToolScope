@@ -1,0 +1,8 @@
+{
+  "format": "toolscope.schema/v1",
+  "server": "Synthetic temperature consumer",
+  "capturedAt": "2026-11-17T00:00:00.000Z",
+  "definitions": {
+    "read_temperature": "{\"name\":\"read_temperature\",\"description\":\"Read a synthetic temperature fixture\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"unit\":{\"type\":\"string\",\"enum\":[\"C\",\"F\"]}},\"required\":[\"unit\"],\"additionalProperties\":false},\"outputSchema\":{\"type\":\"object\",\"properties\":{\"status\":{\"type\":\"string\",\"enum\":[\"ready\"]}},\"required\":[\"status\"],\"additionalProperties\":false}}"
+  }
+}

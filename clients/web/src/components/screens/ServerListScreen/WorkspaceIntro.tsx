@@ -18,7 +18,7 @@ const Steps = SimpleGrid.withProps({ cols: { base: 1, sm: 3 }, spacing: "sm" });
 const StepLabel = Text.withProps({
   size: "xs",
   fw: 700,
-  c: "var(--inspector-brand-primary)",
+  c: "var(--mantine-primary-color-light-color)",
 });
 const Actions = Group.withProps({ gap: "xs", wrap: "nowrap" });
 const Secondary = Button.withProps({ variant: "default", size: "sm" });

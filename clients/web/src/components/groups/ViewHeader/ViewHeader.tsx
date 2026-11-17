@@ -197,6 +197,13 @@ const HeaderStackCell = Group.withProps({
   styles: { root: { gridArea: "1 / 1", placeSelf: "center" } },
 });
 
+// Keep the popup readable independently of the compact header field.
+const InspectorViewSelect = Select.withProps({
+  "aria-label": "Inspector view",
+  allowDeselect: false,
+  comboboxProps: { width: 220, withinPortal: true },
+});
+
 const DisconnectIcon = ActionIcon.withProps({
   variant: "subtle",
   size: 36,
@@ -375,15 +382,13 @@ export function ViewHeader(props: ViewHeaderProps) {
                     gap="xs"
                     wrap="nowrap"
                   >
-                    <Select
-                      aria-label="Inspector view"
+                    <InspectorViewSelect
                       value={headerData.activeTab}
                       onChange={(value) => value && handleTabChange?.(value)}
                       data={headerData.availableTabs.map((tab) => ({
                         value: tab,
                         label: glowing.includes(tab) ? `${tab} (new)` : tab,
                       }))}
-                      allowDeselect={false}
                       flex={1}
                       miw={0}
                     />
@@ -431,14 +436,12 @@ export function ViewHeader(props: ViewHeaderProps) {
           {() => (
             <HeaderStackCell data-anim={props.connected ? "out" : "in"}>
               {!props.connected && props.diagnosticViews ? (
-                <Select
-                  aria-label="Inspector view"
+                <InspectorViewSelect
                   data={props.diagnosticViews.tabs}
                   value={props.diagnosticViews.value}
                   onChange={(value) =>
                     value && props.diagnosticViews?.onChange(value)
                   }
-                  allowDeselect={false}
                   w="100%"
                 />
               ) : (

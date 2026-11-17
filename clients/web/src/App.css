@@ -272,8 +272,10 @@ body {
     gap: 4px;
     padding-inline: 8px;
   }
+  /* Mantine supplies inline flex values. Use intrinsic logo/action widths
+     so the current view keeps room at phone widths. */
   .workspace-header-left {
-    flex: 0 0 auto;
+    flex: 0 0 auto !important;
   }
   .workspace-header-left .header-anim {
     display: none;
@@ -288,7 +290,7 @@ body {
     min-width: 0;
   }
   .workspace-header-right {
-    flex: 0 0 auto;
+    flex: 0 0 auto !important;
     gap: 0;
   }
   .workspace-header-right .header-anim {

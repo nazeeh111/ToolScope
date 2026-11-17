@@ -2127,7 +2127,10 @@ export function createAddToolTool(): ToolDefinition {
     inputSchema: {
       name: z.string().describe("Tool name"),
       description: z.string().describe("Tool description"),
-      inputSchema: z.unknown().optional().describe("Tool input schema"),
+      inputSchema: z
+        .unknown()
+        .optional()
+        .describe("Optional JSON Schema for the new tool's object input"),
     },
     handler: async (
       params: Record<string, unknown>,
@@ -2139,14 +2142,36 @@ export function createAddToolTool(): ToolDefinition {
 
       const { server, state } = context;
 
+      // The wire carries JSON Schema, not the SDK's in-memory Zod shape.
+      // Convert before registration so invalid schemas cannot poison tools/list.
+      let inputSchema: z.ZodType | undefined;
+      if (params.inputSchema !== undefined) {
+        if (
+          typeof params.inputSchema !== "object" ||
+          params.inputSchema === null ||
+          Array.isArray(params.inputSchema) ||
+          (Object.keys(params.inputSchema).length > 0 &&
+            (params.inputSchema as Record<string, unknown>).type !== "object")
+        ) {
+          throw new Error(
+            'Tool inputSchema must be a JSON Schema object with type: "object".',
+          );
+        }
+        // Preserve the empty raw shape previously accepted by the SDK.
+        inputSchema =
+          Object.keys(params.inputSchema).length === 0
+            ? z.object({})
+            : z.fromJSONSchema(
+                params.inputSchema as Parameters<typeof z.fromJSONSchema>[0],
+              );
+      }
+
       // Register with SDK (returns RegisteredTool)
       const registered = server.registerTool(
         params.name as string,
         {
           description: params.description as string,
-          inputSchema: params.inputSchema as
-            | Record<string, z.ZodType>
-            | undefined,
+          inputSchema,
         },
         async () => {
           return {

@@ -1,0 +1,37 @@
+{
+  "format": "toolscope.probes/v1",
+  "cases": [
+    {
+      "id": "celsius-still-accepted",
+      "tool": "read_temperature",
+      "direction": "input",
+      "value": {
+        "unit": "C"
+      }
+    },
+    {
+      "id": "fahrenheit-call-rejected",
+      "tool": "read_temperature",
+      "direction": "input",
+      "value": {
+        "unit": "F"
+      }
+    },
+    {
+      "id": "ready-still-accepted",
+      "tool": "read_temperature",
+      "direction": "output",
+      "value": {
+        "status": "ready"
+      }
+    },
+    {
+      "id": "warming-result-new",
+      "tool": "read_temperature",
+      "direction": "output",
+      "value": {
+        "status": "warming"
+      }
+    }
+  ]
+}

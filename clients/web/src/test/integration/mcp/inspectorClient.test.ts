@@ -5857,6 +5857,71 @@ describe("InspectorClient", () => {
         await fired;
       });
 
+      // Regression: TS-001 — the local add_tool form sends JSON, not Zod objects.
+      // Verification: docs/source-preview-verification.md
+      it("registers a dynamic tool from JSON Schema and enforces its input", async () => {
+        server = createTestServerHttp({
+          serverInfo: createTestServerInfo(),
+          tools: [createAddToolTool()],
+        });
+        await server.start();
+        client = new InspectorClient(
+          { type: "streamable-http", url: server.url },
+          { environment: { transport: createTransportNode } },
+        );
+        await client.connect();
+        const addTool = await getTool(client, "add_tool");
+        const added = await client.callTool(addTool, {
+          name: "inspect_part",
+          description: "Inspect a synthetic part",
+          inputSchema: {
+            type: "object",
+            properties: { partId: { type: "string", minLength: 1 } },
+            required: ["partId"],
+            additionalProperties: false,
+          },
+        });
+        expect(added.result?.isError).not.toBe(true);
+        const tool = await getTool(client, "inspect_part");
+        expect(tool.inputSchema).toMatchObject({
+          type: "object",
+          properties: { partId: { type: "string", minLength: 1 } },
+          required: ["partId"],
+          additionalProperties: false,
+        });
+        const valid = await client.callTool(tool, { partId: "synthetic-42" });
+        expect(valid.result?.isError).not.toBe(true);
+        const invalid = await client.callTool(tool, { partId: 7 });
+        expect(invalid.result?.isError).toBe(true);
+        // The earlier SDK accepted an empty raw shape; preserve that shorthand.
+        const empty = await client.callTool(addTool, {
+          name: "empty_part",
+          description: "Synthetic empty input",
+          inputSchema: {},
+        });
+        expect(empty.result?.isError).not.toBe(true);
+        const emptyTool = await getTool(client, "empty_part");
+        expect(emptyTool.inputSchema).toMatchObject({ type: "object" });
+        const emptyCall = await client.callTool(emptyTool, {});
+        expect(emptyCall.result?.isError).not.toBe(true);
+        // Refused conversion must not leave an unlistable registered tool.
+        for (const inputSchema of [
+          null,
+          { type: "array", items: { type: "string" } },
+          { type: "object", not: { required: ["partId"] } },
+        ]) {
+          const refused = await client.callTool(addTool, {
+            name: "unsupported_part",
+            description: "Unsupported synthetic schema",
+            inputSchema,
+          });
+          expect(refused.result?.isError).toBe(true);
+          expect(
+            (await getAllTools(client)).map((item) => item.name),
+          ).not.toContain("unsupported_part");
+        }
+      });
+
       it("dispatches resourcesListChanged when the server emits resources/list_changed", async () => {
         server = createTestServerHttp({
           serverInfo: createTestServerInfo(),

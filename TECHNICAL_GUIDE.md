@@ -1,0 +1,106 @@
+# ToolScope
+
+Inspect MCP servers from a browser, terminal interface, or command line. ToolScope provides a connection workspace, saved tool-definition baselines, schema checks, a local launcher and bundled local examples.
+
+MCP (Model Context Protocol) lets applications expose tools, resources, and prompts to AI clients. ToolScope exercises those interfaces directly. No language model, subscription, API key, or remote server is needed for the included examples.
+
+## See a contract change first
+
+Download and extract the [offline comparison kit](https://github.com/nazeeh111/ToolScope/releases/tag/v0.3.1). With Node.js 24 installed, run this from the extracted directory. No clone, npm install, server or browser is needed:
+
+```sh
+node scripts/compare-tool-baselines.mjs examples/tool-baselines/before.json examples/tool-baselines/after.json
+```
+
+The bundled synthetic files produce two changes: `inspect_part` is **added**, and `lookup` has a **changed description**. Exit `1` means the comparison found differences; it is the expected result here. Compare `before.json` with itself for exit `0` and `"matched": true`. Neither command edits the inputs.
+
+[Follow the offline comparison](docs/offline-comparison.md) for the actual output, a saved report, and invalid-input recovery. To inspect a running MCP server and capture your own definitions, continue with the desktop app below.
+
+Prefer the source checkout? Run `INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci` first, then use the same comparison command. The kit bundles that command and its shared validator, with examples, dependency licenses and a source/hash manifest. It is separate from the full desktop app and is not an npm package.
+
+## Run the desktop app
+
+Use Node.js 24 (upstream minimum: 22.19). Clone the repository and install from the five committed lockfiles:
+
+```sh
+git clone https://github.com/nazeeh111/ToolScope.git
+cd ToolScope
+INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci
+npm --prefix clients/web ci
+npm --prefix clients/cli ci
+npm --prefix clients/tui ci
+npm --prefix clients/launcher ci
+npm run build:toolscope
+npm run toolscope
+```
+
+Open the local URL printed by the launcher. The authenticated Node backend is required; this application is not a static GitHub Pages site.
+
+The launcher creates a writable `.toolscope/mcp.json` catalog with two local stdio servers. Each server starts only when you connect. Existing catalogs are preserved. Its example paths are generated for this checkout; after moving the checkout, edit the commands in the UI or regenerate a disposable example catalog.
+
+- **Tool contracts:** echo, structured output, and tools that add or remove a tool at runtime.
+- **Resources and prompts:** synthetic resources, a resource template, prompts with arguments, and progress notifications.
+
+## Check a changing tool interface
+
+1. Connect **Tool contracts**, open **Tools**, and choose **Save baseline**.
+2. Call `add_tool` with `name: inspect_part` and `description: Inspect a sample part`.
+3. Refresh the tool list, then choose **Compare tools**. The new definition appears as added.
+4. Call `remove_tool` with that name, refresh, and compare again. The original definitions match.
+5. Export the baseline as JSON. In a fresh browser, select the same catalog server and choose **Import baseline** to restore it. If a baseline exists, review the capture time and confirm replacement.
+
+Baselines contain advertised tool definitions, including input/output schemas and annotations. They exclude call arguments, results, and authentication data. They are saved per catalog server in browser local storage and survive reloads. Definitions can themselves contain sensitive descriptions; clear a baseline when appropriate. Clearing site data removes them. A comparison checks the currently loaded list; load every page and refresh after server changes. Saving and comparing are disabled if `tools/list` dropped malformed entries or the SDK excluded advertised tools with invalid `x-mcp-header` annotations. Duplicate tool names are rejected as ambiguous. Changes retain their top-level field summary and include nested structural locations as JSON Pointers (for example `/inputSchema/properties/id/type`). Added or removed subtrees appear once at their parent; replaced container types appear at the replaced path. Array positions remain significant, including `required` and `enum` order. These diagnostics do not classify changes as breaking or non-breaking. Exports can be imported for the same catalog server identity, without executing tools or initiating a connection. Imports preserve the original capture time and require confirmation before replacing a saved baseline. Invalid files, cancelled imports and storage errors leave the previous baseline intact. Files are limited to 4,000,000 bytes before reading; normalized storage remains limited to 1,000,000 characters. Duplicate JSON keys, mismatched tool names, non-finite numbers, unsupported formats and JSON nesting beyond 100 containers are rejected. Equivalent object-key order does not count as a change. A file is a reference supplied by its author, not authenticated proof of a server’s history.
+
+## CLI and terminal interface
+
+Compare two exported baselines without starting a server or opening a browser:
+
+```sh
+node scripts/compare-tool-baselines.mjs baseline.json current.json
+```
+
+The command writes a JSON report to stdout. Exit status `0` means the definitions match, `1` means definitions differ, and `2` means an input or argument is invalid. Use the status directly in a CI check, or save the report with `> comparison.json`. Both files must identify the same catalog server. Capture times and object-key order do not count as changes; array order does. The report lists added or removed tools and changed top-level fields. Changed tools also include `details` with JSON Pointer `path` and structural `kind` (`added`, `removed`, `changed`), plus `detailsTruncated`. Details stop at 100 locations or 16,000 total pointer UTF-16 code units per tool; a true truncation flag means further differences may be omitted. Pointers escape `~` as `~0` and `/` as `~1`. Definitions remain available in full in the input exports. These locations are diagnostic, not executable patch operations or a backward-compatibility judgment. Neither input file is modified.
+
+Try the bundled synthetic example from the kit, or from a checkout with root dependencies installed:
+
+```sh
+node scripts/compare-tool-baselines.mjs examples/tool-baselines/before.json examples/tool-baselines/after.json
+```
+
+This example exits `1` and reports an updated `lookup` description and an added `inspect_part` tool. Files must be regular UTF-8 JSON files and satisfy the same format, schema and size limits as browser imports. Validation errors go to stderr without a successful JSON report. This command compares supplied definitions; it makes no connection and calls no tools.
+
+The same example catalog works across all three clients:
+
+```sh
+npm run toolscope -- --cli --server "Tool contracts" --method tools/list --format json
+npm run toolscope -- --tui
+```
+
+Use `node scripts/toolscope.mjs` instead of `npm run` when stdout must contain only the CLI's machine-readable result. The original upstream `mcp-inspector` binaries and connection behavior remain available. The ToolScope wrapper sets its own catalog and storage paths for default launches. Explicit `--catalog`, `--config`, and ad-hoc server arguments select their own source without an injected default catalog.
+
+## Storage and connections
+
+The ToolScope launcher uses `.toolscope/` for its catalog, client settings, OAuth state and logs. An inherited `MCP_CATALOG_PATH` does not replace its example catalog. Set `TOOLSCOPE_DATA_DIR` to choose another ToolScope state directory. Secrets use the in-memory backend by default and are lost when the process exits. Explicitly configuring a different secret store opts into upstream persistence behavior; see [secret storage](docs/secret-storage.md).
+
+Connections you add may execute local commands or contact remote services. ToolScope does not require those connections for its local examples. The backend's generated session token, host checks, origin checks and OAuth protections remain enabled. The interface uses system fonts and makes no font-service requests.
+
+The current interface inherits the upstream desktop layout and is intended for viewports at least 1280 pixels wide.
+
+## Development and checks
+
+```sh
+npm run toolscope -- --web --dev
+npm run build:toolscope
+npm --prefix clients/web test
+node --test scripts/toolscope.test.mjs
+```
+
+See [verification](docs/toolscope-verification.md), [implementation notes](docs/toolscope-changes.md), and the inherited [architecture](docs/architecture.md). The validation workflow checks all four clients, coverage, and built application flows. See the [quality gate](docs/quality-gate.md) for exact commands. The repository does not publish an npm package or deploy a public backend.
+
+Weekly grouped dependency update PRs cover all five npm lockfiles and GitHub Actions. See [dependency maintenance](docs/dependency-maintenance.md) for the current runtime updates and review policy.
+
+## License
+
+See [LICENSE](LICENSE) for the applicable Apache-2.0, MIT and CC-BY-4.0 terms. The same file records documentation attribution and ToolScope modifications.
+
+For concrete schema regression examples, run `npm run toolscope:probe -- before.json after.json cases.json`. This offline command checks synthetic input and output examples in the correct consumer direction, without invoking a server. See [case suites, report limits and exit codes](docs/offline-comparison.md#check-known-calls-and-result-shapes).
