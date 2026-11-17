@@ -367,7 +367,7 @@ export function useOAuthRecovery({
    *   continuation can open a prompt and install its retry before a previous
    *   commit's passive effect flushes, and that effect's stale
    *   `pendingStepUp === null` snapshot would then delete the new prompt's
-   *   retry (Copilot on #2237).
+   *   retry (#2237).
    */
   const trySetPendingStepUp = useCallback(
     (
@@ -1539,7 +1539,7 @@ export function useOAuthRecovery({
       //
       // The live client's own config is what the comparison uses, because a
       // card can be edited while connected and the catalog write does not
-      // rebuild the client (Copilot). `resolveOAuthClearIdentity` owns the
+      // rebuild the client. `resolveOAuthClearIdentity` owns the
       // rule; `App`'s in-flight guard reads the same answer from it.
       const { isActive, sharesActiveOAuthKey, affectsActiveSession } =
         resolveOAuthClearIdentity({
@@ -1623,7 +1623,7 @@ export function useOAuthRecovery({
               // the disconnect, which is not: the stale-session guard skips it
               // after a switch, and `disconnect()` can reject (that failure
               // gets its own toast above). Either way the shared state is gone,
-              // so the session must reconnect (Copilot).
+              // so the session must reconnect.
               `Stored OAuth state was removed for "${server.name}". The active session authorizes against the same URL, so its stored tokens went too — reconnect to run a fresh authorization flow.${revocationSuffix(revocation)}`
             : `Stored OAuth state was removed for "${server.name}". Connect to authorize again.${revocationSuffix(revocation)}`,
         color: "blue",

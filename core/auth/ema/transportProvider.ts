@@ -56,7 +56,7 @@ export class EmaTransportOAuthProvider implements OAuthClientProvider {
   // and the inner provider keys registrations by it. Dropping it here made every
   // EMA read and write land on the unkeyed slot — and, since #2242, left
   // `resolveSdkRegistrationKind` with no issuer to check, so a CIMD registration
-  // made over an EMA connection was recorded as DCR (Copilot).
+  // made over an EMA connection was recorded as DCR.
   clientInformation(
     ctx?: OAuthClientInformationContext,
   ):

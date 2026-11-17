@@ -144,7 +144,7 @@ export function createRemoteFetch(options: RemoteFetchOptions): typeof fetch {
     // promise: the POST stayed in flight, so the backend never saw its request
     // cancelled and its outbound fetch to the authorization server was left
     // running detached, holding a handler and a socket for as long as the
-    // server cared to stall (Copilot). `init.signal` wins when present and not
+    // server cared to stall. `init.signal` wins when present and not
     // `undefined` (a WebIDL dictionary member present as `undefined` converts
     // as absent), otherwise a `Request` carries its own.
     const explicitSignal = init?.signal;
@@ -158,7 +158,7 @@ export function createRemoteFetch(options: RemoteFetchOptions): typeof fetch {
     // #2319: tell the route whether *this* request is bounded, and by how much.
     // The route serves MCP traffic as well as OAuth work, and a Streamable HTTP
     // tool call can legitimately withhold its response headers for minutes — so
-    // a timer there must be per-request rather than unconditional (Copilot). An
+    // a timer there must be per-request rather than unconditional. An
     // exempt request carries no deadline and the route applies none.
     //
     // In the JSON envelope rather than a header: `headers` is re-sent verbatim
@@ -183,8 +183,7 @@ export function createRemoteFetch(options: RemoteFetchOptions): typeof fetch {
       // A deadline the backend enforced arrives as an ordinary error response;
       // rebuild the typed error from its marker so the `instanceof` checks
       // downstream — most importantly the one that lets a stalled probe escape
-      // `withRfc8414OidcCompat` — still see a timeout for what it is (#2319,
-      // Copilot).
+      // `withRfc8414OidcCompat` — still see a timeout for what it is (#2319).
       //
       // Both ends run the same budget, so the client's race usually settles
       // first and this path is not taken. It matters when the backend's timer

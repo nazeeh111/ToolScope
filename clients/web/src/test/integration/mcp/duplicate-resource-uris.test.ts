@@ -109,7 +109,7 @@ describe("duplicate resource URIs in resources/list (#2206)", () => {
   });
 
   // The option matches the assembled list, not `state.registeredResources`, so
-  // a URI a resource template contributed is duplicated too (Copilot). Both
+  // a URI a resource template contributed is duplicated too. Both
   // kinds land in the same Resources sidebar list and collide on the same React
   // key, so the fixture has to be able to reproduce either.
   it("duplicates a URI a resource template listed", async () => {

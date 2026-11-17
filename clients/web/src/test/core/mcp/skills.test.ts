@@ -1010,7 +1010,7 @@ describe("checkSkillFrontmatterMatch (#2248)", () => {
     // `.nan` / `.inf` are YAML values JSON cannot express, and
     // `JSON.stringify` turns every one of them into `null` — so a naive
     // canonical comparison reported a served `.nan` as EQUAL to a listed
-    // `null`: a mismatch silently presented as agreement (Copilot).
+    // `null`: a mismatch silently presented as agreement.
     const issues = checkSkillFrontmatterMatch(
       entry({ threshold: null }),
       file("threshold: .nan"),
@@ -1039,7 +1039,7 @@ describe("checkSkillFrontmatterMatch (#2248)", () => {
   it("cannot be fooled by a listing that looks like an encoding", () => {
     // The regression this guards: encoding non-finite numbers as a sentinel
     // object let a listing whose value genuinely WAS that object alias it and
-    // match a served `.nan` (Copilot). The comparison is structural now, so
+    // match a served `.nan`. The comparison is structural now, so
     // there is no encoding to alias.
     const issues = checkSkillFrontmatterMatch(
       entry({ x: { "#non-finite": "NaN" } }),
@@ -1062,7 +1062,7 @@ describe("checkSkillFrontmatterMatch (#2248)", () => {
   it("does not report -0 against 0 as a difference", () => {
     // `Object.is` holds them distinct; JSON does not (`JSON.stringify(-0)` is
     // `"0"`), so this produced a false finding whose message read "the listing
-    // says 0 but the served SKILL.md says 0" (Copilot).
+    // says 0 but the served SKILL.md says 0".
     expect(checkSkillFrontmatterMatch(entry({ a: 0 }), file("a: -0"))).toEqual(
       [],
     );
@@ -1097,7 +1097,7 @@ describe("checkSkillFrontmatterMatch (#2248)", () => {
     // The listing arrives over JSON-RPC so it cannot be cyclic, but it is just
     // as unbounded in depth — and both the comparison and its message
     // formatter walk it, so an absurdly nested advertised value crashed the
-    // tool exactly as a cyclic served one did (Copilot).
+    // tool exactly as a cyclic served one did.
     let deep: unknown = "leaf";
     for (let i = 0; i < 5000; i += 1) deep = { a: deep };
     const issues = checkSkillFrontmatterMatch(
@@ -1188,7 +1188,7 @@ describe("checkSkillNameCollisions (#2248)", () => {
     // Duplicate names are legal and SEP-2640 puts no ceiling on a catalog, so
     // naming every other member made both the work and the generated text
     // O(N²) — a server controls N, which turns a legal listing into a denial
-    // of service against the tool sent to inspect it (Copilot).
+    // of service against the tool sent to inspect it.
     const N = 500;
     const collisions = checkSkillNameCollisions(
       Array.from({ length: N }, (_, i) => at(`skill://s${i}/r/SKILL.md`, "r")),
@@ -1274,7 +1274,7 @@ describe("skillEntryKey (#2248)", () => {
   it("survives frontmatter too deep to serialize", () => {
     // `frontmatter` is unbounded server-controlled JSON, and this key is
     // computed during render — so `JSON.stringify` let one catalog entry crash
-    // the pane that exists to report on it (Copilot).
+    // the pane that exists to report on it.
     let deep: unknown = "leaf";
     for (let i = 0; i < 60000; i += 1) deep = { a: deep };
     const hostile = {

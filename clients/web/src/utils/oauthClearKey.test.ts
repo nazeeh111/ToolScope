@@ -74,7 +74,7 @@ describe("resolveOAuthClearIdentity", () => {
     expect(id.affectsActiveSession).toBe(true);
   });
 
-  // Copilot: a card can be edited while connected, and the catalog write does
+  // A card can be edited while connected, and the catalog write does
   // not rebuild the client — so the entry reads Y while the live session is
   // still authorized against X. Reading the entry would miss entry B at X.
   it("follows the live client's URL, not the edited catalog entry's", () => {

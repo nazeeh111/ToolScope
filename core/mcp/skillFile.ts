@@ -123,7 +123,7 @@ const MAX_FRONTMATTER_DEPTH = 64;
  * listed side arrives over JSON-RPC and cannot be, but it is just as unbounded
  * in DEPTH — a server can advertise a listing nested tens of thousands of
  * levels deep, and the comparison and its message formatter both recurse. A
- * guard on only the YAML side left that door open (Copilot).
+ * guard on only the YAML side left that door open.
  *
  * ⚠️ **A YAML document is a graph, not a tree, and JSON is a tree.** An alias
  * can refer to its own ancestor — `meta: &m [*m]` parses without error into a
@@ -131,7 +131,7 @@ const MAX_FRONTMATTER_DEPTH = 64;
  * walk, so such a value crashed `--verify` and the TUI with a stack overflow
  * instead of producing a finding. That is a hostile server taking the tool
  * down, so it is rejected here, at the parse, rather than defended against at
- * every consumer (Copilot).
+ * every consumer.
  *
  * The depth bound closes the same hole by its other door: a legal, acyclic but
  * absurdly nested document would exhaust the stack just as effectively, and a
@@ -177,7 +177,7 @@ export function parseSkillFrontmatter(yamlText: string): ParsedFrontmatter {
   // An empty (or comment-only) block parses to `null`, and so does an explicit
   // `null` / `~` scalar — but only the first is a degenerate mapping of no
   // fields. The second is a non-mapping document, and returning `{ fields: {} }`
-  // for it contradicts this function's own contract (Copilot). They are told
+  // for it contradicts this function's own contract. They are told
   // apart by the SOURCE, since the parsed value cannot distinguish them.
   if (parsed === null || parsed === undefined) {
     return hasContent(yamlText)

@@ -342,7 +342,7 @@ export class BaseOAuthClientProvider implements OAuthClientProvider {
    * RFC 7591 §3.2 makes a dynamically issued `client_id` opaque, so an AS may
    * mint that very URL from `POST /register`; the URL comparison only decides
    * whether CIMD is *in play* for this connection, and the two cases above decide
-   * what actually happened (#2242, Copilot).
+   * what actually happened (#2242).
    *
    * Consequences worth stating, since each was a defect on the way here:
    *

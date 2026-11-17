@@ -858,7 +858,7 @@ export class InspectorClient extends InspectorClientEventTarget {
     // are *not* MCP traffic — the OAuth work the SDK runs from inside the
     // transport on the 401/refresh path, which otherwise waits out the SDK's
     // incidental per-request timeout and reports a bare `Request timed out`
-    // naming no endpoint (Copilot). The MCP endpoint itself is exempt, and the
+    // naming no endpoint. The MCP endpoint itself is exempt, and the
     // predicate fails open: a long-running tool call withholding its response
     // headers for minutes, or an SSE body that stays open, must never be timed
     // here. Deadline innermost, for the same reason as the auth chain below.
@@ -881,7 +881,7 @@ export class InspectorClient extends InspectorClientEventTarget {
     // it outside, and then a stalled OIDC probe would be reported under the
     // URL of the RFC 8414 request that preceded it — defeating the whole point
     // of naming the endpoint — while every probe in the loop shared that one
-    // request's budget (Copilot). Innermost here matches the CLI's
+    // request's budget. Innermost here matches the CLI's
     // `storedAuthFetch`. It also passes no `isExempt`, unlike the transport
     // chain above: every request on this chain is OAuth work, so there is
     // nothing here to exempt.
@@ -5795,7 +5795,7 @@ export class InspectorClient extends InspectorClientEventTarget {
    * entry, while the CLI prints the result and must not reshape it. SEP-2640
    * explicitly leaves open whether this result carries `ttlMs` / `cacheScope`,
    * so a server may send them — and unwrapping to the entry discards exactly
-   * those (Copilot).
+   * those.
    */
   async getSkillResult(
     uri: string,

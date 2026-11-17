@@ -67,7 +67,7 @@ export const SKILL_MAX_TOTAL_BYTES = 16 * 1024 * 1024;
  * cursor-walk's page cap constrains nothing here. Every entry costs at least
  * one `resources/read`, so an unbounded catalog is unbounded work and
  * unbounded transfer against the tool sent to inspect it — a `--verify` in CI
- * that never returns (Copilot).
+ * that never returns.
  *
  * Entries past either bound are reported as `incomplete` rather than dropped
  * or failed: they were not checked, which is neither a pass nor a verdict
@@ -600,7 +600,7 @@ export function totalSkillBytes(resources: readonly SkillResource[]): number {
  * `frontmatter` is unbounded server-controlled JSON, so a deep enough object
  * throws `RangeError: Maximum call stack size exceeded` — and this is evaluated
  * during render, so one catalog entry could crash the pane that exists to
- * report on it (Copilot).
+ * report on it.
  *
  * The same guard that bounds the frontmatter comparison decides it here. When
  * the entry is representable the key is its serialization, which is exact;
@@ -867,7 +867,7 @@ export async function verifySkillResource(
  * EQUAL to a listing declaring `x: null` — and to each other. An earlier fix
  * encoded non-finite numbers as a sentinel object, which merely moved the
  * problem: a listing whose value genuinely *was* that object aliased the
- * sentinel and matched a served `.nan` (Copilot). Any encoding into the value
+ * sentinel and matched a served `.nan`. Any encoding into the value
  * space can be aliased by a document containing the encoding, so there is no
  * sentinel here at all.
  *
@@ -882,7 +882,7 @@ function jsonLikeEqual(a: unknown, b: unknown): boolean {
     // `Object.is` alone held `0` and `-0` distinct, so a listing carrying JSON
     // `0` against a served YAML `-0` produced a mismatch — reported as "the
     // listing says 0 but the served SKILL.md says 0", a false finding with an
-    // unintelligible explanation (Copilot). JSON does not distinguish them
+    // unintelligible explanation. JSON does not distinguish them
     // (`JSON.stringify(-0)` is `"0"`), so neither may this. `===` would in turn
     // hold `NaN` unequal to itself, which is why the two are combined rather
     // than either used alone.
@@ -981,7 +981,7 @@ export function checkSkillFrontmatterMatch(
   // arrives over JSON-RPC so it cannot be cyclic, but it is just as unbounded
   // in depth — and both `jsonLikeEqual` and `displayValue` walk it, so a
   // server advertising an absurdly nested value crashed the tool exactly as a
-  // cyclic served one did (Copilot). Checked before the file is parsed: there
+  // cyclic served one did. Checked before the file is parsed: there
   // is no point reading one if the thing to compare it against is unusable.
   const listedError = jsonGraphError(entry.frontmatter);
   if (listedError) {
@@ -1116,7 +1116,7 @@ export function checkSkillNameCollisions(
       // `uris.filter(...)` and not the whole list in the message. Duplicate
       // names are legal and SEP-2640 puts no ceiling on a catalog, so a group
       // of N made both the work and the generated text O(N²): every one of N
-      // entries scanned all N URIs and embedded the other N−1 (Copilot). A
+      // entries scanned all N URIs and embedded the other N−1. A
       // server controls N, which turns a legal listing into a denial of
       // service against the tool meant to inspect it.
       const sample: string[] = [];

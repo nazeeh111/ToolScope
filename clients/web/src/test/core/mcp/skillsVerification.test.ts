@@ -333,7 +333,7 @@ describe("verifySkills (#2248)", () => {
     // A base64 `blob` is a legal `resources/read` shape, and this module
     // already decodes it for the digest. Reading `contents.text` skipped the
     // MANDATORY frontmatter comparison for such a server while still reporting
-    // `ok` (Copilot).
+    // `ok`.
     const skillMd = "---\nname: demo\ndescription: Served\n---\n\n# D\n";
     const bytes = new TextEncoder().encode(skillMd);
     const skill: SkillEntry = {
@@ -394,7 +394,7 @@ describe("verifySkills (#2248)", () => {
     // A dynamic skill has no manifest rows, so `files` stayed empty and its
     // only static finding is a warning — an unreadable SKILL.md therefore
     // reported `ok: true` for a skill whose mandatory frontmatter check never
-    // ran (Copilot).
+    // ran.
     const skill: SkillEntry = {
       uri: "skill://gen/SKILL.md",
       frontmatter: { name: "gen", description: "Generated" },
@@ -568,7 +568,7 @@ describe("verifySkills (#2248)", () => {
   it("bounds reads at the interoperability limit, not at the manifest length", async () => {
     // The 512-entry limit is CHECKED but constrains nothing, so a hostile
     // server advertising far more had the tool perform that many sequential
-    // reads after the report already knew the manifest was over (Copilot).
+    // reads after the report already knew the manifest was over.
     const { skill, client } = await truncatable({ name: "many", count: 900 });
     const readResource = vi.spyOn(
       client as unknown as { readResource: (u: string) => unknown },
@@ -588,7 +588,7 @@ describe("verifySkills (#2248)", () => {
   it("bounds reads by the total-byte limit, not only the entry count", async () => {
     // A manifest can sit at exactly 512 entries and declare a gigabyte each,
     // so bounding the count alone still let a server dictate unbounded
-    // bandwidth after `size-limit-exceeded` had been reported (Copilot).
+    // bandwidth after `size-limit-exceeded` had been reported.
     const { skill, client } = await truncatable({
       name: "fat",
       count: 4,
@@ -606,7 +606,7 @@ describe("verifySkills (#2248)", () => {
   it("does not report success for a manifest it could not finish reading", async () => {
     // Entries past the cap are never fetched and `resource-limit-exceeded` is
     // only a warning, so a manifest whose 513th file is tampered with returned
-    // `ok: true` and the CLI said the skill verified (Copilot).
+    // `ok: true` and the CLI said the skill verified.
     const { skill, client } = await truncatable({ name: "many", count: 600 });
     const [report] = await verifySkills(client, [skill]);
     expect(report.incomplete).toBeDefined();
@@ -616,7 +616,7 @@ describe("verifySkills (#2248)", () => {
   it("verifies the entry's own file even when the cap excluded it", async () => {
     // The fallback exists for the frontmatter check, but reading the file and
     // then skipping the digest its manifest advertised would leave the skill's
-    // own SKILL.md the one file nobody verified (Copilot).
+    // own SKILL.md the one file nobody verified.
     const skill: SkillEntry = {
       uri: "skill://huge/SKILL.md",
       frontmatter: { name: "huge", description: "Listed" },
@@ -646,7 +646,7 @@ describe("verifySkills (#2248)", () => {
 
   it("stops on bytes ACTUALLY served, not the sizes the manifest declared", async () => {
     // The declared budget is server-controlled: advertising `size: 1` and then
-    // serving megabytes sailed straight through it (Copilot). The fixture'"'"'s
+    // serving megabytes sailed straight through it. The fixture'"'"'s
     // digests are honest, so the only thing wrong is the unfinished walk.
     const { skill, client } = await truncatable({
       name: "liar",
@@ -668,7 +668,7 @@ describe("verifySkills (#2248)", () => {
     // The budget was charged only after a matching block had been decoded, so
     // a server could answer every row with one enormous block labelled some
     // OTHER URI: `contentsFor` found nothing, zero was banked, and the walk
-    // went on to issue up to 512 more of them (Copilot). The bytes crossed the
+    // went on to issue up to 512 more of them. The bytes crossed the
     // wire either way, so the transfer is what pays.
     const junk = "z".repeat(6 * 1024 * 1024);
     const { skill } = await truncatable({ name: "junk", count: 20 });
@@ -701,7 +701,7 @@ describe("verifySkills (#2248)", () => {
   it("charges non-ASCII text in UTF-8 bytes, not UTF-16 units", async () => {
     // `text.length` undercharged every non-ASCII payload by up to 3×, so a
     // decoy block of emoji kept the counter under 16 MiB while the wire
-    // carried twice that, and the walk read on (Copilot). Each block below is
+    // carried twice that, and the walk read on. Each block below is
     // 3 MiB of UTF-16 units and 12 MiB of UTF-8 bytes, so two cross the limit
     // under correct accounting and six would be needed under the old one.
     const emoji = "🙂".repeat(1.5 * 1024 * 1024); // 2 units each, 4 bytes each
@@ -744,7 +744,7 @@ describe("verifySkills (#2248)", () => {
     // The per-skill caps bound what ONE entry costs; nothing bounded how many
     // entries there are, and SEP-2640 puts no ceiling on a catalog — so a
     // listing of a hundred thousand conforming skills made `--verify` run
-    // indefinitely (Copilot).
+    // indefinitely.
     // Each skill carries its OWN SKILL.md, whose frontmatter matches its
     // listing entry — otherwise every report is `failed` on a frontmatter
     // mismatch and the budget is not what the test is measuring.
@@ -884,7 +884,7 @@ describe("verifySkills (#2248)", () => {
   it("stops reading once the byte budget is exactly REACHED, not only exceeded", async () => {
     // Every name is one digit, so every SKILL.md has the same length. With the
     // budget set to exactly one file's charge, the first skill spends it and
-    // the second must not be read (Copilot, #2294).
+    // the second must not be read (#2294).
     const enc = new TextEncoder();
     const mdFor = (i: number) =>
       `---\nname: e${i}\ndescription: A demo\n---\n\n# e${i}\n`;
@@ -928,7 +928,7 @@ describe("verifySkills (#2248)", () => {
   it("charges a dynamic skill's SKILL.md read to the byte budget", async () => {
     // A `"dynamic"` skill has no manifest, so its only read is the fallback
     // SKILL.md fetch. Uncharged, `catalogBytes` stayed 0 and a byte budget of
-    // 1 read every dynamic skill in the catalog (Copilot).
+    // 1 read every dynamic skill in the catalog.
     const mdFor = (i: number) =>
       `---\nname: d${i}\ndescription: A demo\n---\n\n# d${i}\n`;
     const skills: SkillEntry[] = Array.from({ length: 3 }, (_, i) => ({
@@ -972,7 +972,7 @@ describe("verifySkills (#2248)", () => {
     // Crossing the line on the final row stopped nothing: every manifest entry
     // was fetched and checked. Reporting "Stopped after 4 of 4" there both
     // reads as a contradiction and demotes a fully-read skill out of
-    // `verified` (Copilot).
+    // `verified`.
     //
     // The sizes are understated for the same reason as the test above — with
     // honest ones the *declared* prefilter stops first and the received-bytes
@@ -1031,7 +1031,7 @@ describe("verifySkills (#2248)", () => {
     // fallback recorded `entry.uri`, so a consumer matching rows against the
     // manifest found nothing — while a normalized "extra files" filter
     // suppressed it as already covered. The verdict existed in the report and
-    // appeared nowhere on screen (Copilot).
+    // appeared nowhere on screen.
     const declaredSpelling = "skill://huge/x/../SKILL.md";
     const skill: SkillEntry = {
       uri: "skill://huge/SKILL.md",
@@ -1061,7 +1061,7 @@ describe("verifySkills (#2248)", () => {
   it("runs the fallback when the byte budget broke the loop before the self row", async () => {
     // `manifestListsSelf` described the bounded SLICE, not the rows reached —
     // so a break on the byte budget left it true, suppressed the fallback, and
-    // skipped the mandatory frontmatter check entirely (Copilot).
+    // skipped the mandatory frontmatter check entirely.
     const md = "---\nname: late\ndescription: Served\n---\n\n# late\n";
     const big = "z".repeat(9 * 1024 * 1024);
     const enc = new TextEncoder();

@@ -52,7 +52,7 @@ test("reachableScripts: follows every npm spelling of `run` (#2341)", () => {
   // `run-script` is the canonical command; `run`, `rum` and `urn` are its
   // aliases. A chain written in any of them reaches the same scripts, so a
   // guard that only followed `npm run` would let `npm run-script validate:web`
-  // reintroduce what it exists to forbid (Copilot).
+  // reintroduce what it exists to forbid.
   const scripts = {
     gate: "npm run-script a && npm rum b && npm urn c && npm run d",
     a: "noop",

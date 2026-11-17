@@ -100,7 +100,7 @@ interface VerificationState {
    * fetch. They were derived from two separate `resources/read` calls — the
    * on-selection preview and the Verify click — so a resource that changed
    * between them could pair a verified digest with a frontmatter verdict for
-   * different bytes (Copilot). Set only when the verified row is the entry's
+   * different bytes. Set only when the verified row is the entry's
    * own file; the preview remains the fallback until then, since a reader who
    * has not clicked Verify should still get the check.
    */
@@ -113,7 +113,7 @@ interface VerificationState {
    * verification produced: the digest verdict on screen was computed from that
    * fetch, and replacing only the text would let the frontmatter findings
    * describe different bytes — recreating the mixed-fetch verdict this state
-   * exists to prevent (Copilot). A verification always wins, since it brings a
+   * exists to prevent. A verification always wins, since it brings a
    * matching digest verdict with it.
    */
   entryTextVerified?: boolean;
@@ -872,7 +872,7 @@ export function SkillsScreen({
       // `skillEntryKey`, not `JSON.stringify`: `selected` carries unbounded
       // server-controlled frontmatter, and this runs during render — so a
       // deeply nested entry threw `RangeError` before the screen could show
-      // the `frontmatter-unparsable` finding that describes it (Copilot). Same
+      // the `frontmatter-unparsable` finding that describes it. Same
       // helper, and the same guard, the TUI uses.
       `${sessionKey}\n${selected ? skillEntryKey(selected) : (selectedSkillUri ?? "")}`,
     [selected, selectedSkillUri, sessionKey],
@@ -1195,7 +1195,7 @@ export function SkillsScreen({
     // raw string when parsing fails, so `not a uri/SKILL.md` yielded the "root"
     // `not a uri` and enabled the Directory section — letting the UI send a
     // directory request derived from a URI the conformance checks had already
-    // rejected as malformed (Copilot). Identity is the right tool for
+    // rejected as malformed. Identity is the right tool for
     // COMPARING two spellings; it is the wrong one for deciding that a URI is
     // well-formed enough to build a request from.
     const normalized = normalizeSkillUri(selected.uri);
@@ -1262,7 +1262,7 @@ export function SkillsScreen({
           // A FAILED page leaves what is already on screen where it is, and
           // keeps the cursor that would retry it. Replacing the state outright
           // made the table vanish and stranded the reader with no way back to
-          // that page short of restarting at the root (Copilot). Only a first
+          // that page short of restarting at the root. Only a first
           // read of a directory has nothing to preserve.
           commit((prev) => ({
             uri,
@@ -1529,7 +1529,7 @@ export function SkillsScreen({
     // `previewParts` is a *presentation* value: it only exists when the
     // displayed MIME is recognized as markdown, so a `SKILL.md` a server
     // labelled `text/plain` — or anything else — skipped this check entirely
-    // while the report still read as clean (Copilot). The SEP makes the
+    // while the report still read as clean. The SEP makes the
     // comparison mandatory for the skill's own file regardless of how the
     // server typed it, and `showingSkillMd` already establishes that this IS
     // that file. Decoding the same bytes the digest is taken over also keeps
@@ -1562,7 +1562,7 @@ export function SkillsScreen({
    * badge carries the whole answer — but the frontmatter findings arrive later,
    * from the `SKILL.md` read, and land inside that collapsed section. The badge
    * now counts them, so the number changes; the alerts explaining a mandatory
-   * verification failure were still a click away (Copilot).
+   * verification failure were still a click away.
    *
    * Keyed on the entry so it fires **once** per skill, when findings first
    * appear, rather than fighting a user who deliberately collapses it again.
@@ -1591,7 +1591,7 @@ export function SkillsScreen({
    * The frontmatter findings render inside this section, so counting only the
    * static listing issues left the badge saying `0 error(s)` above a red
    * `frontmatter-mismatch` alert — the section contradicting its own output
-   * (Copilot). Digest and size mismatches stay OUT: they have their own
+   * Digest and size mismatches stay OUT: they have their own
    * `mismatch(es)` badge, because "the listing is wrong" and "the bytes are
    * wrong" are different answers and merging them would hide which failed.
    */
@@ -1644,7 +1644,7 @@ export function SkillsScreen({
                 // a sidebar computed from that alone showed both colliding
                 // skills as clean until one was selected, which is exactly
                 // when a reader most needs to be told two rows are the same
-                // name (Copilot). Same composition as `conformance` above.
+                // name. Same composition as `conformance` above.
                 const collision = collisions.get(skillUriIdentity(skill.uri));
                 const skillIssues = [
                   ...checkSkillConformance(skill),
@@ -2232,7 +2232,7 @@ export function SkillsScreen({
                                 // selected skill's tree, and the "Up" control
                                 // only compares against `skillRoot` — so the
                                 // walk could then continue outside it entirely
-                                // (Copilot). Containment is decided on the
+                                // Containment is decided on the
                                 // NORMALIZED URI, like every containment check
                                 // in `core/mcp/skills.ts`, so a `..` segment
                                 // cannot walk out while still matching as a
@@ -2248,7 +2248,7 @@ export function SkillsScreen({
                                 // sibling's file, or the directory itself is
                                 // inside the root and so passed `inRoot`, and
                                 // was then rendered as though the server had
-                                // said it lives here (Copilot). This screen
+                                // said it lives here. This screen
                                 // exists to report what a server sent, so an
                                 // entry that is not a direct child is shown
                                 // and named rather than quietly navigable.
@@ -2308,7 +2308,7 @@ export function SkillsScreen({
                                                 // the first Up produced
                                                 // `skill://r/a/..` and the
                                                 // second walked into
-                                                // `skill://r/a` (Copilot).
+                                                // `skill://r/a`.
                                                 readDirectory(
                                                   childUri,
                                                   manifestKey,

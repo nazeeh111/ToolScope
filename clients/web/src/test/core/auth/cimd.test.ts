@@ -162,7 +162,7 @@ describe("ensureCimdClientRegistration", () => {
     );
   });
 
-  // #2242 (Copilot): the existing-client check moved after discovery, so this
+  // #2242: the existing-client check moved after discovery, so this
   // helper must not turn a well-known outage into a failed reconnect. It reuses
   // the discovery state SDK `auth()` persists, and treats a discovery failure as
   // "skip pre-registration" rather than an error.

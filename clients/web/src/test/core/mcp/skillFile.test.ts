@@ -99,7 +99,7 @@ describe("parseSkillFrontmatter (#2248)", () => {
   it("reports an explicit null scalar as an error, not as no fields", () => {
     // `null` and `~` parse to the same value an EMPTY block does, but only the
     // empty one is a degenerate mapping — returning `{ fields: {} }` for an
-    // explicit null scalar contradicts this function's own contract (Copilot).
+    // explicit null scalar contradicts this function's own contract.
     for (const src of ["null", "~", "  null  ", "# lead\nnull"]) {
       expect(parseSkillFrontmatter(src)).toEqual({
         error: expect.stringContaining("mapping"),
@@ -142,7 +142,7 @@ describe("parseSkillFrontmatter (#2248)", () => {
     // into a self-referential array, and the field-by-field comparison is a
     // recursive walk — so this crashed `--verify` and the TUI with a stack
     // overflow rather than producing a finding. A hostile server taking the
-    // tool down is a worse outcome than any wrong verdict (Copilot).
+    // tool down is a worse outcome than any wrong verdict.
     const parsed = parseSkillFrontmatter("meta: &m [*m]");
     expect(parsed).toEqual({ error: expect.stringContaining("cyclic") });
   });

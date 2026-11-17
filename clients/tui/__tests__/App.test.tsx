@@ -810,7 +810,7 @@ describe("App (foundation)", () => {
     // The tab disappears from the bar when the gate goes false, but `activeTab`
     // is independent of the bar — so without this the render branch keeps
     // showing the pane for a server that never declared the extension, and the
-    // user is stranded on content they cannot navigate back to (Copilot).
+    // user is stranded on content they cannot navigate back to.
     h.ctrl.status = "connected";
     h.ctrl.skillsExtension = { directoryRead: false };
     const r = await mount(oneStdio());

@@ -608,7 +608,7 @@ describe("SkillsTab (#2248)", () => {
   it("renders both rows when a listing repeats a URI", () => {
     // A malformed listing can carry the same skill twice, and this pane exists
     // to show BOTH — a URI-keyed row would collide them and let React drop or
-    // reuse one (Copilot).
+    // reuse one.
     const dup: SkillEntry = {
       uri: "skill://twice/SKILL.md",
       frontmatter: { name: "twice", description: "Listed twice" },
@@ -696,7 +696,7 @@ describe("SkillsTab (#2248)", () => {
   it("shows the digests for a mismatch, not just the failed mark", async () => {
     // `verifySkillResource` sets `reason` for a SIZE mismatch but not a digest
     // one, so a pane rendering only `reason` left a bare `✗` with no diagnosis
-    // — a failed verification the reader cannot act on (Copilot).
+    // — a failed verification the reader cannot act on.
     // The declared size must be RIGHT, or the cheaper size cross-check
     // short-circuits before hashing and reports its own `reason` instead —
     // which is the path that already rendered.
@@ -754,7 +754,7 @@ describe("SkillsTab (#2248)", () => {
     // `verifySkills` sets `incomplete` so a consumer can tell "not fully
     // checked" from a real failure; printing only "Verification FAILED" threw
     // that distinction away, and the entries beyond the cap stayed marked `·`
-    // with nothing explaining why (Copilot).
+    // with nothing explaining why.
     //
     // Truncation is triggered by the BYTE budget rather than the 512-entry one
     // so the manifest stays four rows long: a 512-row pane pushes the status
@@ -765,7 +765,7 @@ describe("SkillsTab (#2248)", () => {
     // this skill is the unfinished walk. An earlier version understated the
     // sizes, which is itself a size mismatch — the report was `failed` and the
     // test passed only because the status line branched on `ok` before
-    // `incomplete`, the very bug this pins (Copilot).
+    // `incomplete`, the very bug this pins.
     const big = "x".repeat(6 * 1024 * 1024);
     const bigDigest = await sha256Digest(textToBytes(big));
     const fatMd = "---\nname: fat\ndescription: Four big files\n---\n\n# F\n";

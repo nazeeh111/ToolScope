@@ -3079,7 +3079,7 @@ export function createOAuthTestServerConfig(options: {
       scopesSupported: options.scopesSupported ?? ["mcp"],
       // `!== undefined`, not truthiness: an explicitly supplied `""` is
       // invalid, and dropping it here would silently fall back to the
-      // well-known route instead of reporting the bad fixture (Copilot).
+      // well-known route instead of reporting the bad fixture.
       ...(options.resourceMetadataPath !== undefined
         ? { resourceMetadataPath: options.resourceMetadataPath }
         : {}),

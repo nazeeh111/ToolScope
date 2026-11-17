@@ -177,7 +177,7 @@ test("classifyModulePath: install root is the OUTERMOST node_modules, package th
   // A NESTED copy folds onto its outermost install: npm resolving a transitive
   // conflict inside one install is routine, not a cross-install skew. Its
   // `entryPath` still names the copy itself, so the caller can price the version
-  // the program actually loaded (Copilot, #1965 r1).
+  // the program actually loaded (#1965 r1).
   assert.deepEqual(
     classifyModulePath("node_modules/a/node_modules/zod/index.d.ts"),
     {
@@ -231,7 +231,7 @@ test("crossInstallPackages: two installs in ONE program is the whole test (#1965
   const byRoot = found.get("zod").get("clients/web/tsconfig.test.json");
   assert.deepEqual([...byRoot.keys()].sort(), [".", "clients/web"]);
   // The entry paths ride along so the caller can price each copy from its own
-  // lockfile entry (Copilot, #1965 r1).
+  // lockfile entry (#1965 r1).
   assert.deepEqual([...byRoot.get(".")], ["node_modules/zod"]);
 });
 
@@ -273,7 +273,7 @@ test("crossInstallPackages: every program that saw both copies is recorded", () 
   ]);
 });
 
-test("crossInstallPackages: a nested copy is kept as its own entry path (Copilot, #1965 r1)", () => {
+test("crossInstallPackages: a nested copy is kept as its own entry path (#1965 r1)", () => {
   // Folded onto the root install for candidacy, but recorded at the path it was
   // loaded from so its real version can be read.
   const found = crossInstallPackages([

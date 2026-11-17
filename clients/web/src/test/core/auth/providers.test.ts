@@ -692,7 +692,7 @@ describe("OAuthNavigation", () => {
 
         // RFC 7591 §3.2 leaves a dynamically issued `client_id` opaque, so an
         // existing DCR may carry the configured metadata URL. Back-stamping it
-        // must not relabel it (Copilot).
+        // must not relabel it.
         it("keeps dcr when back-stamping a DCR that uses the metadata URL", async () => {
           const storage = makeStorage();
           vi.mocked(storage.getClientInformation).mockImplementation(
@@ -823,7 +823,7 @@ describe("OAuthNavigation", () => {
         // `OAuthStorageBase` and the real `ensureCimdClientRegistration`, because
         // the behaviour under test is how the pre-registration binds provenance to
         // a discovered issuer and how storage promotes and clears slots — neither
-        // of which a mock would express (Copilot).
+        // of which a mock would express.
         describe("across two authorization servers", () => {
           const ISSUER_B = "https://as-b.example.com";
 
@@ -963,7 +963,7 @@ describe("OAuthNavigation", () => {
             ).toBe("cimd");
           });
 
-          // Copilot: an AS advertising CIMD does not make an *existing* dynamic
+          // An AS advertising CIMD does not make an *existing* dynamic
           // registration a CIMD one. RFC 7591 §3.2 leaves the id opaque, so a
           // real DCR may carry the metadata URL; end to end, it must stay `dcr`.
           it("does not relabel an existing DCR whose client_id is the metadata URL", async () => {
@@ -1000,7 +1000,7 @@ describe("OAuthNavigation", () => {
           // `invalidateCredentials("client")` and an immediate retry. That clear
           // removes the registration *and* its kind, so the retry takes the
           // new-registration path and must be answered from the discovery state
-          // — which the clear does not touch (Copilot). Asserted against real
+          // — which the clear does not touch. Asserted against real
           // storage, since the point is what `clearClientInformation` does.
           it("keeps cimd through invalid-client recovery, which clears the credential", async () => {
             const storage = makeRealStorage();

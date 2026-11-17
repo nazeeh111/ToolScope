@@ -24,7 +24,7 @@ export function summarizeSkillVerification(
   // ⚠️ Counted off `outcome`, never off `ok`. `ok` means "nothing that was
   // checked is wrong", which an `incomplete` report satisfies while the walk
   // was cut short — so branching on `ok` printed "no conformance errors" one
-  // line before exiting SKILL_INCOMPLETE (Copilot).
+  // line before exiting SKILL_INCOMPLETE.
   const failed = reports.filter((report) => report.outcome === "failed").length;
   const incomplete = reports.filter(
     (report) => report.outcome === "incomplete",

@@ -108,7 +108,7 @@ describe("RFC 8414 metadata at the OIDC well-known path (#2172)", () => {
   it("hands the transport a fetch that carries the shim", async () => {
     // The SDK also runs discovery from *inside* the transport, which receives
     // `InspectorClient`'s base fetch directly — so a reconnect with an existing
-    // auth provider must not bypass the shim (Copilot). Capturing the fetch the
+    // auth provider must not bypass the shim. Capturing the fetch the
     // transport was handed and driving it against this server is what proves
     // the wiring, without depending on the SDK to trigger that leg.
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});

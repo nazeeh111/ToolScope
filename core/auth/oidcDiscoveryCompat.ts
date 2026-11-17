@@ -74,7 +74,7 @@
  *   place that also covers the discovery the SDK runs from **inside the
  *   transport**, which is handed the base fetch directly and whose tracker is
  *   built inside the transport where nothing here can reach above it
- *   (Copilot). One seam therefore covers every path, at the cost that a
+ *  . One seam therefore covers every path, at the cost that a
  *   captured entry shows the substituted document rather than the real 404 —
  *   so the substituted response carries {@link COMPAT_SOURCE_HEADER} naming
  *   the URL the body actually came from, and the warning below says the same
@@ -135,7 +135,7 @@ export function oidcDiscoveryCandidates(rfc8414Url: string): string[] {
   // A bare prefix match would also claim `/.well-known/oauth-authorization-server-backup`
   // — a path this wrapper has no business rewriting, and one whose failed
   // response it would replace with a document fetched from somewhere else
-  // entirely (Copilot). The SDK appends the authorization server's pathname,
+  // entirely. The SDK appends the authorization server's pathname,
   // which always begins with `/`, so requiring the exact path or a `/`
   // boundary is precisely the set it can emit.
   if (path !== "" && !path.startsWith("/")) return [];
@@ -176,7 +176,7 @@ async function releaseBody(response: Response): Promise<void> {
  * ⚠️ `ReadableStream.cancel()` adopts the underlying source's cancel promise,
  * which is permitted never to settle — so awaiting it on a path that is
  * *propagating a cancellation* can hang the very thing that was meant to end
- * (Copilot), and awaiting it on the normal path leaves the caller's abort
+ *, and awaiting it on the normal path leaves the caller's abort
  * unable to end a stalled release (#2389). Every release below uses this: the
  * release is a courtesy to the connection pool, and neither progress nor the
  * caller's abort or timeout may wait on it. The `void` is the documented case where the callee owns its
@@ -258,7 +258,7 @@ export function withRfc8414OidcCompat(fetchFn: typeof fetch): typeof fetch {
     // stops an authorization or token endpoint from living under
     // `/.well-known/oauth-authorization-server/…`, and a `POST` there returning
     // an ordinary OAuth `400 invalid_grant` must reach its caller intact rather
-    // than being replaced with a metadata document (Copilot). Metadata
+    // than being replaced with a metadata document. Metadata
     // discovery is a `GET`, so anything else is not ours.
     if (requestMethodOf(input, init) !== "GET") return response;
 
@@ -269,7 +269,7 @@ export function withRfc8414OidcCompat(fetchFn: typeof fetch): typeof fetch {
     // The probe is a request the caller never made, issued on its behalf — so
     // it has to be cancellable by the caller too. Without the signal, aborting
     // after the initial 404 left the probe running to its own deadline and the
-    // caller was handed a timeout in place of its own abort (Copilot). Same
+    // caller was handed a timeout in place of its own abort. Same
     // precedence rule as everywhere else, hence the shared helper rather than a
     // second copy of it.
     const callerSignal = callerSignalOf(input, init);
@@ -278,7 +278,7 @@ export function withRfc8414OidcCompat(fetchFn: typeof fetch): typeof fetch {
     // discovery run its normal course, because *promoting a later candidate
     // over an earlier one the SDK would have stopped at* would turn a failure
     // into a success — a much worse defect than the one being worked around
-    // (Copilot). Concretely: a 500 on the first OIDC candidate is an outage the
+    // Concretely: a 500 on the first OIDC candidate is an outage the
     // SDK surfaces, a malformed JSON body there is terminal for it, and a
     // network error propagates outside the browser's CORS case. In each of
     // those, returning `response` leaves the SDK to make the same request and
@@ -293,7 +293,7 @@ export function withRfc8414OidcCompat(fetchFn: typeof fetch): typeof fetch {
       // return it is the value the caller gets and reads; on a throw nobody
       // will ever read it, and an unread body holds its connection open on
       // Node/undici — the same reason the successful-substitution path
-      // releases it (Copilot). Matters most for a standalone user of this
+      // releases it. Matters most for a standalone user of this
       // exported wrapper, where no timeout wrapper is underneath to have
       // already drained it.
       if (callerSignal?.aborted) {
@@ -307,7 +307,7 @@ export function withRfc8414OidcCompat(fetchFn: typeof fetch): typeof fetch {
       } catch (err) {
         // A deadline the Inspector imposed is *our* error, not the server's
         // answer, so it escapes rather than being folded back into the original
-        // response (#2319, Copilot). Swallowing it would hand the caller the
+        // response (#2319). Swallowing it would hand the caller the
         // preceding 404 and discard the one thing the deadline adds — the name
         // of the endpoint that stalled — leaving discovery to fail later under
         // a message that points at the wrong URL. There is no flow this can
@@ -334,7 +334,7 @@ export function withRfc8414OidcCompat(fetchFn: typeof fetch): typeof fetch {
         // A probe response nobody will read still holds its connection open on
         // Node/undici, and this loop can run on every OAuth attempt — so
         // release it rather than letting repeated discovery against a 404
-        // candidate exhaust the origin's pool (Copilot). Same discipline as
+        // candidate exhaust the origin's pool. Same discipline as
         // `core/mcp/node/authChallengeFetch.ts`. Detached, not awaited
         // (#2389): the next step — the abort check, the next candidate — must
         // not depend on a cancel that is permitted never to settle, or a
@@ -369,7 +369,7 @@ export function withRfc8414OidcCompat(fetchFn: typeof fetch): typeof fetch {
         // in the catch above: the probe's headers arrived, the caller gave up,
         // and `probe.text()` rejects on the partial body. Substituting the
         // preceding 404 would hand a standalone user of this wrapper a
-        // discovery failure in place of its own abort reason (Copilot). A body
+        // discovery failure in place of its own abort reason. A body
         // that merely will not parse still falls through, which is the case
         // this catch exists for.
         if (callerSignal?.aborted) {
@@ -388,7 +388,6 @@ export function withRfc8414OidcCompat(fetchFn: typeof fetch): typeof fetch {
       // `fetch` follows redirects, so the candidate is where the probe was
       // *aimed*; `probe.url` is where the body actually came from. Report the
       // latter, falling back for a synthesized response that carries no url
-      // (Copilot).
       const source = probe.url || candidate;
       // The original failed response is about to be dropped in favour of the
       // substitution, so release its connection too — detached, for the same

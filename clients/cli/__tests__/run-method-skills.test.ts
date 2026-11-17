@@ -111,7 +111,7 @@ describe("runMethod skills dispatch (#2248)", () => {
   it("prints the whole skills/get envelope, not just the entry", async () => {
     // SEP-2640 leaves it open whether this result carries `ttlMs`/`cacheScope`,
     // so a server may send them — and unwrapping to the entry discarded exactly
-    // those, from a path whose contract is "print the result" (Copilot).
+    // those, from a path whose contract is "print the result".
     const entry = await cleanEntry();
     const envelope = {
       skill: entry,
@@ -205,7 +205,7 @@ describe("runMethod skills dispatch (#2248)", () => {
     // SEP-2640 states the read limits as SHOULD NOT and lets hosts support
     // more, so exiting `SKILL_NONCONFORMANT` would call a conforming server
     // nonconformant — while exiting 0 would report success for entries nobody
-    // fetched (Copilot).
+    // fetched.
     const md = "---\nname: many\ndescription: Big\n---\n\n# many\n";
     const enc = new TextEncoder();
     const selfDigest = await sha256Digest(enc.encode(md));
@@ -307,7 +307,7 @@ describe("summarizeSkillVerification (#2248)", () => {
   it("does not claim a truncated walk verified", () => {
     // An `incomplete` report keeps `ok: true` — nothing checked was wrong —
     // so a summary branching on `ok` printed "no conformance errors" one line
-    // before the run exited SKILL_INCOMPLETE (Copilot).
+    // before the run exited SKILL_INCOMPLETE.
     const cut = report({
       outcome: "incomplete",
       incomplete: "Stopped after 2 of 9 manifest entries.",

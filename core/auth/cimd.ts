@@ -29,7 +29,7 @@ export async function ensureCimdClientRegistration(params: {
   // Prefer the discovery state SDK `auth()` itself persists and reuses. Without
   // this, moving the existing-client check after discovery would turn a
   // temporary well-known outage into a failed reconnect, even where the SDK
-  // could have proceeded from cache (Copilot).
+  // could have proceeded from cache.
   let metadata = (await params.provider.discoveryState())
     ?.authorizationServerMetadata;
 
@@ -43,7 +43,7 @@ export async function ensureCimdClientRegistration(params: {
         // `createRemoteFetch`, which proxies through the backend to sidestep
         // CORS — on the global `fetch` this leg would fail in the browser, be
         // swallowed by the catch, and leave CIMD probing the wrong
-        // authorization server (Copilot).
+        // authorization server.
         params.fetchFn,
       );
     } catch {

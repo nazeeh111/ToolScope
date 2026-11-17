@@ -394,7 +394,7 @@ describe("clearStoredAuthForRelogin", () => {
       // the real clock this is a one-sided detector: a worker preempted for
       // more than the budget reaches the check with a NEGATIVE remainder, where
       // the unfixed `remainingMs <= 0` bound takes the same branch and prints
-      // the same message — passing without the floor (Copilot).
+      // the same message — passing without the floor.
       const nowSpy = vi.spyOn(performance, "now").mockReturnValue(1_000);
       try {
         const outcome = await clearStoredAuthForRelogin("https://example.com", {

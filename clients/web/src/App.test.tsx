@@ -4287,7 +4287,7 @@ describe("App MCP App listed-resource metadata wiring (#2055)", () => {
 // dedupe by catalog id, which cannot see that: clearing both entries while the
 // first revocation was still out ran concurrent store writes, concurrent RFC
 // 7009 requests and two contradictory teardown toasts — the exact race the
-// guard exists to prevent (Copilot, on this PR).
+// guard exists to prevent.
 describe("App dedupes concurrent OAuth clears that share a storage key (#2217)", () => {
   const SHARED_URL = "https://shared.example/mcp";
   const sharedEntry = (id: string, name: string): ServerEntry => ({
@@ -4351,7 +4351,7 @@ describe("App dedupes concurrent OAuth clears that share a storage key (#2217)",
   // different work" exception that change establishes, and the 20000 was a
   // value somebody had already chosen against an observed failure. Lowering it
   // to the shared ceiling would trade a measured number for a general one and
-  // could reintroduce the flake (Copilot).
+  // could reintroduce the flake.
   const THREE_MODAL_SEQUENCE_MS = 20_000;
 
   it(
@@ -4364,7 +4364,7 @@ describe("App dedupes concurrent OAuth clears that share a storage key (#2217)",
       await user.click(screen.getByText("connect"));
       await waitFor(() => expect(clientInstances).toHaveLength(1));
       // The instances are typed `EventTarget`; an intersection names the
-      // test-only spy without erasing that (Copilot).
+      // test-only spy without erasing that.
       const client = clientInstances[0] as EventTarget & {
         clearOAuthTokens: ReturnType<typeof vi.fn>;
       };

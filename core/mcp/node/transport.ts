@@ -133,7 +133,7 @@ export function createTransportNode(
     // (the proxy-aware baseFetch plus the optional auth-challenge intercept).
     // The challenge observer is applied either way: it is passive, and without
     // it a first-time legacy SSE authorization through an explicit fetch would
-    // lose the challenge's `resource_metadata` the same way (Copilot).
+    // lose the challenge's `resource_metadata` the same way.
     const configuredSseFetch = sseConfig.eventSourceInit?.fetch as
       | typeof fetch
       | undefined;

@@ -1234,7 +1234,7 @@ export function createRemoteApp(
     // the browser abandons its promise, but the request it made is served here,
     // and an outbound fetch with neither a signal nor a timeout holds a handler
     // and an authorization-server socket open indefinitely — once per timed-out
-    // retry (Copilot). `c.req.raw.signal` is the propagated cancellation, now
+    // retry. `c.req.raw.signal` is the propagated cancellation, now
     // that `createRemoteFetch` forwards it; the timer is the backstop for a
     // client that vanishes without aborting, and it matches the client-side
     // budget so the two agree on when this is hopeless.
@@ -1258,7 +1258,7 @@ export function createRemoteApp(
     // Streamable HTTP tool call that legitimately withholds its response
     // headers for longer than the budget — reintroducing on the backend exactly
     // the regression `exemptMcpEndpoint` exists to prevent on the client, and
-    // reporting it as an OAuth timeout besides (Copilot). No deadline in the
+    // reporting it as an OAuth timeout besides. No deadline in the
     // envelope means no timer at all.
     // Clamped to what `setTimeout` can schedule: past 2**31-1 the delay
     // overflows and Node falls back to 1ms, turning an over-large budget into
@@ -1273,7 +1273,7 @@ export function createRemoteApp(
     // Redacted for the same reason `OAuthRequestTimeoutError` redacts: this
     // message and this URL are handed back to the browser, recorded in the
     // Network log and persisted, and an OAuth endpoint's query string can carry
-    // a `code`, an `access_token` or a `client_secret` (Copilot).
+    // a `code`, an `access_token` or a `client_secret`.
     const safeUrl = redactUrlQuery(url);
     const timer =
       deadlineMs === undefined
@@ -1320,7 +1320,7 @@ export function createRemoteApp(
         // Left un-cancelled, an OAuth endpoint that sends event-stream or
         // NDJSON headers and never closes would hold the upstream socket open
         // for good, since the `finally` below clears the only deadline once
-        // this handler returns (Copilot). Best-effort, like `releaseBody` in
+        // this handler returns. Best-effort, like `releaseBody` in
         // `oidcDiscoveryCompat`: a body already consumed, locked or absent is
         // not an error here. Measured, undici does reclaim an unread body on
         // its own in this configuration — so this is belt and braces rather
@@ -1331,7 +1331,7 @@ export function createRemoteApp(
         // underlying source's cancel promise, which is permitted never to
         // settle — awaiting it would keep this handler pending forever, and on
         // an unbounded request there is no timer to release it either
-        // (Copilot). The `void` is the documented case where the callee owns
+        // The `void` is the documented case where the callee owns
         // its failures, via the `catch` below, and the caller cannot await.
         void res.body?.cancel().catch(() => {});
       }
@@ -1348,7 +1348,7 @@ export function createRemoteApp(
       if (deadlineFired) {
         // Stamped so the browser can rebuild an `OAuthRequestTimeoutError`
         // rather than receiving a plain `Error` that no `instanceof` check
-        // downstream can recognize (Copilot). 504 because that is what this
+        // downstream can recognize. 504 because that is what this
         // is — the gateway gave up on the upstream, not a fault in the route.
         return c.json(
           {

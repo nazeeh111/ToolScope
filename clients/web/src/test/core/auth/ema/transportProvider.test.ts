@@ -134,7 +134,7 @@ describe("EmaTransportOAuthProvider", () => {
   // SEP-2352: the wrapper used to drop the SDK's `ctx`, so every EMA read and
   // write landed on the unkeyed slot — and, since #2242, the registration-kind
   // resolver had no issuer to check and recorded a CIMD registration made over
-  // an EMA connection as DCR (Copilot).
+  // an EMA connection as DCR.
   it("forwards the SDK issuer context on client-information reads and writes", async () => {
     const ctx = { issuer: "https://as.example.com" };
 

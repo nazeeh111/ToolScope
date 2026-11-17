@@ -211,7 +211,7 @@ describe("createRemoteFetch", () => {
       // standard gives `new Request(url, { signal })` a *dependent* signal, so
       // the two are distinct objects in a spec-compliant runtime. Asserting
       // against the controller's would encode non-standard identity and could
-      // pass or fail on the host rather than on the behaviour (Copilot).
+      // pass or fail on the host rather than on the behaviour.
       const request = new Request("http://upstream.example/", {
         signal: caller.signal,
       });

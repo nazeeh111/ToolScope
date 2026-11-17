@@ -350,13 +350,13 @@ export async function refreshStoredAuthToken(
   // `InspectorClient.effectiveAuthFetch`, so it needs the same compatibility
   // wrapper — otherwise a stored refresh token with no persisted
   // `serverMetadata` still cannot refresh against an authorization server that
-  // publishes RFC 8414 metadata at the OIDC well-known path (Copilot).
+  // publishes RFC 8414 metadata at the OIDC well-known path.
   //
   // Built over `createProxyFetch()` for the same reason `environment.fetch` is
   // (#2067): this whole function runs outside `InspectorClient`, so nothing
   // else puts a proxy under it, and a server reachable only through
   // `HTTPS_PROXY` would otherwise be probed directly. The same fetch is handed
-  // to the token request below, so neither leg bypasses the proxy (Copilot).
+  // to the token request below, so neither leg bypasses the proxy.
   // #2319: this path runs outside `InspectorClient`, so nothing else bounds it
   // — the discovery and the token request below would otherwise hang forever
   // against an authorization server that accepts the connection and never

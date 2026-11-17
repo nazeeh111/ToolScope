@@ -338,7 +338,7 @@ export async function runMethod(
           // Three outcomes, three exit codes: a broken MUST is 7, a walk the
           // read bounds cut short is 8, and everything checked and passing is
           // 0. Collapsing the middle case into either of the others reports
-          // something untrue about the server (Copilot).
+          // something untrue about the server.
           ...(allSkillsVerified(reports)
             ? {}
             : {
@@ -359,12 +359,12 @@ export async function runMethod(
       // undeclared server answers `-32601`, which a script cannot tell apart
       // from the `-32602` a *declared* server returns for a skill URI it does
       // not serve — "this server has no Skills support" and "no such skill"
-      // are different answers (Copilot).
+      // are different answers.
       assertSkillsSupported(inspectorClient, args.method);
       // The ENVELOPE, not the unwrapped entry. `getSkill` discards every other
       // member the result carried — including the `ttlMs` / `cacheScope` that
       // SEP-2640 explicitly leaves open — and a CLI whose contract is "print
-      // the result" must not drop what the server actually sent (Copilot).
+      // the result" must not drop what the server actually sent.
       const envelope = await inspectorClient.getSkillResult(
         args.uri,
         args.metadata,
@@ -383,7 +383,7 @@ export async function runMethod(
           // Three outcomes, three exit codes: a broken MUST is 7, a walk the
           // read bounds cut short is 8, and everything checked and passing is
           // 0. Collapsing the middle case into either of the others reports
-          // something untrue about the server (Copilot).
+          // something untrue about the server.
           ...(allSkillsVerified(reports)
             ? {}
             : {

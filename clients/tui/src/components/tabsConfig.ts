@@ -77,7 +77,7 @@ function tabWidth(
  * ⚠️ **Not always 1.** Adding Skills pushed a stdio server's bar past 100
  * columns, so it wraps at any ordinary terminal width — and `App` hard-coded
  * `tabsHeight = 1`, sizing every content pane one row too tall and clipping the
- * bottom of the TUI (Copilot). Deriving the height from the same list `Tabs`
+ * bottom of the TUI. Deriving the height from the same list `Tabs`
  * renders is what keeps the two in agreement as tabs are added.
  *
  * The bar is a `flexWrap="wrap"` row with one column of padding each side and

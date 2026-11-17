@@ -35,7 +35,7 @@ export interface OAuthClearIdentityInput {
    * This — not the catalog entry — is what the session's credentials are keyed
    * under. A card can be edited while connected and the catalog write does not
    * rebuild the client, so after A connects to X and is edited to Y, the live
-   * client still authorizes against X while the entry reads Y (Copilot).
+   * client still authorizes against X while the entry reads Y.
    */
   activeClientConfig: MCPServerConfig | undefined;
   /** The active entry's catalog config, used only when there is no client. */

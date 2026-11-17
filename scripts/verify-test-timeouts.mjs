@@ -120,7 +120,7 @@ export const CLIENTS_DIR = "clients";
  * Every filename Vitest will load a config from, most specific first.
  *
  * The full set, not the two spellings this repo happens to use: discovery is
- * only deny-by-default if it sees every config Vitest would (Copilot). A
+ * only deny-by-default if it sees every config Vitest would. A
  * `clients/foo/vitest.config.mts` that this list did not name would be
  * invisible, and an invisible config yields no project to reject — the same
  * hole as a hand-written `CONFIG_ROOTS`, one level down. Order matters at
@@ -203,7 +203,7 @@ export function checkNoRetrySetupLoaded(name, setupFiles) {
  * Discovery rather than the hand-written `CONFIG_ROOTS` list, so that a new
  * client with its own config cannot go unwatched — which would have made the
  * "a project with no row is an error" promise vacuous, since an undiscovered
- * config yields no project to reject (Copilot). `CONFIG_ROOTS` still exists to
+ * config yields no project to reject. `CONFIG_ROOTS` still exists to
  * say which project names each config must produce; this is what proves the
  * list is complete.
  *
@@ -305,7 +305,7 @@ async function main() {
   // reject a project this guard actually resolves, so a config it never opens
   // is invisible to it. Without this line the deny-by-default claim rested on
   // `test:scripts` happening to run the same comparison — a different command,
-  // which a standalone `npm run verify:test-timeouts` does not invoke (Copilot).
+  // which a standalone `npm run verify:test-timeouts` does not invoke.
   const failures = checkConfigRootCoverage(discoverConfigRoots());
   let checked = 0;
 

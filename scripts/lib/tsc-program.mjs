@@ -348,7 +348,7 @@ export function projectPackageFiles(clientDir, project) {
  *   `node_modules/a/node_modules/zod`). Folding tells you *which install* loaded
  *   it; this tells you *which copy*, so the version can be read from the entry
  *   the program actually resolved rather than from whatever sits at the
- *   install's top level (Copilot, #1965 r1 — a nested copy at a different
+ *   install's top level (#1965 r1 — a nested copy at a different
  *   version would otherwise be compared against a top-level entry that is
  *   absent, or worse, present and aligned, and the real pair would pass).
  */
@@ -382,7 +382,7 @@ export function classifyModulePath(rel) {
  * co-occurrences themselves, not a flattened name list.
  *
  * Keeping the structure is what lets the caller compare only the copies that met
- * (Copilot, #1965 r1). Flattening to names hands the comparison a package that
+ * (#1965 r1). Flattening to names hands the comparison a package that
  * is aligned wherever it co-occurs, and a third install holding a different
  * version of it then fails the guard even though no program ever loads that
  * copy — with a diagnostic naming an install that was never involved.

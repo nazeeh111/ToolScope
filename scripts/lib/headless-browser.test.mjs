@@ -113,7 +113,7 @@ describe("loadBrowser", () => {
 
   it("launches the engine that was asked for, and returns it", async () => {
     // The load-bearing assertion, and the one the failure-path tests below
-    // CANNOT make (Copilot, #2133): their stand-in rejects identically for every
+    // CANNOT make (#2133): their stand-in rejects identically for every
     // engine, so `loadBrowser(root, "firefox")` could call `chromium.launch()`
     // and still produce a correctly Firefox-labelled error. The smokes cannot
     // catch that either — the Firefox gate runs after Chromium is already

@@ -2111,7 +2111,7 @@ describe("SkillsScreen directory browsing (#2248)", () => {
     // A server can return a child pointing anywhere; descending into one
     // leaves the selected skill's tree, and "Up" only compares against
     // `skillRoot`, so the walk could then continue outside it entirely
-    // (Copilot). The row is still SHOWN — a child outside the skill is itself
+    // The row is still SHOWN — a child outside the skill is itself
     // the finding — but it is not a link.
     const user = userEvent.setup();
     const STRAY = {
@@ -2138,7 +2138,7 @@ describe("SkillsScreen directory browsing (#2248)", () => {
     // `resources/directory/read` answers with the directory's direct children.
     // A grandchild, or the directory itself echoed back, is still inside the
     // root — so it passed the containment check and was rendered as though the
-    // server had said it lives here (Copilot). The row is shown, because that
+    // server had said it lives here. The row is shown, because that
     // is the finding, but it is not a link.
     const user = userEvent.setup();
     const GRANDCHILD = {
@@ -2213,7 +2213,7 @@ describe("SkillsScreen directory browsing (#2248)", () => {
     // Containment was decided on the normalized URI while navigation sent and
     // stored the raw one, so for `skill://root/a/../templates` the first Up
     // produced `skill://root/a/..` and a second walked into `skill://root/a`
-    // — a directory the check never validated (Copilot).
+    // — a directory the check never validated.
     const user = userEvent.setup();
     const DOTTED_DIR = {
       uri: "skill://data-analysis/nested/../templates",
@@ -2391,7 +2391,7 @@ describe("SkillsScreen directory browsing (#2248)", () => {
     // Ends with the suffix and so LOOKS addressable, but does not parse. The
     // identity fallback returned the raw string here, producing the "root"
     // `not a uri` and enabling a directory request built from a URI the
-    // conformance checks had already rejected (Copilot).
+    // conformance checks had already rejected.
     ["unparseable but suffixed", "not a uri/SKILL.md"],
     ["relative, not a full URI", "demo/SKILL.md"],
   ])(
@@ -2515,7 +2515,7 @@ describe("SkillsScreen name collisions (#2248)", () => {
     // on one entry cannot see it — and a sidebar computed from that alone
     // showed both colliding rows as clean until one was clicked, which is
     // exactly when a reader most needs to be told two rows share a name
-    // (Copilot). Nothing is selected here on purpose.
+    // Nothing is selected here on purpose.
     renderWithMantine(<ControlledSkillsScreen skills={[ACME, GLOBEX]} />);
     const rows = [ACME, GLOBEX].map((skill) =>
       screen.getByText(skill.uri).closest(".mantine-NavLink-root"),
@@ -2572,7 +2572,7 @@ describe("SkillsScreen frontmatter cross-check (#2248)", () => {
   it("still checks a SKILL.md the server typed as something other than markdown", async () => {
     // The check was gated on the DISPLAY mime, so a server labelling its
     // SKILL.md `text/plain` skipped a mandatory comparison while the report
-    // still read as clean (Copilot). It runs against the fetched bytes now.
+    // still read as clean. It runs against the fetched bytes now.
     const user = userEvent.setup();
     const lying: SkillEntry = {
       ...CLEAN_SKILL,
@@ -2628,7 +2628,7 @@ describe("SkillsScreen frontmatter cross-check (#2248)", () => {
     // A structurally clean entry opens collapsed, and the frontmatter findings
     // arrive later from the SKILL.md read — so the alerts explaining a
     // mandatory verification failure sat behind a click the reader had no
-    // reason to make (Copilot).
+    // reason to make.
     const user = userEvent.setup();
     const lying: SkillEntry = {
       ...CLEAN_SKILL,
@@ -2663,7 +2663,7 @@ describe("SkillsScreen frontmatter cross-check (#2248)", () => {
     // The digest verdict on screen was computed from the verification's fetch;
     // replacing only the text would let the frontmatter findings describe
     // different bytes, recreating the mixed-fetch verdict this state exists to
-    // prevent (Copilot).
+    // prevent.
     const user = userEvent.setup();
     let served = skillMdFor({ ...CLEAN_FM, description: "As verified" });
     const onReadSkillFile = vi.fn(async (uri: string) => {
@@ -2708,7 +2708,6 @@ describe("SkillsScreen frontmatter cross-check (#2248)", () => {
     // supporting file made `showingSkillMd` false and silently dropped the
     // finding AND its error count — erasing an observed conformance failure
     // because the reader browsed a second file, with the skill unchanged
-    // (Copilot).
     const user = userEvent.setup();
     const lying: SkillEntry = {
       ...CLEAN_SKILL,
@@ -2760,7 +2759,7 @@ describe("SkillsScreen frontmatter cross-check (#2248)", () => {
   it("prefers the bytes verification read over the preview read", async () => {
     // The two verdicts came from separate `resources/read` calls, so a resource
     // that changed between them could pair a verified digest with a frontmatter
-    // verdict computed for different bytes (Copilot). After Verify, the
+    // verdict computed for different bytes. After Verify, the
     // frontmatter check reads what the verification hashed.
     const user = userEvent.setup();
     let served = skillMdFor(CLEAN_FM); // agrees with the listing…

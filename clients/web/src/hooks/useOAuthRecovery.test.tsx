@@ -2080,7 +2080,7 @@ describe("useOAuthRecovery", () => {
       ).toBeDefined();
     });
 
-    // Copilot on this PR: a card can be edited while connected and the catalog
+    // A card can be edited while connected and the catalog
     // write does not rebuild the client, so the active *entry* can read a URL
     // the live session never authorized against. Reading the entry would miss
     // an entry still sitting on the client's real URL.

@@ -379,7 +379,7 @@ describe("InspectorClient OAuth E2E", () => {
         // the CIMD pre-registration now writes the issuer-keyed slot itself, so
         // the SDK finds an already-stamped credential and never calls
         // `saveClientInformation`. The test below covers the resolver across the
-        // integration boundary (Copilot).
+        // integration boundary.
         const oauthState = await client.getOAuthState();
         expect(oauthState?.client).toMatchObject({
           clientId: metadataUrl,

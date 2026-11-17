@@ -158,7 +158,7 @@ describe("OAuth request timeouts against a stalled endpoint (#2382)", () => {
   // ⚠️ Every advertised endpoint, not a sample. `stallTargetsFor` hardcodes a
   // path and a method set per endpoint, so a typo in any entry produces a
   // fixture that quietly answers normally — the precise failure this option
-  // exists to prevent, and one no other test would catch (Copilot).
+  // exists to prevent, and one no other test would catch.
   for (const endpoint of STALLABLE_OAUTH_ENDPOINTS) {
     it(`stalls the ${endpoint} endpoint until the deadline fires`, async () => {
       const started = await startStalling([endpoint]);
@@ -207,7 +207,7 @@ describe("OAuth request timeouts against a stalled endpoint (#2382)", () => {
   it("distinguishes two calls that share a path by their method", async () => {
     // ⚠️ Both configurable document paths are caller-supplied, so a config may
     // point one at a path another endpoint already serves. Keyed on path alone,
-    // stalling `token` would also stall this GET (Copilot).
+    // stalling `token` would also stall this GET.
     const started = await startStalling(["token"]);
     const collided = new URL("/oauth/token", started.url).href;
 
@@ -225,7 +225,6 @@ describe("OAuth request timeouts against a stalled endpoint (#2382)", () => {
   it("answers late rather than never when stallMs is positive", async () => {
     // `stallMs` is advertised and was previously untested: every fixture used
     // 0, so the `setTimeout(() => next())` branch could regress unseen
-    // (Copilot).
     const delayMs = 600;
     const started = await startStalling(["protected-resource-metadata"], {
       stallMs: delayMs,
@@ -256,7 +255,7 @@ describe("OAuth request timeouts against a stalled endpoint (#2382)", () => {
     // End-to-end: the fixture lets go. This observes the REGISTRY, which is
     // decremented by the `close` listener — so it does NOT prove the timer was
     // cleared. That claim belongs to the focused test below, which can actually
-    // see the timer (Copilot).
+    // see the timer.
     const started = await startStalling(["token"], { stallMs: 10_000 });
     const controller = new AbortController();
 
@@ -328,7 +327,7 @@ describe("OAuth request timeouts against a stalled endpoint (#2382)", () => {
     // A sleep that lost the race would stop the server before the request
     // arrived; the fetch would then reject because the server closed, and this
     // test would pass without ever exercising `closeAllConnections()` on an
-    // established request (Copilot).
+    // established request.
     await until(
       () => started.stalledRequestCount() >= 1,
       "the request to be parked",
@@ -344,7 +343,6 @@ describe("OAuth request timeouts against a stalled endpoint (#2382)", () => {
     // ⚠️ `authorize` is the only endpoint mapped to two methods, and the table
     // above drives it as a GET. Without this, deleting `"POST"` from its method
     // list passes the whole suite while a consent submission stops stalling
-    // (Copilot).
     const started = await startStalling(["authorize"]);
     const url = new URL("/oauth/authorize", started.url).href;
     const timedFetch = withOAuthRequestTimeout(fetch, BUDGET_MS);
@@ -363,7 +361,7 @@ describe("OAuth request timeouts against a stalled endpoint (#2382)", () => {
     // requests the DEFAULTS. A regression replacing either lookup in
     // `stallTargetsFor` with its default literal would leave every other test
     // green while `stallEndpoints` silently stopped working for any config that
-    // moves the document (Copilot).
+    // moves the document.
     const moved = "/custom/protected-resource.json";
     const started = createTestServerHttp({
       serverInfo: createTestServerInfo("oauth-stall-moved-prm", "1.0.0"),
@@ -454,7 +452,7 @@ describe("OAuth request timeouts against a stalled endpoint (#2382)", () => {
  *
  * The end-to-end abort test can only watch the registry, which a separate
  * `close` listener decrements — so it passes with the timer still armed and
- * cannot support a claim about `clearTimeout` (Copilot). Here `next` is a spy
+ * cannot support a claim about `clearTimeout`. Here `next` is a spy
  * and time is fake, so "the delayed answer never fires after a close" is
  * directly checkable.
  */
@@ -482,7 +480,7 @@ describe("createOAuthStallMiddleware timer cleanup (#2382)", () => {
    * these doubles are structurally correct for every field the code under test
    * reads. If the middleware ever reads more, the double will be wrong at
    * runtime rather than silently absorbing it, which is what an `any` would do
-   * (Copilot).
+   *
    */
   function fakeRes(): { res: Response; close: () => void } {
     const listeners: Array<() => void> = [];
@@ -556,7 +554,7 @@ describe("createOAuthStallMiddleware timer cleanup (#2382)", () => {
     // `stallEndpoints` can arrive as a string or an object with a `length`. A
     // bare `.length === 0` check accepts `""` and `{ length: 0 }` and returns
     // "no stalling configured" — silently disabling the very capability this
-    // validation exists to protect (Copilot).
+    // validation exists to protect.
     for (const stallEndpoints of ["", "token", null, { length: 0 }, 3]) {
       expect(() =>
         createOAuthStallMiddleware({
@@ -586,7 +584,7 @@ describe("createOAuthStallMiddleware timer cleanup (#2382)", () => {
     // ⚠️ The middleware runs BEFORE Express routing, so without this it will
     // hold a request for an endpoint that would otherwise 404 — turning a
     // contradictory fixture into a hang that reads as a timeout, and inviting a
-    // test that passes for entirely the wrong reason (Copilot).
+    // test that passes for entirely the wrong reason.
     const cases: Array<[Record<string, unknown>, StallableOAuthEndpoint]> = [
       // DCR off, but asked to stall the registration endpoint.
       [{ mode: "combined", supportDCR: false }, "register"],
@@ -649,7 +647,7 @@ describe("createOAuthStallMiddleware timer cleanup (#2382)", () => {
 
   it("names the offending value honestly, including NaN and Infinity", () => {
     // ⚠️ `JSON.stringify(NaN)` is the string "null", so an error built with it
-    // reports a value the author never wrote (Copilot).
+    // reports a value the author never wrote.
     expect(() =>
       createOAuthStallMiddleware({
         enabled: true,
@@ -681,7 +679,6 @@ describe("createOAuthStallMiddleware timer cleanup (#2382)", () => {
   it("rejects an explicit stallMs: null rather than defaulting it to 0", () => {
     // ⚠️ `?? 0` would turn `null` into a valid 0 and skip every check, silently
     // producing a permanent stall. Only an OMITTED value gets the default
-    // (Copilot).
     expect(() =>
       createOAuthStallMiddleware({
         enabled: true,
@@ -708,7 +705,6 @@ describe("createOAuthStallMiddleware timer cleanup (#2382)", () => {
     // silently becomes a PERMANENT stall, and a value past the 32-bit timer
     // range overflows to ~1ms and answers almost immediately — both read as
     // "the timeout behaved strangely" rather than "the config is wrong"
-    // (Copilot).
     for (const stallMs of [-1, Number.NaN, Infinity, MAX_STALL_MS + 1]) {
       expect(() =>
         createOAuthStallMiddleware({

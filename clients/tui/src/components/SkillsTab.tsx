@@ -106,7 +106,7 @@ const VERIFY_STATUS: Record<SkillVerifyReport["outcome"], string> = {
  * `verifySkillResource` sets `reason` for a SIZE mismatch but not for a digest
  * one — that carries `expectedDigest` / `actualDigest` instead — so a pane that
  * rendered only `reason` showed a bare `✗ notes.md` and never said why, leaving
- * the failure unactionable (Copilot). Digests are truncated because the pane is
+ * the failure unactionable. Digests are truncated because the pane is
  * 40-odd columns wide and the first bytes are enough to see that two differ;
  * the CLI report carries them in full.
  */
@@ -162,7 +162,7 @@ export function SkillsTab({
    * another's name — and rather than by its URI alone, because a refresh can
    * replace the manifest or the frontmatter *under the same URI*, and a
    * URI-keyed verdict would then present hashes and findings computed for the
-   * previous snapshot as if they described the new one (Copilot).
+   * previous snapshot as if they described the new one.
    *
    * The same key the web screen uses, for the same reason: re-verifying after a
    * metadata-only refresh is the cheap direction to be wrong in; showing a
@@ -338,7 +338,6 @@ export function SkillsTab({
                   // the same reason: a malformed listing can repeat a URI, and
                   // this pane exists to show BOTH entries — a URI key would
                   // collide them and let React drop or reuse the wrong row
-                  // (Copilot).
                   <Box
                     key={`${index}:${skill.uri}`}
                     paddingY={0}
@@ -397,7 +396,7 @@ export function SkillsTab({
                   "conforms" sat directly above "Verification FAILED" in the
                   same pane and flatly contradicted it — these are the static
                   checks against the LISTING, and passing them says nothing
-                  about the bytes the server serves (Copilot). Same wording
+                  about the bytes the server serves. Same wording
                   problem, and the same fix, as the web screen's "No structural
                   issues". */}
               <Box marginTop={1} flexShrink={0}>
@@ -420,7 +419,7 @@ export function SkillsTab({
                   512-row manifest it would be off-screen, which is the same as
                   absent. `verifySkills` sets `incomplete` precisely so a
                   consumer can tell "not fully checked" from a real failure
-                  (Copilot). */}
+                 */}
               {activeReport?.incomplete && (
                 <>
                   <Box marginTop={1} flexShrink={0}>
@@ -447,7 +446,7 @@ export function SkillsTab({
                 // just above — a raw comparison misses a report row recorded
                 // under an equivalent spelling, while `extraReportFiles`
                 // suppresses it as already covered, and the verdict renders
-                // nowhere (Copilot).
+                // nowhere.
                 const fileReport = activeReport?.files.find(
                   (file) =>
                     skillUriIdentity(file.uri) ===
@@ -486,7 +485,7 @@ export function SkillsTab({
                   skill has no rows at all, yet a failed read of its own
                   SKILL.md is recorded so the failure is visible. Rendering only
                   manifest rows left "Verification FAILED" with no diagnosis
-                  anywhere on screen (Copilot). */}
+                  anywhere on screen. */}
               {extraReportFiles.length > 0 && (
                 <>
                   <Box marginTop={1} flexShrink={0}>
@@ -545,7 +544,7 @@ export function SkillsTab({
                         // true for an `incomplete` report — nothing checked
                         // was wrong — so an `ok`-first branch printed
                         // "Verified" for a walk the read bounds cut short and
-                        // the INCOMPLETE arm was unreachable (Copilot).
+                        // the INCOMPLETE arm was unreachable.
                         VERIFY_STATUS[activeReport.outcome]
                       : "[Enter to verify digests and frontmatter]"}
                 </Text>
