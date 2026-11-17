@@ -73,8 +73,8 @@
     },
     {
       "path": "fixture-server.mjs",
-      "bytes": 3500,
-      "sha256": "7535630d2300003b1a150f2028520ecff1228afd93366fdb7295b943affedb74"
+      "bytes": 5562,
+      "sha256": "06f63ef48b6820d014ce5ea1fc8aafcbf13ca10a170377e9f64bfa8acc072348"
     },
     {
       "path": "invalid-preserved.json",
