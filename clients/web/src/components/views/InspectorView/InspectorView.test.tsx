@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import userEvent from "@testing-library/user-event";
 import type {
   InitializeResult,
@@ -21,12 +21,18 @@ import {
 import { InspectorView, type InspectorViewProps } from "./InspectorView";
 import { noopPagination } from "../../../test/fixtures/pagination";
 
-// Keep the desktop inspector path in this suite; narrow navigation has its own control.
+const viewport = vi.hoisted(() => ({ narrow: false }));
+beforeEach(() => {
+  viewport.narrow = false;
+});
+
+// Exercise both desktop monitoring and narrow diagnostic navigation.
 vi.mock("@mantine/hooks", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@mantine/hooks")>();
   return {
     ...actual,
-    useMediaQuery: (query: string): boolean => !query.includes("max-width"),
+    useMediaQuery: (query: string): boolean =>
+      query.includes("max-width") ? viewport.narrow : true,
   };
 });
 import type { BridgeFactory } from "../../elements/AppRenderer/AppRenderer";
@@ -2176,6 +2182,60 @@ describe("InspectorView", () => {
         overrides,
       );
     }
+
+    it("keeps a pinned monitor reachable in narrow navigation and restores the desktop column", async () => {
+      viewport.narrow = true;
+      window.localStorage.setItem("inspector.monitor.pinned", "true");
+      const props = connectedHttp();
+      const { rerender } = renderWithMantine(
+        <StatefulInspectorViewHost {...props} />,
+      );
+      expect(
+        screen.queryByRole("button", { name: "Close monitoring sidebar" }),
+      ).toBeNull();
+      const user = userEvent.setup();
+      await user.click(
+        await screen.findByRole("textbox", { name: "Inspector view" }),
+      );
+      await user.click(await screen.findByRole("option", { name: "Network" }));
+      expect(
+        screen.getByRole("textbox", { name: "Inspector view" }),
+      ).toHaveValue("Network");
+      expect(window.localStorage.getItem("inspector.monitor.pinned")).toBe(
+        "true",
+      );
+      viewport.narrow = false;
+      rerender(<StatefulInspectorViewHost {...props} />);
+      expect(
+        await screen.findByRole("button", { name: "Close monitoring sidebar" }),
+      ).toBeInTheDocument();
+    });
+
+    it("keeps captured diagnostics selectable after a narrow connection failure", async () => {
+      viewport.narrow = true;
+      const onActiveTabChange = vi.fn();
+      renderWithMantine(
+        <InspectorView
+          {...failedHttp({
+            shell: { onActiveTabChange },
+            console: {
+              stderrLogs: [
+                { timestamp: new Date(), message: "Synthetic process failed" },
+              ],
+            },
+          })}
+        />,
+      );
+      expect(
+        screen.queryByRole("button", { name: "Open monitoring sidebar" }),
+      ).toBeNull();
+      const user = userEvent.setup();
+      await user.click(
+        await screen.findByRole("textbox", { name: "Inspector view" }),
+      );
+      await user.click(await screen.findByRole("option", { name: "Console" }));
+      expect(onActiveTabChange).toHaveBeenCalledWith("Console");
+    });
 
     it("opens the monitoring sidebar on a failed connection attempt (#1621)", async () => {
       const { rerender } = renderWithMantine(

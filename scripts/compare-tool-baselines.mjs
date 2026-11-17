@@ -1,11 +1,6 @@
 /** Compare exported tool definitions offline using the same policy as the web app. */
-import { constants } from "node:fs";
-import { open } from "node:fs/promises";
-import {
-  compareContracts,
-  importContracts,
-  MAX_IMPORT_BYTES,
-} from "../core/toolContracts.ts";
+import { readJsonInput } from "./lib/baseline-input.mjs";
+import { compareContracts, importContracts } from "../core/toolContracts.ts";
 
 const usage = [
   "Usage: node scripts/compare-tool-baselines.mjs baseline.json current.json",
@@ -14,45 +9,6 @@ const usage = [
   "Exit codes: 0 match, 1 differences, 2 invalid input or arguments.",
   "",
 ].join("\n");
-
-async function readBaseline(path) {
-  // Nonblocking open prevents a FIFO supplied as a filename from hanging admission.
-  const file = await open(
-    path,
-    constants.O_RDONLY | (constants.O_NONBLOCK ?? 0),
-  );
-  try {
-    const info = await file.stat();
-    if (!info.isFile())
-      throw new Error("Baseline input must be a regular file.");
-    if (info.size > MAX_IMPORT_BYTES)
-      throw new Error("Baseline file exceeds the 4,000,000-byte import limit.");
-    // Read at most limit+1 even if the file grows after stat().
-    const bytes = Buffer.alloc(MAX_IMPORT_BYTES + 1);
-    let length = 0;
-    while (length < bytes.length) {
-      const read = await file.read(
-        bytes,
-        length,
-        bytes.length - length,
-        length,
-      );
-      if (read.bytesRead === 0) break;
-      length += read.bytesRead;
-    }
-    if (length > MAX_IMPORT_BYTES)
-      throw new Error("Baseline file exceeds the 4,000,000-byte import limit.");
-    try {
-      return new TextDecoder("utf-8", { fatal: true }).decode(
-        bytes.subarray(0, length),
-      );
-    } catch {
-      throw new Error("Baseline file must contain valid UTF-8.");
-    }
-  } finally {
-    await file.close();
-  }
-}
 
 async function main(args) {
   if (args.length === 1 && args[0] === "--help") {
@@ -64,12 +20,15 @@ async function main(args) {
     return 2;
   }
   try {
-    const first = await readBaseline(args[0]);
-    const header = JSON.parse(first);
+    const first = await readJsonInput(args[0]);
+    const header = JSON.parse(first.text);
     if (typeof header?.server !== "string" || !header.server.trim())
       throw new Error("Baseline must identify its catalog server.");
-    const before = importContracts(first, header.server);
-    const after = importContracts(await readBaseline(args[1]), before.server);
+    const before = importContracts(first.text, header.server);
+    const after = importContracts(
+      (await readJsonInput(args[1])).text,
+      before.server,
+    );
     const tools = Object.values(after.definitions).map((definition) =>
       JSON.parse(definition),
     );

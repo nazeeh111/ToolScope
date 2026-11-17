@@ -122,7 +122,7 @@ export function captureContracts(
 }
 
 /** JSON.parse discards repeated keys. Reject that ambiguity before using a value. */
-function parseUniqueJson(raw: string): unknown {
+export function parseUniqueJson(raw: string): unknown {
   const value: unknown = JSON.parse(raw, (_key: string, entry: unknown) => {
     if (typeof entry === "number" && !Number.isFinite(entry))
       throw new Error("Baseline contains an out-of-range number.");

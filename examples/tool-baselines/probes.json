@@ -1,0 +1,11 @@
+{
+  "format": "toolscope.probes/v1",
+  "cases": [
+    {
+      "id": "lookup-known-id",
+      "tool": "lookup",
+      "direction": "input",
+      "value": { "id": "synthetic-42" }
+    }
+  ]
+}

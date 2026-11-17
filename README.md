@@ -102,3 +102,5 @@ Weekly grouped dependency update PRs cover all five npm lockfiles and GitHub Act
 ## License
 
 See [LICENSE](LICENSE) for the applicable Apache-2.0, MIT and CC-BY-4.0 terms. The same file records documentation attribution and ToolScope modifications.
+
+For concrete schema regression examples, run `npm run toolscope:probe -- before.json after.json cases.json`. This offline command checks synthetic input and output examples in the correct consumer direction, without invoking a server. See [case suites, report limits and exit codes](docs/offline-comparison.md#check-known-calls-and-result-shapes).

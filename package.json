@@ -89,7 +89,8 @@
     "toolscope": "node scripts/toolscope.mjs",
     "build:examples": "npm --prefix clients/web run test-servers:build",
     "build:toolscope": "npm run build && npm run build:examples",
-    "toolscope:compare": "node scripts/compare-tool-baselines.mjs"
+    "toolscope:compare": "node scripts/compare-tool-baselines.mjs",
+    "toolscope:probe": "node scripts/probe-tool-baselines.mjs"
   },
   "dependencies": {
     "@hono/node-server": "2.1.8",
