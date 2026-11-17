@@ -1,0 +1,26 @@
+{
+  "format": "toolscope.comparison/v1",
+  "server": "Voltage fixture",
+  "matched": false,
+  "changes": [
+    {
+      "name": "read_voltage",
+      "kind": "changed",
+      "fields": [
+        "inputSchema",
+        "outputSchema"
+      ],
+      "details": [
+        {
+          "path": "/inputSchema/properties/unit/enum/1",
+          "kind": "removed"
+        },
+        {
+          "path": "/outputSchema/properties/status/enum/1",
+          "kind": "added"
+        }
+      ],
+      "detailsTruncated": false
+    }
+  ]
+}

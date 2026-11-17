@@ -1,0 +1,41 @@
+{
+  "format": "toolscope.probes/v1",
+  "cases": [
+    {
+      "id": "V-call-control",
+      "tool": "read_voltage",
+      "direction": "input",
+      "value": {
+        "unit": "V"
+      }
+    },
+    {
+      "id": "mV-call-removed",
+      "tool": "read_voltage",
+      "direction": "input",
+      "value": {
+        "unit": "mV"
+      }
+    },
+    {
+      "id": "ready-result-control",
+      "tool": "read_voltage",
+      "direction": "output",
+      "value": {
+        "value": 3.3,
+        "unit": "V",
+        "status": "ready"
+      }
+    },
+    {
+      "id": "warming-result-added",
+      "tool": "read_voltage",
+      "direction": "output",
+      "value": {
+        "value": 3.3,
+        "unit": "V",
+        "status": "warming"
+      }
+    }
+  ]
+}

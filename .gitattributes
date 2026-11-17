@@ -1,2 +1,4 @@
 * text=auto eol=lf
 package-lock.json linguist-generated=true
+# Hash-addressed synthetic presentation artifacts.
+docs/presentation/** -text -eol

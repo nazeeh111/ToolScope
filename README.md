@@ -6,6 +6,19 @@ A local workspace for tools, resources and prompts exposed through the Model Con
 
 Adapted from [MCP Inspector](https://github.com/modelcontextprotocol/inspector), with ToolScope's launcher, baseline workflows, contract checks and visual identity. The [license and attribution](LICENSE) record the inherited work. No model, subscription or API key is needed for the included synthetic examples.
 
+## Follow one live contract change
+
+An actual local stdio session negotiates MCP `2025-11-25`, inspects one resource and prompt, and saves the synthetic `read_voltage` definition. Revision 2 removes `mV` calls and adds the possible result `warming`. The structural comparison names both exact JSON pointers; the offline checker witnesses why both compatibility directions matter.
+
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/presentation/contract-mobile.png">
+  <img src="docs/presentation/contract.png" alt="An old millivolt call fails the new input enum, while a new warming result fails the old ready-only consumer. Two supplied controls remain accepted. This finite example does not prove universal compatibility.">
+</picture>
+
+[Reproduce and reopen the example](docs/presentation/README.md) · [Download the reader bundle](docs/presentation/toolscope-contract-reader.zip) · [Actual desktop workspace](docs/presentation/workspace-desktop.png) · [Actual phone result](docs/presentation/workspace-mobile.png)
+
+These fixed values are synthetic software fixtures, not voltage measurements. The four supplied probes produce two witnessed regressions and two accepted controls, with `compatibilityProven: false`. Cancellation and malformed baseline import preserved the saved capture. The actual workspace and original MCP Inspector attribution remain intact.
+
 ## Start with a concrete change
 
 Use **Node.js 24**. From a source checkout:
