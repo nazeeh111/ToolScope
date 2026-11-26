@@ -1,54 +1,50 @@
 # ToolScope
 
-**Inspect MCP servers. Review what changed. Check the examples your client relies on.**
+**The old fixture returned 3300 mV. The revised contract rejects that call.** The synthetic `read_voltage` tool dropped `mV` from its input enum. A valid new `V` call returns **3.3 V · warming**, a status the old consumer schema rejects. Both values are fixed fixture outputs.
 
-A local workspace for tools, resources and prompts exposed through the Model Context Protocol. Connect a server, exercise its tools, save definition baselines and review changes. Use the offline CLI to check known call and result examples against two versions of a schema. Includes a browser client, scriptable CLI, terminal UI and local test servers.
+[Inspect the fixture in the GUI](docs/presentation/README.md#run-the-real-inspector) · [Check the saved contracts with the CLI](#check-the-saved-contracts-with-the-cli) · [Download the reader bundle](https://raw.githubusercontent.com/nazeeh111/ToolScope/8fead5a1a1eccdfbb2fe2f3438d53b9cf16e503f/docs/presentation/toolscope-contract-reader.zip)
 
-Adapted from [MCP Inspector](https://github.com/modelcontextprotocol/inspector), with ToolScope's launcher, baseline workflows, contract checks and visual identity. The [license and attribution](LICENSE) record the inherited work. No model, subscription or API key is needed for the included synthetic examples.
+ToolScope is a local workspace adapted from [MCP Inspector](https://github.com/modelcontextprotocol/inspector). See the [license and upstream attribution](LICENSE). The bundled example needs no model, account or hardware.
 
-## Follow one live contract change
-
-An actual local stdio session negotiates MCP `2025-11-25`, inspects one resource and prompt, and saves the synthetic `read_voltage` definition. Revision 2 removes `mV` calls and adds the possible result `warming`. The structural comparison names both exact JSON pointers; the offline checker witnesses why both compatibility directions matter.
+<a id="follow-one-live-contract-change"></a>
 
 <picture>
   <source media="(max-width: 600px)" srcset="docs/presentation/contract-mobile.png">
   <img src="docs/presentation/contract.png" alt="An old millivolt call fails the new input enum, while a new warming result fails the old ready-only consumer. Two supplied controls remain accepted. This finite example does not prove universal compatibility.">
 </picture>
 
-[Reproduce and reopen the example](docs/presentation/README.md) · [Download the reader bundle](https://raw.githubusercontent.com/nazeeh111/ToolScope/8fead5a1a1eccdfbb2fe2f3438d53b9cf16e503f/docs/presentation/toolscope-contract-reader.zip) · [Actual desktop workspace](docs/presentation/workspace-desktop.png) · [Actual phone result](docs/presentation/workspace-mobile.png)
+The offline checker found **two regressions and two accepted controls** among four supplied examples. Its report records `compatibilityProven: false`. [Exact report](docs/presentation/probe-report.json) · [Actual workspace on desktop](docs/presentation/workspace-desktop.png) and [phone](docs/presentation/workspace-mobile.png)
 
-These fixed values are synthetic software fixtures, not voltage measurements. The four supplied probes produce two witnessed regressions and two accepted controls, with `compatibilityProven: false`. Cancellation and malformed baseline import preserved the saved capture. The actual workspace and original MCP Inspector attribution remain intact.
+<a id="start-with-a-concrete-change"></a>
 
-## Start with a concrete change
+## Check the saved contracts with the CLI
 
-Use **Node.js 24**. From a source checkout:
+Use **Node.js 24** and run these commands from a source checkout. They use the same voltage fixture and require no server connection.
 
 ```sh
 git clone https://github.com/nazeeh111/ToolScope.git
 cd ToolScope
 INSPECTOR_SKIP_CLIENT_INSTALL=1 npm ci
-node scripts/probe-tool-baselines.mjs examples/tool-baselines/consumer-before.json examples/tool-baselines/consumer-after.json examples/tool-baselines/consumer-probes.json
+node scripts/probe-tool-baselines.mjs docs/presentation/before.json docs/presentation/after.json docs/presentation/probes.json
 ```
 
-This synthetic temperature interface drops Fahrenheit inputs and adds a new result status. The command exits **1**, identifying two concrete regression examples:
+The command exits **1** because it witnesses two supplied regressions.
 
-| Supplied example | Old schema | New schema | Result |
-| --- | --- | --- | --- |
-| Input `{ "unit": "C" }` | Accepts | Accepts | Accepted example |
-| Input `{ "unit": "F" }` | Accepts | Rejects | Input regression |
-| Output `{ "status": "ready" }` | Accepts | Accepts | Accepted example |
-| Output `{ "status": "warming" }` | Rejects | Accepts | Output regression |
+| Supplied example | Old schema | New schema |
+| --- | --- | --- |
+| Input `unit: "V"` | Accepts | Accepts |
+| Input `unit: "mV"` | Accepts | Rejects |
+| Result `3.3 V, ready` | Accepts | Accepts |
+| Result `3.3 V, warming` | Rejects | Accepts |
 
-Inputs check what an existing caller can still send. Outputs check whether an existing consumer can accept a possible new result. The report records SHA-256 and byte counts for all three input files, without embedding their values or paths. It never calls a tool or connects to a server.
-
-A passing example suite covers only those examples. Reports explicitly retain `scope: "supplied-examples-only"` and `compatibilityProven: false`. Unsupported schemas and inconclusive cases remain visible. [Walk through the report and limits](docs/review-a-tool-change.md).
+The input check asks whether a new server accepts an old call. The output check asks whether an old consumer accepts a possible new result. The report records hashes and byte counts without embedding the checked values or file paths. Unsupported schemas and inconclusive cases remain visible. [Report format and limits](docs/review-a-tool-change.md).
 
 <a id="run-the-desktop-app"></a>
 <a id="check-a-changing-tool-interface"></a>
 
 ## Use the inspector
 
-Install the four clients and build the local examples:
+Connect a local MCP server to inspect tools, resources and prompts, then save a definition baseline and review changes. Install the four clients and build the local examples:
 
 ```sh
 npm --prefix clients/web ci
