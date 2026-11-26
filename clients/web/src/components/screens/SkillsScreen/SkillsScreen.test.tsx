@@ -562,7 +562,9 @@ describe("SkillsScreen", () => {
     renderWithMantine(<ControlledSkillsScreen />);
     await user.click(screen.getByText("data-analysis"));
     await user.click(screen.getByRole("button", { name: /Verify all/ }));
-    expect(await screen.findAllByText("verified")).toHaveLength(2);
+    await waitFor(() =>
+      expect(screen.getAllByText("verified")).toHaveLength(2),
+    );
   });
 
   it("reports a digest mismatch loudly, with both digests", async () => {
@@ -1512,10 +1514,27 @@ describe("SkillsScreen", () => {
 
   it("drops verification results when the selection changes", async () => {
     const user = userEvent.setup();
-    renderWithMantine(<ControlledSkillsScreen />);
+    let resolveReference!: (value: { text: string }) => void;
+    const reference = new Promise<{ text: string }>((resolve) => {
+      resolveReference = resolve;
+    });
+    const onReadSkillFile = (uri: string) =>
+      uri === "skill://data-analysis/reference.md"
+        ? reference
+        : readFixtureFile(uri);
+    renderWithMantine(
+      <ControlledSkillsScreen onReadSkillFile={onReadSkillFile} />,
+    );
     await user.click(screen.getByText("data-analysis"));
     await user.click(screen.getByRole("button", { name: /Verify all/ }));
-    expect(await screen.findAllByText("verified")).toHaveLength(2);
+    // Verification workers publish each verdict as its file settles.
+    await waitFor(() =>
+      expect(screen.getAllByText("verified")).toHaveLength(1),
+    );
+    resolveReference({ text: REF_TEXT });
+    await waitFor(() =>
+      expect(screen.getAllByText("verified")).toHaveLength(2),
+    );
 
     // A verdict belongs to the skill it was computed for; carrying it across a
     // selection change would attribute one skill's result to another.
@@ -1702,7 +1721,9 @@ describe("SkillsScreen", () => {
       />,
     );
     await user.click(screen.getByRole("button", { name: /Verify all/ }));
-    expect(await screen.findAllByText("verified")).toHaveLength(2);
+    await waitFor(() =>
+      expect(screen.getAllByText("verified")).toHaveLength(2),
+    );
 
     rerender(
       <SkillsScreen

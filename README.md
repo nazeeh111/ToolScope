@@ -15,7 +15,7 @@ An actual local stdio session negotiates MCP `2025-11-25`, inspects one resource
   <img src="docs/presentation/contract.png" alt="An old millivolt call fails the new input enum, while a new warming result fails the old ready-only consumer. Two supplied controls remain accepted. This finite example does not prove universal compatibility.">
 </picture>
 
-[Reproduce and reopen the example](docs/presentation/README.md) · [Download the reader bundle](docs/presentation/toolscope-contract-reader.zip) · [Actual desktop workspace](docs/presentation/workspace-desktop.png) · [Actual phone result](docs/presentation/workspace-mobile.png)
+[Reproduce and reopen the example](docs/presentation/README.md) · [Download the reader bundle](https://raw.githubusercontent.com/nazeeh111/ToolScope/8fead5a1a1eccdfbb2fe2f3438d53b9cf16e503f/docs/presentation/toolscope-contract-reader.zip) · [Actual desktop workspace](docs/presentation/workspace-desktop.png) · [Actual phone result](docs/presentation/workspace-mobile.png)
 
 These fixed values are synthetic software fixtures, not voltage measurements. The four supplied probes produce two witnessed regressions and two accepted controls, with `compatibilityProven: false`. Cancellation and malformed baseline import preserved the saved capture. The actual workspace and original MCP Inspector attribution remain intact.
 
